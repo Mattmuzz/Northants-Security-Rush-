@@ -8,17 +8,20 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="NS Rush">
-    <title>Northants Security Rush - Mobile Edition</title>
+    <title>Northants Security Rush - Trade Counter Edition</title>
+
+    <!-- Fast Asynchronous Three.js r128 WebGL Engine -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
 
     <!-- Embedded Web App Manifest for Instant Android Home Screen / PWA / APK Packaging -->
     <link rel="manifest" id="pwa-manifest" href='data:application/manifest+json,{"name":"Northants Security Rush","short_name":"NS Rush","description":"First-Person Alarm Engineer Game for Northants Security","start_url":".","display":"fullscreen","orientation":"landscape","background_color":"#0F2C59","theme_color":"#FF6B00","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 120 120%27%3E%3Crect width=%27120%27 height=%27120%27 rx=%2726%27 fill=%27%230F2C59%27 stroke=%27%23FF6B00%27 stroke-width=%278%27/%3E%3Ctext x=%2760%27 y=%2778%27 font-family=%27sans-serif%27 font-weight=%27900%27 font-size=%2756%27 fill=%27%23FF6B00%27 text-anchor=%27middle%27%3ENS%3C/text%3E%3C/svg%3E","sizes":"192x192","type":"image/svg+xml","purpose":"any maskable"}]}'>
 
-    <!-- Zero-Dependency Embedded CSS (Replaces external Tailwind & Google Fonts CDNs for <50ms instant startup) -->
+    <!-- Zero-Dependency Embedded CSS (<50ms Instant Android Load) -->
     <style>
         :root {
-            --ns-blue: #0F2C59;
+            --ns-blue: #004B93;
+            --ns-navy: #0F2C59;
             --ns-dark: #07192B;
-            --ns-bright-blue: #1D4ED8;
             --ns-orange: #FF6B00;
             --ns-amber: #FF8800;
         }
@@ -44,7 +47,7 @@
             letter-spacing: 0.03em;
         }
 
-        /* Compact Utility Classes so zero external CSS CDN is required */
+        /* Compact Utility Classes */
         .hidden { display: none !important; }
         .flex { display: flex; }
         .inline-flex { display: inline-flex; }
@@ -60,7 +63,6 @@
         .justify-center { justify-content: center; }
         .justify-between { justify-content: space-between; }
         .justify-around { justify-content: space-around; }
-        .gap-0\.5 { gap: 2px; }
         .gap-1 { gap: 4px; }
         .gap-1\.5 { gap: 6px; }
         .gap-2 { gap: 8px; }
@@ -89,35 +91,24 @@
         .p-3\.5 { padding: 14px; }
         .p-4 { padding: 16px; }
         .p-5 { padding: 20px; }
-        .p-6 { padding: 24px; }
         .px-2 { padding-left: 8px; padding-right: 8px; }
         .px-2\.5 { padding-left: 10px; padding-right: 10px; }
         .px-3 { padding-left: 12px; padding-right: 12px; }
-        .px-3\.5 { padding-left: 14px; padding-right: 14px; }
         .px-4 { padding-left: 16px; padding-right: 16px; }
-        .px-6 { padding-left: 24px; padding-right: 24px; }
-        .py-0\.5 { padding-top: 2px; padding-bottom: 2px; }
         .py-1 { padding-top: 4px; padding-bottom: 4px; }
         .py-1\.5 { padding-top: 6px; padding-bottom: 6px; }
         .py-2 { padding-top: 8px; padding-bottom: 8px; }
         .py-2\.5 { padding-top: 10px; padding-bottom: 10px; }
         .py-3 { padding-top: 12px; padding-bottom: 12px; }
-        .py-3\.5 { padding-top: 14px; padding-bottom: 14px; }
-        .py-4 { padding-top: 16px; padding-bottom: 16px; }
-        .m-auto { margin: auto; }
         .my-2 { margin-top: 8px; margin-bottom: 8px; }
-        .my-4 { margin-top: 16px; margin-bottom: 16px; }
-        .my-5 { margin-top: 20px; margin-bottom: 20px; }
         .mt-1 { margin-top: 4px; }
         .mt-2 { margin-top: 8px; }
         .mb-1 { margin-bottom: 4px; }
         .mb-2 { margin-bottom: 8px; }
         .mb-3 { margin-bottom: 12px; }
         .mb-4 { margin-bottom: 16px; }
-        .mb-5 { margin-bottom: 20px; }
         .ml-2 { margin-left: 8px; }
         .mr-2 { margin-right: 8px; }
-        .ml-auto { margin-left: auto; }
         .text-left { text-align: left; }
         .text-center { text-align: center; }
         .text-right { text-align: right; }
@@ -146,7 +137,7 @@
         .overflow-hidden { overflow: hidden; }
         .overflow-y-auto { overflow-y: auto; }
 
-        /* Theme Colors & UI Panels */
+        /* Theme Colors */
         .bg-ns-blue { background-color: rgba(15, 44, 89, 0.94); }
         .bg-ns-dark { background-color: rgba(7, 25, 43, 0.95); }
         .bg-ns-orange { background-color: #FF6B00; }
@@ -184,16 +175,23 @@
             height: 100%;
             z-index: 10;
             pointer-events: none;
-            padding: max(10px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+            padding: max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
         }
 
         /* Animations */
         @keyframes pulse-orange {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 0, 0.75); }
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 0, 0.8); }
             50% { box-shadow: 0 0 0 12px rgba(255, 107, 0, 0); }
         }
         .pulse-btn {
-            animation: pulse-orange 1.8s infinite;
+            animation: pulse-orange 1.6s infinite;
+        }
+        @keyframes pulse-blue {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.8); }
+            50% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+        }
+        .pulse-door-btn {
+            animation: pulse-blue 1.6s infinite;
         }
         @keyframes radio-wave {
             0%, 100% { transform: scaleY(0.3); }
@@ -214,18 +212,9 @@
         .fpv-bob {
             animation: float-hands 2.2s ease-in-out infinite;
         }
-        @keyframes burglar-creep {
-            0% { transform: translateX(-110%) scaleX(1); }
-            45% { transform: translateX(8%) scaleX(1); }
-            55% { transform: translateX(8%) scaleX(-1); }
-            100% { transform: translateX(-110%) scaleX(-1); }
-        }
-        .burglar-run {
-            animation: burglar-creep 4.2s ease-in-out infinite;
-        }
         @keyframes bounce-anim {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
+            50% { transform: translateY(-7px); }
         }
         .animate-bounce {
             animation: bounce-anim 0.9s infinite;
@@ -234,7 +223,7 @@
         /* Radio Slide-in */
         #david-radio {
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
-            max-width: 340px;
+            max-width: 330px;
         }
         .radio-hidden {
             transform: translateX(-125%);
@@ -247,18 +236,18 @@
 
         /* Terminal Nodes */
         .terminal-node {
-            background: #0F2C59;
+            background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%);
             color: #fff;
-            border: 2px solid #3B82F6;
-            border-radius: 12px;
-            padding: 10px 12px;
+            border: 2px solid #475569;
+            border-radius: 10px;
+            padding: 8px 10px;
             width: 100%;
             display: flex;
             align-items: center;
             justify-content: space-between;
             font-weight: 700;
-            font-size: 13px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.35);
+            font-size: 12px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 4px 10px rgba(0,0,0,0.45);
             touch-action: none;
         }
         .terminal-node.selected {
@@ -267,9 +256,46 @@
             transform: scale(1.03);
         }
         .terminal-node.connected {
-            background: rgba(15, 23, 42, 0.9);
+            background: linear-gradient(180deg, #064E3B 0%, #022C22 100%);
             border-color: #22C55E;
             color: #4ADE80;
+        }
+        .screw-head {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #F8FAFC, #94A3B8 60%, #475569 100%);
+            border: 2px solid #334155;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.4);
+        }
+        .screw-head::after {
+            content: '';
+            width: 12px;
+            height: 2.5px;
+            background: #334155;
+            border-radius: 1px;
+            display: block;
+        }
+        .connected .screw-head {
+            transform: rotate(135deg);
+            border-color: #22C55E;
+        }
+
+        /* LCD Keypad Display */
+        .lcd-screen {
+            background: linear-gradient(180deg, #84CC16 0%, #65A30D 100%);
+            color: #1A2E05;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 900;
+            border: 3px solid #334155;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.45), 0 0 12px rgba(132, 204, 22, 0.45);
+            text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+            letter-spacing: 0.06em;
         }
 
         /* Tea Vignette */
@@ -277,23 +303,24 @@
             box-shadow: inset 0 0 85px rgba(255, 165, 0, 0.5);
         }
 
-        /* Responsive Mobile Adjustments */
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+        /* Shop Item Card */
+        .shop-card {
+            background: #091E3A;
+            border: 2px solid #1E40AF;
+            border-radius: 14px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
-        @media (max-width: 640px) {
-            .feature-grid {
-                grid-template-columns: 1fr;
-            }
-            .hide-mobile {
-                display: none !important;
-            }
-            .terminal-node {
-                padding: 8px 9px;
-                font-size: 11px;
-            }
+        .shop-card.purchased {
+            border-color: #22C55E;
+            background: #022C22;
+        }
+
+        @media (max-width: 680px) {
+            .hide-mobile { display: none !important; }
+            .terminal-node { padding: 7px 8px; font-size: 11px; }
         }
     </style>
 </head>
@@ -305,112 +332,96 @@
     <!-- Main HUD & UI Overlay -->
     <div id="ui-layer" class="flex flex-col justify-between">
 
-        <!-- TOP BAR: Brand, SLA Timer, Pay Packet & Radio -->
-        <div class="flex flex-wrap items-center justify-between gap-2 w-full z-20">
+        <!-- TOP BAR: Brand, Room Location, SLA Timer, Torch, Pay Packet & Radio -->
+        <div class="flex flex-wrap items-center justify-between gap-1.5 w-full z-20">
             <!-- Brand & Current Property -->
-            <div class="flex items-center gap-2.5 bg-ns-blue border-ns-orange rounded-xl px-3 py-1.5 shadow-lg interactive">
-                <div class=" bg-ns-orange rounded-lg flex items-center justify-center font-tech font-extrabold text-ns-blue" style="width:36px;height:36px;font-size:18px;">
+            <div class="flex items-center gap-2 bg-ns-blue border-ns-orange rounded-xl px-2.5 py-1.5 shadow-lg interactive">
+                <div class="bg-ns-orange rounded-lg flex items-center justify-center font-tech font-extrabold text-ns-blue" style="width:34px;height:34px;font-size:17px;">
                     NS
                 </div>
                 <div>
-                    <div class="flex items-center gap-2">
-                        <span class="font-tech font-extrabold text-ns-orange" style="font-size:13px;">NORTHANTS SECURITY</span>
-                        <span id="hud-level" class="rounded px-2 py-0.5 font-bold" style="background:#1D4ED8;font-size:10px;">SHIFT 1/5</span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="font-tech font-extrabold text-ns-orange" style="font-size:12px;">NORTHANTS SECURITY</span>
+                        <span id="hud-level" class="rounded px-1.5 py-0.5 font-bold" style="background:#004B93;font-size:9.5px;">JOB 1/5</span>
                     </div>
-                    <div id="hud-address" style="font-size:11px;color:#BFDBFE;font-weight:600;">14 Kettering Road, Northampton</div>
+                    <div id="hud-address" style="font-size:10.5px;color:#BFDBFE;font-weight:600;">14 Kettering Rd • <span id="hud-room-badge" style="color:#FDE047;">Street</span></div>
                 </div>
             </div>
 
             <!-- Center Objective & SLA Countdown -->
-            <div class="flex items-center gap-3 bg-ns-blue border-ns-blue rounded-xl px-3.5 py-1.5 shadow-lg">
+            <div class="flex items-center gap-2.5 bg-ns-blue border-ns-blue rounded-xl px-3 py-1 shadow-lg">
                 <div>
-                    <div class="uppercase font-bold" style="font-size:9px;color:#93C5FD;letter-spacing:0.08em;">Target Job</div>
-                    <div id="hud-objective" class="font-bold" style="font-size:12px;color:#FBBF24;">Walk to No. 14 & Fit Alarm</div>
+                    <div class="uppercase font-bold" style="font-size:8.5px;color:#93C5FD;letter-spacing:0.06em;">Current Task</div>
+                    <div id="hud-objective" class="font-bold" style="font-size:11.5px;color:#FBBF24;">Enter No. 14 & Find Panel</div>
                 </div>
-                <div style="width:2px;height:28px;background:#1E40AF;"></div>
-                <div class="text-center" style="min-width:64px;">
-                    <div class="uppercase font-bold" style="font-size:9px;color:#93C5FD;letter-spacing:0.08em;">SLA Timer</div>
-                    <div id="hud-timer" class="font-tech font-extrabold" style="font-size:20px;">48.0s</div>
+                <div style="width:2px;height:26px;background:#1E40AF;"></div>
+                <div class="text-center" style="min-width:58px;">
+                    <div class="uppercase font-bold" style="font-size:8.5px;color:#93C5FD;letter-spacing:0.06em;">SLA Timer</div>
+                    <div id="hud-timer" class="font-tech font-extrabold" style="font-size:18px;">65.0s</div>
                 </div>
             </div>
 
-            <!-- Right Score, Radio David & Audio Toggle -->
-            <div class="flex items-center gap-2 bg-ns-blue border-ns-orange rounded-xl px-3 py-1.5 shadow-lg interactive">
-                <div class="text-right mr-2">
-                    <div class="uppercase font-bold" style="font-size:9px;color:#93C5FD;">Pay Packet</div>
-                    <div id="hud-score" class="font-tech font-extrabold text-ns-orange" style="font-size:18px;">£0</div>
+            <!-- Right Controls: Torch, Score, Shop, Radio David & Audio Toggle -->
+            <div class="flex items-center gap-1.5 bg-ns-blue border-ns-orange rounded-xl px-2.5 py-1.5 shadow-lg interactive">
+                <div class="text-right mr-1">
+                    <div class="uppercase font-bold" style="font-size:8.5px;color:#93C5FD;">Pay</div>
+                    <div id="hud-score" class="font-tech font-extrabold text-ns-orange" style="font-size:16px;">£0</div>
                 </div>
-                <button id="btn-joke" title="Radio Boss David for a Dad Joke" class="rounded-lg px-2.5 py-2 font-bold flex items-center gap-1" style="background:#1E40AF;color:#fff;border:1px solid #3B82F6;font-size:12px;">
-                    <span>📻</span> <span class="hide-mobile">David</span>
+                <button id="btn-shop" class="rounded-lg px-2.5 py-1.5 font-bold flex items-center gap-1" style="background:#10B981;color:#07192B;font-size:11.5px;">
+                    <span>🛒</span> <span class="hide-mobile">Shop</span>
                 </button>
-                <button id="btn-mute" title="Toggle Sound" class="bg-ns-orange text-ns-blue font-bold p-2 rounded-lg" style="font-size:14px;">
-                    🔊
+                <button id="btn-torch" title="Toggle Headtorch (T)" class="rounded-lg px-2.5 py-1.5 font-bold flex items-center gap-1" style="background:#F59E0B;color:#07192B;font-size:11.5px;">
+                    <span>🔦</span> <span id="torch-label">ON</span>
+                </button>
+                <button id="btn-joke" title="Radio Boss David" class="rounded-lg px-2.5 py-1.5 font-bold" style="background:#004B93;color:#fff;border:1px solid #3B82F6;font-size:11.5px;">
+                    📻
                 </button>
             </div>
         </div>
 
-        <!-- MIDDLE LAYER: Walkie-Talkie, Customer Chat, Crosshair & Open Panel Button -->
+        <!-- MIDDLE LAYER: Walkie-Talkie, Customer Chat, Crosshair & Contextual Buttons -->
         <div class="relative flex-1 w-full pointer-events-none my-2">
 
             <!-- Boss David's Walkie-Talkie Popup -->
-            <div id="david-radio" class="radio-hidden bg-ns-blue border-ns-orange rounded-2xl p-3 shadow-2xl pointer-events-auto">
+            <div id="david-radio" class="radio-hidden bg-ns-blue border-ns-orange rounded-2xl p-2.5 shadow-2xl pointer-events-auto">
                 <div class="flex items-start gap-2.5">
-                    <div class="relative rounded-xl bg-ns-orange p-0.5 flex-shrink-0" style="width:46px;height:46px;">
+                    <div class="relative rounded-xl bg-ns-orange p-0.5 flex-shrink-0" style="width:44px;height:44px;">
                         <svg viewBox="0 0 64 64" class="w-full h-full rounded-lg" style="background:#0A2540;">
                             <path d="M12 24 C12 12, 52 12, 52 24 Z" fill="#FF6B00"/>
                             <rect x="8" y="22" width="48" height="4" rx="2" fill="#FF8800"/>
                             <circle cx="32" cy="36" r="14" fill="#FBBF24"/>
                             <rect x="20" y="30" width="10" height="7" rx="1" fill="none" stroke="#0A2540" stroke-width="2.5"/>
                             <rect x="34" y="30" width="10" height="7" rx="1" fill="none" stroke="#0A2540" stroke-width="2.5"/>
-                            <line x1="30" y1="33" x2="34" y2="33" stroke="#0A2540" stroke-width="2.5"/>
-                            <path d="M22 42 Q32 39 42 42" stroke="#78350F" stroke-width="4" fill="none" stroke-linecap="round"/>
-                            <path d="M26 45 Q32 50 38 45" stroke="#0A2540" stroke-width="2" fill="none"/>
                         </svg>
                     </div>
                     <div class="flex-1">
                         <div class="flex items-center justify-between">
-                            <span class="font-tech font-extrabold uppercase text-ns-orange" style="font-size:11px;">BOSS DAVID • CH-1</span>
+                            <span class="font-tech font-extrabold uppercase text-ns-orange" style="font-size:10.5px;">BOSS DAVID • CH-1</span>
                             <div class="flex items-center gap-0.5">
                                 <span class="wave-bar"></span>
                                 <span class="wave-bar" style="animation-delay:0.15s"></span>
                                 <span class="wave-bar" style="animation-delay:0.3s"></span>
                             </div>
                         </div>
-                        <p id="david-text" class="mt-1" style="font-size:12.5px;line-height:1.35;margin-bottom:0;">
-                            "Morning mate! Why did the burglar take a shower? To make a clean getaway! Over."
+                        <p id="david-text" class="mt-1" style="font-size:12px;line-height:1.35;margin-bottom:0;">
+                            "Head inside the front door mate! You can't wire the control panel from the street!"
                         </p>
                     </div>
                 </div>
             </div>
 
-            <!-- Awkward British Customer Small Talk Toast -->
-            <div id="customer-toast" class="hidden absolute top-0 right-0 rounded-xl p-2.5 shadow-xl" style="max-width:290px;background:#ffffff;color:#0F2C59;border-left:6px solid #FF6B00;">
-                <div class="flex items-center gap-2">
-                    <span style="font-size:20px;">🏡</span>
-                    <div>
-                        <div id="customer-name" class="font-extrabold uppercase" style="font-size:10px;color:#1E40AF;">Mrs. Higgins (Customer)</div>
-                        <div id="customer-quote" class="italic font-bold" style="font-size:11.5px;color:#1E293B;">"You've caught the weather for it love!"</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Driveway Terrier Dog Encounter Popup -->
-            <div id="dog-encounter" class="hidden absolute inset-0 flex items-center justify-center pointer-events-auto">
-                <div class="bg-ns-blue border-ns-orange-4 rounded-2xl p-5 text-center shadow-2xl" style="max-width:320px;">
-                    <div class="animate-bounce mb-1" style="font-size:44px;">🐕</div>
-                    <h3 class="font-tech font-extrabold text-ns-orange" style="font-size:17px;margin:0;">CURIOUS TERRIER ON DRIVEWAY!</h3>
-                    <p style="font-size:12px;color:#DBEAFE;margin:6px 0 14px;">Barnaby wants to chew your CAT5 cable reel! Toss a Digestive Biscuit to distract him.</p>
-                    <button id="btn-toss-biscuit" class="w-full py-2.5 bg-ns-orange text-ns-blue font-tech font-extrabold rounded-xl shadow-lg" style="font-size:14px;">
-                        🍪 TOSS DIGESTIVE BISCUIT
+            <!-- Contextual Interactive Prompts (Open/Close Door & Fit Interior Alarm Panel) -->
+            <div class="absolute bottom-28 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-auto">
+                <div id="door-prompt" class="hidden">
+                    <button id="btn-interact-door" class="pulse-door-btn font-tech font-extrabold px-5 py-2.5 rounded-2xl shadow-2xl flex items-center gap-2" style="background:#004B93;color:#fff;border:2px solid #60A5FA;font-size:14px;white-space:nowrap;">
+                        <span>🚪</span> <span id="door-prompt-text">OPEN FRONT DOOR (E / TAP)</span>
                     </button>
                 </div>
-            </div>
-
-            <!-- Open Alarm Panel Prompt -->
-            <div id="panel-prompt" class="hidden absolute bottom-28 left-1/2 -translate-x-1/2 pointer-events-auto">
-                <button id="btn-open-panel" class="pulse-btn bg-ns-orange text-ns-blue font-tech font-extrabold px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-2" style="border:2px solid #fff;font-size:15px;white-space:nowrap;">
-                    <span>🪛</span> FIT ALARM PANEL (TAP / SPACE)
-                </button>
+                <div id="panel-prompt" class="hidden">
+                    <button id="btn-open-panel" class="pulse-btn bg-ns-orange text-ns-blue font-tech font-extrabold px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-2" style="border:2px solid #fff;font-size:15px;white-space:nowrap;">
+                        <span>🪛</span> WIRE INTERIOR ALARM PANEL (SPACE / TAP)
+                    </button>
+                </div>
             </div>
 
             <!-- Center FPV Crosshair -->
@@ -421,79 +432,140 @@
             </div>
         </div>
 
-        <!-- FIRST-PERSON ENGINEER HANDS IN NORTHANTS SECURITY ORANGE & BLUE GLOVES -->
-        <div id="fpv-hands" class="pointer-events-none fixed bottom-0 left-0 right-0 flex justify-between items-end px-4 z-10 overflow-hidden" style="height:155px;">
-            <!-- Left Hand: Voltage Multimeter -->
-            <div class="fpv-bob hide-mobile" style="transform:translate(-10px, 14px);">
-                <svg width="195" height="155" viewBox="0 0 210 170">
-                    <path d="M20 170 L50 95 L115 110 L95 170 Z" fill="#0F2C59" stroke="#FF6B00" stroke-width="3"/>
-                    <path d="M32 140 L103 152" stroke="#FF6B00" stroke-width="8"/>
-                    <circle cx="90" cy="95" r="28" fill="#FF6B00" stroke="#0F2C59" stroke-width="3"/>
-                    <rect x="75" y="65" width="38" height="22" rx="10" fill="#1D4ED8" stroke="#0F2C59" stroke-width="2"/>
-                    <rect x="92" y="32" width="46" height="58" rx="6" fill="#FF6B00" stroke="#0F2C59" stroke-width="3"/>
-                    <rect x="99" y="40" width="32" height="20" rx="2" fill="#A7F3D0"/>
-                    <text x="102" y="54" fill="#0F2C59" font-family="monospace" font-weight="bold" font-size="11">13.8V</text>
-                </svg>
-            </div>
-
-            <!-- Right Hand: Insulated Screwdriver -->
-            <div class="fpv-bob ml-auto" style="animation-delay:0.35s;transform:translate(12px, 14px);">
-                <svg width="200" height="160" viewBox="0 0 220 180">
-                    <line x1="75" y1="75" x2="25" y2="15" stroke="#CBD5E1" stroke-width="6" stroke-linecap="round"/>
-                    <line x1="75" y1="75" x2="40" y2="33" stroke="#FF6B00" stroke-width="8" stroke-linecap="round"/>
-                    <rect x="65" y="65" width="26" height="52" rx="10" transform="rotate(-40 78 91)" fill="#FF6B00" stroke="#0F2C59" stroke-width="3"/>
-                    <circle cx="115" cy="105" r="28" fill="#FF6B00" stroke="#0F2C59" stroke-width="3"/>
-                    <rect x="85" y="85" width="35" height="20" rx="9" fill="#1D4ED8" stroke="#0F2C59" stroke-width="2"/>
-                    <path d="M100 180 L105 115 L170 105 L190 180 Z" fill="#0F2C59" stroke="#FF6B00" stroke-width="3"/>
-                    <path d="M102 150 L178 142" stroke="#FF6B00" stroke-width="8"/>
-                </svg>
-            </div>
-        </div>
-
-        <!-- BOTTOM CONTROLS: Touch D-Pad on Left + One-Tap Sprint & Cuppa Tea on Right -->
+        <!-- BOTTOM CONTROLS: Touch D-Pad on Left, Guide & Cuppa Tea on Right -->
         <div class="flex items-end justify-between w-full z-20 pointer-events-none">
-            <!-- Left Touch D-Pad -->
-            <div class="bg-ns-blue border-ns-blue p-2 rounded-2xl shadow-xl interactive flex flex-col items-center gap-1">
-                <button id="move-f" class="rounded-lg font-bold flex items-center justify-center" style="width:46px;height:40px;background:#1E40AF;color:#fff;font-size:16px;">▲</button>
+            <div class="bg-ns-blue border-ns-blue p-1.5 rounded-2xl shadow-xl interactive flex flex-col items-center gap-1">
                 <div class="flex gap-1">
-                    <button id="turn-l" class="rounded-lg font-bold flex items-center justify-center" style="width:46px;height:40px;background:#1E40AF;color:#fff;font-size:15px;">↺</button>
-                    <button id="move-b" class="rounded-lg font-bold flex items-center justify-center" style="width:46px;height:40px;background:#1E40AF;color:#fff;font-size:16px;">▼</button>
-                    <button id="turn-r" class="rounded-lg font-bold flex items-center justify-center" style="width:46px;height:40px;background:#1E40AF;color:#fff;font-size:15px;">↻</button>
+                    <button id="turn-l" class="rounded-lg font-bold flex items-center justify-center" style="width:42px;height:38px;background:#0F2C59;color:#93C5FD;border:1px solid #3B82F6;font-size:14px;">↺</button>
+                    <button id="move-f" class="rounded-lg font-bold flex items-center justify-center" style="width:46px;height:38px;background:#004B93;color:#fff;font-size:16px;">▲</button>
+                    <button id="turn-r" class="rounded-lg font-bold flex items-center justify-center" style="width:42px;height:38px;background:#0F2C59;color:#93C5FD;border:1px solid #3B82F6;font-size:14px;">↻</button>
                 </div>
-                <span style="font-size:9px;color:#93C5FD;font-weight:600;">D-Pad / Swipe Right Side to Look</span>
+                <div class="flex gap-1">
+                    <button id="strafe-l" class="rounded-lg font-bold flex items-center justify-center" style="width:42px;height:38px;background:#004B93;color:#fff;font-size:14px;">◀</button>
+                    <button id="move-b" class="rounded-lg font-bold flex items-center justify-center" style="width:46px;height:38px;background:#004B93;color:#fff;font-size:16px;">▼</button>
+                    <button id="strafe-r" class="rounded-lg font-bold flex items-center justify-center" style="width:42px;height:38px;background:#004B93;color:#fff;font-size:14px;">▶</button>
+                </div>
             </div>
 
-            <!-- Right Quick Actions: One-Tap Sprint to Target House & Sip Cuppa Tea -->
-            <div class="flex flex-col items-end gap-2 interactive">
-                <button id="btn-autowalk" class="font-tech font-extrabold px-3.5 py-2.5 rounded-xl shadow-lg flex items-center gap-1.5" style="background:#1D4ED8;color:#fff;border:2px solid #60A5FA;font-size:12px;">
-                    <span>⚡</span> SPRINT TO HOUSE
+            <div class="flex flex-col items-end gap-1.5 interactive">
+                <button id="btn-autowalk" class="font-tech font-extrabold px-3 py-2 rounded-xl shadow-lg flex items-center gap-1.5" style="background:#004B93;color:#fff;border:2px solid #60A5FA;font-size:11.5px;">
+                    <span>⚡</span> <span id="autowalk-label">STEP TO PANEL</span>
                 </button>
-                <button id="btn-tea" class="bg-ns-orange text-ns-blue font-tech font-extrabold px-3.5 py-2.5 rounded-xl shadow-lg flex items-center gap-1.5" style="border:2px solid #fff;font-size:12px;">
+                <button id="btn-tea" class="bg-ns-orange text-ns-blue font-tech font-extrabold px-3 py-2 rounded-xl shadow-lg flex items-center gap-1.5" style="border:2px solid #fff;font-size:11.5px;">
                     <span>☕</span> CUPPA TEA (<span id="tea-count">2</span>)
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- ===================================================== -->
-    <!-- WIRING MINIGAME MODAL (TOUCH DRAG OR TAP TO CONNECT)  -->
-    <!-- ===================================================== -->
-    <div id="wiring-modal" class="hidden fixed inset-0 z-30 flex items-center justify-center p-2" style="background:rgba(4,13,26,0.88);">
-        <div class="relative w-full bg-ns-blue border-ns-orange-4 rounded-3xl shadow-2xl overflow-hidden flex flex-col" style="max-width:740px;max-height:95vh;">
-            
-            <!-- Modal Header -->
-            <div class="bg-ns-dark px-4 py-2.5 flex flex-wrap items-center justify-between gap-2" style="border-bottom:2px solid #FF6B00;">
-                <div class="flex items-center gap-2">
-                    <span class="px-2 py-0.5 bg-ns-orange text-ns-blue font-tech font-extrabold rounded" style="font-size:11px;">NS-PRO PANEL</span>
-                    <span id="panel-title" class="font-tech font-bold" style="font-size:14px;">TERMINAL WIRING</span>
+    <!-- ========================================================================= -->
+    <!-- TRADE COUNTER SHOP MODAL                                                  -->
+    <!-- ========================================================================= -->
+    <div id="shop-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3" style="background:rgba(4,13,26,0.95);">
+        <div class="w-full bg-ns-blue border-ns-orange-4 rounded-3xl p-5 shadow-2xl flex flex-col" style="max-width:720px;max-height:92vh;">
+            <div class="flex items-center justify-between mb-3 border-b border-blue-900 pb-2">
+                <div>
+                    <h2 class="font-tech font-extrabold text-ns-orange" style="font-size:20px;margin:0;">🛒 NORTHANTS TRADE COUNTER SHOP</h2>
+                    <p style="font-size:11.5px;color:#BFDBFE;margin:2px 0 0;">Spend your hard-earned alarm-fitting cash on professional tools, van upgrades, and snacks!</p>
                 </div>
-                <div class="flex items-center gap-2">
-                    <div class="rounded-lg px-2.5 py-1 flex items-center gap-1.5" style="background:#0F172A;border:1px solid #3B82F6;">
-                        <span class="uppercase font-bold" style="font-size:10px;color:#93C5FD;">SLA:</span>
-                        <span id="modal-timer" class="font-tech font-extrabold text-ns-orange" style="font-size:16px;">38.0s</span>
+                <div class="flex items-center gap-3">
+                    <div class="bg-ns-dark px-3 py-1.5 rounded-xl border border-orange-500 font-tech font-extrabold text-ns-orange" style="font-size:16px;" id="shop-cash-display">
+                        £0
                     </div>
-                    <button id="btn-modal-tea" class="bg-ns-orange text-ns-blue font-tech font-extrabold px-2.5 py-1.5 rounded-lg" style="font-size:11px;">
-                        ☕ SIP TEA (<span id="modal-tea-count">2</span>)
+                    <button id="btn-close-shop" class="rounded-xl px-3 py-1.5 font-bold bg-ns-dark text-white">✕</button>
+                </div>
+            </div>
+
+            <!-- Shop Items Grid -->
+            <div class="flex-1 overflow-y-auto grid gap-3" style="grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));">
+                
+                <!-- Tool 1: Knipex Snips -->
+                <div class="shop-card" id="card-tool_snips">
+                    <div>
+                        <div class="text-2xl mb-1">✂️</div>
+                        <div class="font-tech font-bold text-ns-orange">Knipex Pro Snips</div>
+                        <p style="font-size:11px;color:#DBEAFE;margin:4px 0 8px;">Cuts wire stripping time in half, giving you +10s extra SLA buffer every job.</p>
+                    </div>
+                    <button class="w-full py-2 bg-ns-orange text-ns-blue font-tech font-extrabold rounded-lg" onclick="buyShopItem('tool_snips', 120)">BUY (£120)</button>
+                </div>
+
+                <!-- Tool 2: Fluke Multimeter -->
+                <div class="shop-card" id="card-tool_multimeter">
+                    <div>
+                        <div class="text-2xl mb-1">📟</div>
+                        <div class="font-tech font-bold text-ns-orange">Fluke Digital Meter</div>
+                        <p style="font-size:11px;color:#DBEAFE;margin:4px 0 8px;">Instantly detects live 12V terminals so you never trigger short-circuit sparks.</p>
+                    </div>
+                    <button class="w-full py-2 bg-ns-orange text-ns-blue font-tech font-extrabold rounded-lg" onclick="buyShopItem('tool_multimeter', 250)">BUY (£250)</button>
+                </div>
+
+                <!-- Gear: Hi-Vis Jacket -->
+                <div class="shop-card" id="card-gear_hivis">
+                    <div>
+                        <div class="text-2xl mb-1">🦺</div>
+                        <div class="font-tech font-bold text-ns-orange">NS Hi-Vis Jacket</div>
+                        <p style="font-size:11px;color:#DBEAFE;margin:4px 0 8px;">Look professional in lofts and boost customer tips by +20% on all shift payouts.</p>
+                    </div>
+                    <button class="w-full py-2 bg-ns-orange text-ns-blue font-tech font-extrabold rounded-lg" onclick="buyShopItem('gear_hivis', 85)">BUY (£85)</button>
+                </div>
+
+                <!-- Van: Transit Custom -->
+                <div class="shop-card" id="card-van_custom">
+                    <div>
+                        <div class="text-2xl mb-1">🚐</div>
+                        <div class="font-tech font-bold text-ns-orange">Signwritten Transit Custom</div>
+                        <p style="font-size:11px;color:#DBEAFE;margin:4px 0 8px;">Upgrade from the rusty starter van to a gleaming orange & blue Custom with alloy wheels.</p>
+                    </div>
+                    <button class="w-full py-2 bg-ns-orange text-ns-blue font-tech font-extrabold rounded-lg" onclick="buyShopItem('van_custom', 500)">BUY (£500)</button>
+                </div>
+
+                <!-- Snack: Greggs Sausage Roll -->
+                <div class="shop-card" id="card-snack_greggs">
+                    <div>
+                        <div class="text-2xl mb-1">🥐</div>
+                        <div class="font-tech font-bold text-ns-orange">Greggs Sausage Roll</div>
+                        <p style="font-size:11px;color:#DBEAFE;margin:4px 0 8px;">Restores your energy and adds +1 Extra Cuppa Tea flask to your inventory.</p>
+                    </div>
+                    <button class="w-full py-2 bg-ns-orange text-ns-blue font-tech font-extrabold rounded-lg" onclick="buyShopItem('snack_greggs', 25)">BUY (£25)</button>
+                </div>
+
+                <!-- Snack: Giant Mug -->
+                <div class="shop-card" id="card-snack_giantmug">
+                    <div>
+                        <div class="text-2xl mb-1">☕</div>
+                        <div class="font-tech font-bold text-ns-orange">Sports Direct Giant Mug</div>
+                        <p style="font-size:11px;color:#DBEAFE;margin:4px 0 8px;">Doubles the duration of your Cuppa Tea slow-mo time boost (16 seconds!).</p>
+                    </div>
+                    <button class="w-full py-2 bg-ns-orange text-ns-blue font-tech font-extrabold rounded-lg" onclick="buyShopItem('snack_giantmug', 60)">BUY (£60)</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- WIRING MINIGAME MODAL                                                     -->
+    <!-- ========================================================================= -->
+    <div id="wiring-modal" class="hidden fixed inset-0 z-30 flex items-center justify-center p-2" style="background:rgba(4,13,26,0.9);">
+        <div class="relative w-full rounded-3xl shadow-2xl overflow-hidden flex flex-col" style="max-width:760px;max-height:95vh;background:#E2E8F0;border:5px solid #CBD5E1;">
+            
+            <div class="px-3.5 py-2 flex flex-wrap items-center justify-between gap-2" style="background:linear-gradient(180deg,#0F2C59 0%,#07192B 100%);border-bottom:3px solid #FF6B00;">
+                <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-ns-orange text-ns-blue font-tech font-extrabold rounded" style="font-size:10.5px;">NS-EURO 46</span>
+                    <span id="panel-title" class="font-tech font-bold" style="font-size:12.5px;color:#F8FAFC;">HALLWAY CONTROL PANEL</span>
+                </div>
+
+                <div id="lcd-status" class="lcd-screen rounded-lg px-2.5 py-1 text-center" style="font-size:11px;min-width:165px;">
+                    NS-PRO: UNSET [0/3]
+                </div>
+
+                <div class="flex items-center gap-1.5">
+                    <div class="rounded-lg px-2 py-1 flex items-center gap-1" style="background:#0F172A;border:1px solid #3B82F6;">
+                        <span class="uppercase font-bold" style="font-size:9.5px;color:#93C5FD;">SLA:</span>
+                        <span id="modal-timer" class="font-tech font-extrabold text-ns-orange" style="font-size:15px;">45.0s</span>
+                    </div>
+                    <button id="btn-modal-torch" class="rounded-lg px-2.5 py-1 font-tech font-extrabold" style="background:#F59E0B;color:#07192B;font-size:10.5px;">
+                        🔦 TORCH
                     </button>
                     <button id="btn-close-panel" class="rounded-lg px-2.5 py-1 font-bold" style="background:#1E293B;color:#CBD5E1;font-size:11px;">
                         ✕
@@ -501,170 +573,54 @@
                 </div>
             </div>
 
-            <!-- Sub-header Instructions -->
-            <div class="px-4 py-1.5 flex items-center justify-between" style="background:#091E3A;border-bottom:1px solid #1E3A8A;font-size:11px;">
-                <span style="color:#BFDBFE;">
-                    <strong class="text-ns-orange">HOW TO FIT:</strong> Drag or Tap a <span class="underline">Cable</span> on the LEFT, then connect to the matching <span class="underline">Terminal</span> on the RIGHT!
-                </span>
-                <span id="wiring-progress" class="font-tech font-extrabold" style="color:#FBBF24;white-space:nowrap;margin-left:8px;">0 / 3 FITTED</span>
-            </div>
-
-            <!-- Interactive PCB Board Area -->
-            <div id="pcb-container" class="relative flex-1 p-3.5 flex items-center justify-between overflow-hidden" style="background:#071A2E;min-height:290px;">
-                
-                <!-- Decorative Circuit Background -->
-                <svg class="absolute inset-0 w-full h-full pointer-events-none" style="opacity:0.13;" xmlns="http://www.w3.org/2000/svg">
-                    <pattern id="pcb-grid" width="36" height="36" patternUnits="userSpaceOnUse">
-                        <path d="M 36 0 L 0 0 0 36" fill="none" stroke="#38BDF8" stroke-width="1"/>
-                        <circle cx="18" cy="18" r="2" fill="#FF6B00"/>
-                    </pattern>
-                    <rect width="100%" height="100%" fill="url(#pcb-grid)"/>
-                </svg>
-
-                <!-- Left Sensor Cables -->
+            <!-- PCB Wire Terminal Area -->
+            <div id="pcb-container" class="relative flex-1 p-3.5 flex items-center justify-between overflow-hidden" style="background:radial-gradient(circle at 50% 50%, #065F46 0%, #064E3B 55%, #022C22 100%);min-height:300px;border:4px solid #1E293B;">
                 <div id="left-terminals" class="relative z-10 flex flex-col justify-around h-full gap-2" style="width:41%;"></div>
-
-                <!-- Dynamic SVG Cable Overlay (Supports both Tap-to-Connect & Live Touch Dragging!) -->
                 <svg id="wire-svg" class="absolute inset-0 w-full h-full pointer-events-none z-20"></svg>
-
-                <!-- Right Alarm PCB Terminals -->
                 <div id="right-terminals" class="relative z-10 flex flex-col justify-around h-full gap-2 items-end" style="width:41%;"></div>
-
-                <!-- Giant Junction Box Spider Hazard -->
-                <div id="spider-hazard" class="hidden absolute inset-0 z-30 pointer-events-none flex items-center justify-center">
-                    <div id="spider-target" class="pointer-events-auto rounded-2xl p-3.5 shadow-2xl flex flex-col items-center text-center" style="background:rgba(15,23,42,0.95);border:3px solid #FF6B00;cursor:pointer;">
-                        <div class="animate-bounce" style="font-size:42px;">🕷️</div>
-                        <span class="bg-ns-orange text-ns-blue font-tech font-extrabold px-2 py-0.5 rounded mt-1" style="font-size:11px;">
-                            SPIDER IN THE PANEL! TAP <span id="spider-hp">3</span>x TO SHOO!
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Panel Footer -->
-            <div class="bg-ns-dark px-4 py-2 flex items-center justify-between" style="border-top:1px solid #1E3A8A;font-size:11px;">
-                <div class="flex items-center gap-1.5 truncate" style="color:#93C5FD;">
-                    <span>💬</span>
-                    <span id="panel-smalltalk" class="italic truncate">"My nephew wired his own shed once, blew the whole street's fusebox!"</span>
-                </div>
-                <span class="text-ns-orange font-tech font-bold hide-mobile">NS NSI-GOLD APPROVED</span>
+                <canvas id="pcb-sparks-canvas" class="absolute inset-0 w-full h-full pointer-events-none" style="z-index:24;"></canvas>
             </div>
         </div>
     </div>
 
-    <!-- ===================================================== -->
-    <!-- INSTANT-LOAD START SCREEN + APK / PWA INSTALL GUIDE   -->
-    <!-- ===================================================== -->
-    <div id="start-modal" class="fixed inset-0 z-40 flex items-center justify-center p-3" style="background:rgba(7,25,43,0.93);">
-        <div class="w-full bg-ns-blue border-ns-orange-4 rounded-3xl p-5 shadow-2xl text-center relative overflow-y-auto" style="max-width:560px;max-height:95vh;">
-            
-            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-tech font-bold mb-2" style="background:rgba(255,107,0,0.18);border:1px solid #FF6B00;color:#FF6B00;font-size:11px;">
-                <span>🚐</span> INSTANT-LOAD MOBILE & APK EDITION
-            </div>
-
-            <h1 class="font-tech font-extrabold" style="font-size:clamp(24px, 5vw, 38px);margin:4px 0;">
+    <!-- START SCREEN -->
+    <div id="start-modal" class="fixed inset-0 z-40 flex items-center justify-center p-3" style="background:rgba(7,25,43,0.94);">
+        <div class="w-full bg-ns-blue border-ns-orange-4 rounded-3xl p-5 shadow-2xl text-center relative overflow-y-auto" style="max-width:580px;max-height:95vh;">
+            <h1 class="font-tech font-extrabold" style="font-size:clamp(23px, 4.8vw, 36px);margin:4px 0;">
                 NORTHANTS <span class="text-ns-orange">SECURITY RUSH</span>
             </h1>
-            <p style="font-size:12.5px;color:#BFDBFE;max-width:440px;margin:4px auto 14px;">
-                First-Person Alarm Engineer Game. Head down the street in your orange & blue gloves, wire up the terminals before the SLA timer expires, and stop Sticky-Fingers Kev robbing the street!
+            <p style="font-size:12px;color:#BFDBFE;max-width:480px;margin:4px auto 14px;">
+                Fit alarms across Northamptonshire, earn cash, upgrade your van & tools at the Trade Counter Shop, and watch out for Boss David's security dad jokes!
             </p>
-
-            <div class="feature-grid text-left mb-4">
-                <div class="rounded-xl p-2.5" style="background:#091E3A;border:1px solid #1E40AF;">
-                    <div class="font-tech font-bold text-ns-orange" style="font-size:11.5px;">🔌 DRAG OR TAP WIRES</div>
-                    <p style="font-size:11px;color:#DBEAFE;margin:3px 0 0;">Match 12V, 0V, Bell, PIR & Tamper cables before time runs out.</p>
-                </div>
-                <div class="rounded-xl p-2.5" style="background:#091E3A;border:1px solid #1E40AF;">
-                    <div class="font-tech font-bold text-ns-orange" style="font-size:11.5px;">📻 BOSS DAVID'S RADIO</div>
-                    <p style="font-size:11px;color:#DBEAFE;margin:3px 0 0;">Live walkie-talkie alarm dad jokes & awkward British customer chat.</p>
-                </div>
-                <div class="rounded-xl p-2.5" style="background:#091E3A;border:1px solid #1E40AF;">
-                    <div class="font-tech font-bold text-ns-orange" style="font-size:11.5px;">☕ TEA & TERRIERS</div>
-                    <p style="font-size:11px;color:#DBEAFE;margin:3px 0 0;">Sip builder's tea to slow time, shoo spiders & bribe driveway dogs!</p>
-                </div>
-            </div>
-
-            <div class="flex flex-col gap-2">
-                <button id="btn-start-game" class="pulse-btn w-full py-3.5 bg-ns-orange text-ns-blue font-tech font-extrabold rounded-2xl shadow-xl" style="font-size:18px;">
-                    START SHIFT IN NORTHAMPTON →
-                </button>
-                <div class="flex gap-2">
-                    <button id="btn-install-pwa" class="hidden flex-1 py-2.5 rounded-xl font-tech font-bold" style="background:#16A34A;color:#fff;font-size:12.5px;">
-                        📲 INSTALL ANDROID APP NOW
-                    </button>
-                    <button id="btn-open-apk-guide" class="flex-1 py-2.5 rounded-xl font-tech font-bold" style="background:#1E40AF;color:#fff;border:1px solid #60A5FA;font-size:12.5px;">
-                        📱 INSTALL APP / APK BUILDER GUIDE
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===================================================== -->
-    <!-- ANDROID APK & HOME SCREEN INSTALL GUIDE MODAL         -->
-    <!-- ===================================================== -->
-    <div id="apk-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3" style="background:rgba(4,13,26,0.92);">
-        <div class="w-full bg-ns-blue border-ns-orange-4 rounded-3xl p-5 shadow-2xl text-left overflow-y-auto" style="max-width:540px;max-height:92vh;">
-            <div class="flex items-center justify-between mb-3">
-                <h2 class="font-tech font-extrabold text-ns-orange" style="font-size:18px;margin:0;">📱 ANDROID APP & APK GUIDE</h2>
-                <button id="btn-close-apk-guide" class="rounded-lg px-2.5 py-1 font-bold" style="background:#1E293B;color:#fff;">✕</button>
-            </div>
-            <p style="font-size:12px;color:#BFDBFE;margin-top:0;">
-                This game now uses a <strong>100% self-contained zero-dependency 3D engine</strong>. It loads in under 50ms and works completely offline! Here are 2 easy ways to put it on your Android phone:
-            </p>
-            <div class="rounded-xl p-3 mb-3" style="background:#091E3A;border:1px solid #3B82F6;">
-                <div class="font-tech font-bold text-ns-orange" style="font-size:13px;">1. Instant Android Home Screen App (30 Seconds)</div>
-                <ol style="font-size:11.5px;color:#E2E8F0;padding-left:18px;margin:6px 0 0;line-height:1.5;">
-                    <li>Open this file in <strong>Chrome on Android</strong>.</li>
-                    <li>Tap the <strong>⋮ (Three Dots Menu)</strong> in the top-right corner.</li>
-                    <li>Tap <strong>"Add to Home screen"</strong> or <strong>"Install app"</strong>.</li>
-                    <li>Launch <strong>NS Rush</strong> from your app drawer in full-screen landscape mode!</li>
-                </ol>
-            </div>
-            <div class="rounded-xl p-3 mb-4" style="background:#091E3A;border:1px solid #3B82F6;">
-                <div class="font-tech font-bold text-ns-orange" style="font-size:13px;">2. Build a Shareable Android .APK File</div>
-                <ol style="font-size:11.5px;color:#E2E8F0;padding-left:18px;margin:6px 0 0;line-height:1.5;">
-                    <li><strong>Website 2 APK Builder (Windows):</strong> Select "Local HTML Website", point it to this single <code>.html</code> file, set orientation to Landscape, and click <em>Generate APK</em>.</li>
-                    <li><strong>PWABuilder.com:</strong> Upload this file to free GitHub Pages or Netlify, paste the link into PWABuilder.com, and download your signed Android <code>.apk</code>.</li>
-                </ol>
-            </div>
-            <button id="btn-close-apk-guide-bottom" class="w-full py-3 bg-ns-orange text-ns-blue font-tech font-extrabold rounded-xl" style="font-size:14px;">
-                GOT IT — BACK TO NORTHANTS SECURITY
+            <button id="btn-start-game" class="pulse-btn w-full py-3.5 bg-ns-orange text-ns-blue font-tech font-extrabold rounded-2xl shadow-xl" style="font-size:17px;">
+                START SHIFT IN NORTHAMPTON →
             </button>
         </div>
     </div>
 
-    <!-- ===================================================== -->
-    <!-- WIN / STICKY-FINGERS KEV BURGLAR FAIL MODAL           -->
-    <!-- ===================================================== -->
+    <!-- WIN / FAIL MODAL -->
     <div id="outcome-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3" style="background:rgba(4,13,26,0.92);">
-        <div class="w-full bg-ns-blue border-ns-orange-4 rounded-3xl p-5 shadow-2xl text-center" style="max-width:490px;">
+        <div class="w-full bg-ns-blue border-ns-orange-4 rounded-3xl p-5 shadow-2xl text-center" style="max-width:500px;">
             <div id="outcome-badge" class="inline-block px-3.5 py-1 rounded-full font-tech font-extrabold uppercase mb-2" style="background:#22C55E;color:#052E16;font-size:11px;">
                 ALARM ARMED & SECURE!
             </div>
-
-            <h2 id="outcome-title" class="font-tech font-extrabold" style="font-size:26px;margin:2px 0 12px;">
+            <h2 id="outcome-title" class="font-tech font-extrabold" style="font-size:25px;margin:2px 0 10px;">
                 PROPERTY PROTECTED!
             </h2>
-
-            <!-- CCTV Burglar Animation or Job Bonus Box -->
-            <div id="outcome-stage" class="my-3 bg-ns-dark rounded-2xl p-4 relative overflow-hidden flex flex-col items-center justify-center" style="border:2px solid #1E40AF;height:155px;"></div>
-
-            <!-- Boss David Debrief -->
+            <div id="outcome-stage" class="my-3 bg-ns-dark rounded-2xl p-4 relative overflow-hidden flex flex-col items-center justify-center" style="border:2px solid #1E40AF;height:140px;"></div>
             <div class="rounded-xl p-3 mb-4 text-left flex items-center gap-2.5" style="background:#091E3A;border:1px solid #FF6B00;">
                 <div style="font-size:24px;">📻</div>
                 <div>
                     <div class="font-tech font-bold text-ns-orange uppercase" style="font-size:10px;">Boss David says:</div>
-                    <div id="outcome-david-quote" class="italic" style="font-size:12px;color:#E2E8F0;">"Top job mate! That house is tighter than a Yorkshireman's wallet!"</div>
+                    <div id="outcome-david-quote" class="italic" style="font-size:12px;color:#E2E8F0;">"Top job mate!"</div>
                 </div>
             </div>
-
             <div class="flex gap-2.5">
-                <button id="btn-retry-level" class="hidden flex-1 py-3 rounded-xl font-tech font-extrabold" style="background:#1D4ED8;color:#fff;font-size:14px;">
-                    🔄 RETRY PROPERTY
+                <button id="btn-open-shop-outcome" class="flex-1 py-3 bg-emerald-600 text-white rounded-xl font-tech font-extrabold" style="font-size:14px;">
+                    🛒 VISIT SHOP
                 </button>
-                <button id="btn-next-level" class="flex-1 py-3 bg-ns-orange text-ns-blue rounded-xl font-tech font-extrabold" style="font-size:15px;">
-                    NEXT JOB ON SHIFT →
+                <button id="btn-next-level" class="flex-1 py-3 bg-ns-orange text-ns-blue rounded-xl font-tech font-extrabold" style="font-size:14px;">
+                    NEXT JOB →
                 </button>
             </div>
         </div>
@@ -672,65 +628,47 @@
 
     <script>
         /********************************************************************
-         * 0. OFFLINE SERVICE WORKER & PWA INSTALL PROMPT SUPPORT
+         * 1. GAME STATE & UPGRADES
          ********************************************************************/
-        let deferredInstallPrompt = null;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredInstallPrompt = e;
-            const installBtn = document.getElementById('btn-install-pwa');
-            if (installBtn) installBtn.classList.remove('hidden');
-        });
+        const state = {
+            currentLevelIdx: 0,
+            score: 0,
+            cash: 100, // Starting bonus cash for the shop!
+            timeLeft: 70,
+            teaLeft: 2,
+            teaSlowMoTimer: 0,
+            torchOn: true,
+            isPlaying: false,
+            inWiringModal: false,
+            selectedWireId: null,
+            draggingWireId: null,
+            dragPointerPos: null,
+            connectedWires: [],
+            jokeIndex: 0,
+            nearestDoor: null,
+            canOpenPanel: false,
+            sparks: [],
+            upgrades: {
+                tool_snips: false,
+                tool_multimeter: false,
+                gear_hivis: false,
+                van_custom: false,
+                snack_greggs: false,
+                snack_giantmug: false
+            }
+        };
 
-        document.getElementById('btn-install-pwa').addEventListener('click', async () => {
-            if (!deferredInstallPrompt) return;
-            deferredInstallPrompt.prompt();
-            await deferredInstallPrompt.userChoice;
-            deferredInstallPrompt = null;
-            document.getElementById('btn-install-pwa').classList.add('hidden');
-        });
-
-        document.getElementById('btn-open-apk-guide').addEventListener('click', () => {
-            document.getElementById('apk-modal').classList.remove('hidden');
-        });
-        document.getElementById('btn-close-apk-guide').addEventListener('click', () => {
-            document.getElementById('apk-modal').classList.add('hidden');
-        });
-        document.getElementById('btn-close-apk-guide-bottom').addEventListener('click', () => {
-            document.getElementById('apk-modal').classList.add('hidden');
-        });
-
-        // Register inline Service Worker when hosted over HTTPS/localhost for offline caching
-        if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
-            const swCode = `
-                const CACHE = 'ns-rush-v2';
-                self.addEventListener('install', e => {
-                    self.skipWaiting();
-                    e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./'])));
-                });
-                self.addEventListener('fetch', e => {
-                    e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
-                });
-            `;
-            try {
-                const blob = new Blob([swCode], { type: 'application/javascript' });
-                navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
-            } catch (err) {}
-        }
-
-        /********************************************************************
-         * 1. GAME LEVELS, BOSS DAVID JOKES & CUSTOMER SMALL TALK
-         ********************************************************************/
         const LEVELS = [
             {
                 level: 1,
                 address: "14 Kettering Road, Northampton",
                 customer: "Mrs. Higgins",
                 houseIndex: 0,
-                timeLimit: 48,
-                spiderChance: 0,
-                dogObstacle: false,
-                scrambledRight: false,
+                panelRoom: "hallway",
+                panelRoomName: "Front Hallway",
+                isDarkHouse: false,
+                timeLimit: 70,
+                davidBriefing: "Job 1 at No. 14! Open the front door and check the Front Hallway wall for the panel.",
                 wires: [
                     { id: "12v", label: "12V + POWER", targetLabel: "12V + AUX", color: "#EF4444", code: "RED" },
                     { id: "0v",  label: "0V - GROUND", targetLabel: "0V - NEG",  color: "#3B82F6", code: "BLU" },
@@ -742,15 +680,16 @@
                 address: "28 Wellingborough Rd, Abington",
                 customer: "Mr. Bellingham",
                 houseIndex: 1,
-                timeLimit: 44,
-                spiderChance: 0.45,
-                dogObstacle: true,
-                scrambledRight: true,
+                panelRoom: "kitchen",
+                panelRoomName: "Back Kitchen",
+                isDarkHouse: true,
+                timeLimit: 72,
+                davidBriefing: "No. 28 has tripped the mains! Flick your torch on, head through to the Back Kitchen.",
                 wires: [
                     { id: "12v", label: "12V + POWER", targetLabel: "12V + AUX", color: "#EF4444", code: "RED" },
                     { id: "0v",  label: "0V - GROUND", targetLabel: "0V - NEG",  color: "#3B82F6", code: "BLU" },
                     { id: "bell",label: "SIREN BELL",  targetLabel: "BELL TRIG", color: "#F97316", code: "ORG" },
-                    { id: "pir1",label: "HALLWAY PIR", targetLabel: "ZONE 1 PIR",color: "#22C55E", code: "GRN" }
+                    { id: "pir1",label: "KITCHEN PIR", targetLabel: "ZONE 1 PIR",color: "#22C55E", code: "GRN" }
                 ]
             },
             {
@@ -758,10 +697,11 @@
                 address: "7 Cobblers Lane, Duston",
                 customer: "Brenda & Keith",
                 houseIndex: 2,
-                timeLimit: 40,
-                spiderChance: 0.85,
-                dogObstacle: false,
-                scrambledRight: true,
+                panelRoom: "cupboard",
+                panelRoomName: "Under-Stairs Cupboard",
+                isDarkHouse: true,
+                timeLimit: 68,
+                davidBriefing: "Pitch black under the stairs at No. 7! Open the Under-Stairs Cupboard door.",
                 wires: [
                     { id: "12v", label: "12V + POWER", targetLabel: "12V + AUX", color: "#EF4444", code: "RED" },
                     { id: "0v",  label: "0V - GROUND", targetLabel: "0V - NEG",  color: "#3B82F6", code: "BLU" },
@@ -769,83 +709,27 @@
                     { id: "pir1",label: "LOUNGE PIR",  targetLabel: "ZONE 1 PIR",color: "#22C55E", code: "GRN" },
                     { id: "tamp",label: "ANTI-TAMPER", targetLabel: "TAMP LOOP", color: "#EAB308", code: "YLW" }
                 ]
-            },
-            {
-                level: 4,
-                address: "42 Billing Road, Kingsthorpe",
-                customer: "Vicar Humphreys",
-                houseIndex: 3,
-                timeLimit: 36,
-                spiderChance: 1.0,
-                dogObstacle: true,
-                scrambledRight: true,
-                wires: [
-                    { id: "12v", label: "12V + POWER", targetLabel: "12V + AUX", color: "#EF4444", code: "RED" },
-                    { id: "0v",  label: "0V - GROUND", targetLabel: "0V - NEG",  color: "#3B82F6", code: "BLU" },
-                    { id: "bell",label: "SIREN BELL",  targetLabel: "BELL TRIG", color: "#F97316", code: "ORG" },
-                    { id: "pir1",label: "VESTRY PIR",  targetLabel: "ZONE 1 PIR",color: "#22C55E", code: "GRN" },
-                    { id: "tamp",label: "ANTI-TAMPER", targetLabel: "TAMP LOOP", color: "#EAB308", code: "YLW" },
-                    { id: "strb",label: "BLUE STROBE", targetLabel: "STROBE -",  color: "#A855F7", code: "PRP" }
-                ]
-            },
-            {
-                level: 5,
-                address: "99 Towcester Manor, Northants",
-                customer: "Lord Spencer-Smith",
-                houseIndex: 4,
-                timeLimit: 32,
-                spiderChance: 1.0,
-                dogObstacle: true,
-                scrambledRight: true,
-                wires: [
-                    { id: "12v", label: "12V + POWER", targetLabel: "12V + AUX",  color: "#EF4444", code: "RED" },
-                    { id: "0v",  label: "0V - GROUND", targetLabel: "0V - NEG",   color: "#3B82F6", code: "BLU" },
-                    { id: "bell",label: "EXT SIREN",   targetLabel: "BELL TRIG",  color: "#F97316", code: "ORG" },
-                    { id: "pir1",label: "VAULT PIR",   targetLabel: "ZONE 1 PIR", color: "#22C55E", code: "GRN" },
-                    { id: "tamp",label: "ANTI-TAMPER", targetLabel: "TAMP LOOP",  color: "#EAB308", code: "YLW" },
-                    { id: "strb",label: "LED STROBE",  targetLabel: "STROBE -",   color: "#A855F7", code: "PRP" },
-                    { id: "door",label: "FRONT REED",  targetLabel: "ZONE 2 MAG", color: "#EC4899", code: "PNK" }
-                ]
             }
         ];
 
         const DAVID_DAD_JOKES = [
-            "Why did the burglar take a shower before robbing the house? ... To make a clean getaway! Over.",
-            "I fitted an alarm at the Northampton Bakery this morning... Some doughnut kept setting it off!",
-            "Why are Northants Security engineers so calm under pressure? ... Because we know how to handle shocking situations!",
-            "What do you call a dinosaur that breaks into houses? ... A Robber-saurus Rex! Haha, classic.",
-            "Customer asked if our wireless PIR sensors are good... I said they have no strings attached!",
-            "Why did the scarecrow win a Northants Security award? ... He was outstanding in his field monitoring the perimeter!",
-            "Did you hear about the thief who stole a calendar? ... He got twelve months! Keep wiring mate!",
-            "What's a burglar's least favourite vitamin? ... Vitamin C-C-T-V! Get that orange bell box flashing!",
-            "I tried to tell a joke about an ungrounded alarm circuit... but it didn't have enough potential!"
-        ];
-
-        const CUSTOMER_SMALL_TALK = [
-            "You've caught the weather for it love! Proper Northampton drizzle.",
-            "Do you take sugar in your tea? I've only got Rich Tea biscuits I'm afraid.",
-            "Mind the carpet love, I've just had the Vax out this morning!",
-            "Did you find the house alright? Parking's a nightmare round here!",
-            "Will the cat set the motion sensors off? He's a very chonky tabby.",
-            "My brother-in-law tried fitting an alarm once. Siren went off for three days solid!"
+            "Why did the alarm engineer bring a headtorch? To look bright in the dark cupboard! Over.",
+            "Why did the burglar take a shower before robbing the house? To make a clean getaway! Over.",
+            "Why are Northants Security engineers so calm? Because we know how to handle shocking situations!",
+            "What's a burglar's least favourite vitamin? Vitamin C-C-T-V!"
         ];
 
         /********************************************************************
-         * 2. SYNTHESIZED WEB AUDIO API (ZERO EXTERNAL SOUND FILES)
+         * 2. SOUND SYNTHESIZER
          ********************************************************************/
         class SoundEffects {
-            constructor() {
-                this.ctx = null;
-                this.muted = false;
-            }
+            constructor() { this.ctx = null; this.muted = false; }
             init() {
                 if (!this.ctx) {
-                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-                    if (AudioCtx) this.ctx = new AudioCtx();
+                    const AC = window.AudioContext || window.webkitAudioContext;
+                    if (AC) this.ctx = new AC();
                 }
-                if (this.ctx && this.ctx.state === 'suspended') {
-                    this.ctx.resume();
-                }
+                if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
             }
             playTone(freq, type = 'sine', duration = 0.14, vol = 0.15) {
                 if (this.muted) return;
@@ -862,935 +746,274 @@
                     gain.connect(this.ctx.destination);
                     osc.start();
                     osc.stop(this.ctx.currentTime + duration);
-                } catch (e) {}
+                } catch(e){}
             }
-            radioBeep() {
-                this.playTone(1250, 'square', 0.06, 0.07);
-                setTimeout(() => this.playTone(1650, 'square', 0.08, 0.07), 75);
+            doorSwing(isOpen) {
+                this.playTone(isOpen ? 190 : 240, 'triangle', 0.16, 0.16);
             }
             wireSnap() {
                 this.playTone(540, 'triangle', 0.08, 0.2);
-                setTimeout(() => this.playTone(920, 'sine', 0.13, 0.2), 55);
             }
             sparkError() {
                 this.playTone(130, 'sawtooth', 0.22, 0.22);
-                setTimeout(() => this.playTone(95, 'sawtooth', 0.22, 0.22), 85);
             }
-            dogBark() {
-                this.playTone(280, 'sawtooth', 0.11, 0.2);
-                setTimeout(() => this.playTone(340, 'sawtooth', 0.14, 0.2), 130);
-            }
-            teaSlurp() {
-                this.playTone(440, 'sine', 0.14, 0.15);
-                setTimeout(() => this.playTone(660, 'sine', 0.22, 0.18), 110);
-            }
-            alarmArmedSuccess() {
-                [523, 659, 783, 1046].forEach((f, i) => {
-                    setTimeout(() => this.playTone(f, 'triangle', 0.16, 0.2), i * 105);
-                });
-            }
-            burglarSiren() {
-                [390, 290, 390, 290].forEach((f, i) => {
-                    setTimeout(() => this.playTone(f, 'sawtooth', 0.25, 0.18), i * 240);
-                });
+            cashRegister() {
+                this.playTone(880, 'sine', 0.1, 0.2);
+                setTimeout(() => this.playTone(1320, 'sine', 0.15, 0.2), 90);
             }
         }
         const sfx = new SoundEffects();
 
         /********************************************************************
-         * 3. GAME STATE
-         ********************************************************************/
-        const state = {
-            currentLevelIdx: 0,
-            score: 0,
-            timeLeft: 48,
-            teaLeft: 2,
-            teaSlowMoTimer: 0,
-            isPlaying: false,
-            inWiringModal: false,
-            dogClearedForLevel: true,
-            selectedWireId: null,
-            draggingWireId: null,
-            dragPointerPos: null,
-            connectedWires: [],
-            spiderActive: false,
-            spiderHealth: 3,
-            jokeIndex: 0
-        };
-
-        /********************************************************************
-         * 4. ULTRA-FAST ZERO-DEPENDENCY 3D PROJECTION ENGINE (NO CDN WAIT!)
-         * Renders 3D Northamptonshire street, houses, van, beacons & terrier
-         * at 60fps on Android with <50ms startup time.
+         * 3. THREE.JS 3D ENGINE & WORLD SETUP
          ********************************************************************/
         const canvas = document.getElementById('game-canvas');
-        const ctx = canvas.getContext('2d', { alpha: false });
-        let viewW = window.innerWidth;
-        let viewH = window.innerHeight;
-        let fovScale = 450;
+        let viewW = window.innerWidth, viewH = window.innerHeight;
+        let renderer, scene, camera, ambientLight, hemiLight, torchSpotLight, torchTarget;
+        let wallColliders = [], doors = [], houseData = [], activePanelGroup, panelLedMesh, beaconMesh;
 
-        function resizeCanvas() {
-            const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-            viewW = window.innerWidth;
-            viewH = window.innerHeight;
-            canvas.width = Math.floor(viewW * dpr);
-            canvas.height = Math.floor(viewH * dpr);
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-            fovScale = Math.min(viewW, viewH) * 0.85;
-            if (state.inWiringModal) updateWireLines();
+        const player = { x: 0, y: 1.68, z: 16.5, yaw: 0, pitch: 0, speed: 7.4, radius: 0.42, bobPhase: 0 };
+
+        function houseToWorld(h, lx, ly, lz) {
+            const cos = Math.cos(h.rotY), sin = Math.sin(h.rotY);
+            return { x: h.x + (lx * cos + lz * sin), y: ly, z: h.z + (lz * cos - lx * sin) };
         }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        function worldToHouse(h, wx, wz) {
+            const dx = wx - h.x, dz = wz - h.z;
+            const cos = Math.cos(-h.rotY), sin = Math.sin(-h.rotY);
+            return { lx: dx * cos + dz * sin, lz: dz * cos - shin = dz * sin };
+        }
+        function addWallSegment(x1, z1, x2, z2) {
+            wallColliders.push({ x1, z1, x2, z2 });
+        }
 
-        const player = {
-            x: 0,
-            y: 1.75,
-            z: 17,
-            yaw: 0,
-            pitch: 0,
-            speed: 9.0,
-            bobPhase: 0
+        function initWebGL() {
+            if (renderer || typeof THREE === 'undefined') return;
+
+            renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+            renderer.setSize(viewW, viewH);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x07192B);
+            scene.fog = new THREE.FogExp2(0x07192B, 0.022);
+
+            camera = new THREE.PerspectiveCamera(68, viewW / viewH, 0.12, 85);
+            camera.rotation.order = 'YXZ';
+
+            ambientLight = new THREE.AmbientLight(0xDCE8F7, 0.72);
+            hemiLight = new THREE.HemisphereLight(0x93C5FD, 0x1E293B, 0.55);
+            scene.add(ambientLight, hemiLight);
+
+            torchSpotLight = new THREE.SpotLight(0xFFFBEB, 2.6, 22, Math.PI / 4.2, 0.48, 1.2);
+            torchTarget = new THREE.Object3D();
+            scene.add(torchSpotLight, torchTarget);
+            torchSpotLight.target = torchTarget;
+
+            // Ground & Road
+            const grass = new THREE.Mesh(new THREE.PlaneGeometry(90, 90), new THREE.MeshLambertMaterial({ color: 0x143321 }));
+            grass.rotation.x = -Math.PI / 2;
+            grass.position.y = -0.02;
+            const road = new THREE.Mesh(new THREE.PlaneGeometry(10.4, 68), new THREE.MeshLambertMaterial({ color: 0x1E293B }));
+            road.rotation.x = -Math.PI / 2;
+            road.position.set(0, 0.01, -4);
+            scene.add(grass, road);
+
+            // Active Alarm Panel Group
+            activePanelGroup = new THREE.Group();
+            const pBox = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.78, 0.14), new THREE.MeshPhongMaterial({ color: 0xF8FAFC }));
+            panelLedMesh = new THREE.Mesh(new THREE.SphereGeometry(0.045, 10, 10), new THREE.MeshBasicMaterial({ color: 0xFF6B00 }));
+            panelLedMesh.position.set(0.20, -0.18, 0.08);
+            activePanelGroup.add(pBox, panelLedMesh);
+            scene.add(activePanelGroup);
+
+            beaconMesh = new THREE.Mesh(new THREE.OctahedronGeometry(0.75, 0), new THREE.MeshBasicMaterial({ color: 0xFF6B00 }));
+            scene.add(beaconMesh);
+
+            buildHouses();
+        }
+
+        function buildHouses() {
+            wallColliders.length = 0;
+            doors.length = 0;
+            houseData.length = 0;
+
+            const houses = [
+                { index: 0, x: -13.5, z: 8, rotY: Math.PI / 2, num: '14' },
+                { index: 1, x: 13.5, z: 4, rotY: -Math.PI / 2, num: '28' },
+                { index: 2, x: -13.5, z: -8, rotY: Math.PI / 2, num: '7' }
+            ];
+
+            const brickMat = new THREE.MeshLambertMaterial({ color: 0x9A3412 });
+            const doorMat = new THREE.MeshLambertMaterial({ color: 0x004B93 });
+            const wallMat = new THREE.MeshLambertMaterial({ color: 0xE2E8F0 });
+
+            houses.forEach(h => {
+                const group = new THREE.Group();
+                group.position.set(h.x, 0, h.z);
+                group.rotation.y = h.rotY;
+                scene.add(group);
+
+                // Basic 4 walls & door
+                const p0 = houseToWorld(h, -2.2, 0, 4.2);
+                const p1 = houseToWorld(h, -0.9, 0, 4.2);
+                addWallSegment(p0.x, p0.z, p1.x, p1.z);
+
+                doors.push({
+                    id: `h${h.index}_front`,
+                    houseIndex: h.index,
+                    label: `No. ${h.num} Front Door`,
+                    hingeX: p0.x, hingeZ: p0.z,
+                    isOpen: false
+                });
+
+                houseData.push({
+                    ...h,
+                    outsideDoorSpot: houseToWorld(h, -1.55, 0, 5.4),
+                    hallwaySpot: houseToWorld(h, -1.65, 0, 2.0),
+                    panelSpots: {
+                        hallway: { lx: -4.35, ly: 1.55, lz: 2.1, standLX: -3.1, standLZ: 2.1, yawOffset: Math.PI / 2 },
+                        kitchen: { lx: 1.6, ly: 1.55, lz: -4.05, standLX: 1.6, standLZ: -2.7, yawOffset: 0 },
+                        cupboard: { lx: -2.6, ly: 1.55, lz: -4.05, standLX: -2.1, standLZ: -2.5, yawOffset: 0 }
+                    }
+                });
+            });
+        }
+
+        /********************************************************************
+         * 4. SHOP & ECONOMY SYSTEM
+         ********************************************************************/
+        function updateShopUI() {
+            document.getElementById('shop-cash-display').textContent = `£${state.cash}`;
+            for (const [key, purchased] of Object.entries(state.upgrades)) {
+                const card = document.getElementById(`card-${key}`);
+                if (!card) continue;
+                const btn = card.querySelector('button');
+                if (purchased) {
+                    card.classList.add('purchased');
+                    btn.textContent = 'PURCHASED ✓';
+                    btn.disabled = true;
+                    btn.style.background = '#065F46';
+                }
+            }
+        }
+
+        window.buyShopItem = function(itemId, cost) {
+            if (state.cash >= cost && !state.upgrades[itemId]) {
+                state.cash -= cost;
+                state.upgrades[itemId] = true;
+                if (itemId === 'snack_greggs') state.teaLeft++;
+                sfx.cashRegister();
+                updateShopUI();
+                updateHUD();
+            } else {
+                sfx.sparkError();
+            }
         };
 
-        const worldFaces = [];
-        const houseTargets = [];
-
-        // Helper: Add a 3D Polygon Face to the Scene
-        function addFace(verts, fill, stroke = null, tag = null) {
-            worldFaces.push({ verts, fill, stroke, tag });
-        }
-
-        // Helper: Add a 3D Box with Local Rotation
-        function addBox(cx, cy, cz, w, h, d, rotY, colors, tag = null) {
-            const hw = w / 2, hh = h / 2, hd = d / 2;
-            const localPts = [
-                [-hw, -hh, -hd], [hw, -hh, -hd], [hw, hh, -hd], [-hw, hh, -hd],
-                [-hw, -hh,  hd], [hw, -hh,  hd], [hw, hh,  hd], [-hw, hh,  hd]
-            ];
-            const cos = Math.cos(rotY), sin = Math.sin(rotY);
-            const pts = localPts.map(([lx, ly, lz]) => ({
-                x: cx + (lx * cos + lz * sin),
-                y: cy + ly,
-                z: cz + (lz * cos - lx * sin)
-            }));
-
-            // Front, Back, Left, Right, Top faces
-            addFace([pts[4], pts[5], pts[6], pts[7]], colors.front || colors.side, '#0f172a', tag);
-            addFace([pts[1], pts[0], pts[3], pts[2]], colors.side, '#0f172a', tag);
-            addFace([pts[0], pts[4], pts[7], pts[3]], colors.dark || colors.side, '#0f172a', tag);
-            addFace([pts[5], pts[1], pts[2], pts[6]], colors.dark || colors.side, '#0f172a', tag);
-            if (colors.top) {
-                addFace([pts[7], pts[6], pts[2], pts[3]], colors.top, '#0f172a', tag);
-            }
-        }
-
-        // Helper: Add a Pitched Roof Pyramid
-        function addRoof(cx, baseY, cz, w, h, d, rotY, color) {
-            const hw = w / 2, hd = d / 2;
-            const cos = Math.cos(rotY), sin = Math.sin(rotY);
-            const toWorld = (lx, ly, lz) => ({
-                x: cx + (lx * cos + lz * sin),
-                y: baseY + ly,
-                z: cz + (lz * cos - lx * sin)
-            });
-            const p0 = toWorld(-hw, 0, -hd);
-            const p1 = toWorld(hw, 0, -hd);
-            const p2 = toWorld(hw, 0, hd);
-            const p3 = toWorld(-hw, 0, hd);
-            const apex = toWorld(0, h, 0);
-
-            addFace([p3, p2, apex], color, '#1E293B');
-            addFace([p1, p0, apex], color, '#1E293B');
-            addFace([p0, p3, apex], '#1E293B', '#0F172A');
-            addFace([p2, p1, apex], '#1E293B', '#0F172A');
-        }
-
-        function buildNorthamptonStreet() {
-            // Road Segments & White Center Lines
-            for (let z = -34; z < 26; z += 6) {
-                addFace([
-                    { x: -5.5, y: 0, z: z },
-                    { x:  5.5, y: 0, z: z },
-                    { x:  5.5, y: 0, z: z + 6 },
-                    { x: -5.5, y: 0, z: z + 6 }
-                ], '#26292E');
-                // Pavements
-                addFace([
-                    { x: -8.5, y: 0.02, z: z },
-                    { x: -5.5, y: 0.02, z: z },
-                    { x: -5.5, y: 0.02, z: z + 6 },
-                    { x: -8.5, y: 0.02, z: z + 6 }
-                ], '#64748B');
-                addFace([
-                    { x: 5.5, y: 0.02, z: z },
-                    { x: 8.5, y: 0.02, z: z },
-                    { x: 8.5, y: 0.02, z: z + 6 },
-                    { x: 5.5, y: 0.02, z: z + 6 }
-                ], '#64748B');
-                // Center White Dash
-                addFace([
-                    { x: -0.15, y: 0.03, z: z + 1.5 },
-                    { x:  0.15, y: 0.03, z: z + 1.5 },
-                    { x:  0.15, y: 0.03, z: z + 4.2 },
-                    { x: -0.15, y: 0.03, z: z + 4.2 }
-                ], '#F1F5F9');
-            }
-
-            // Northants Security Van (#0F2C59 Blue & #FF6B00 Orange Livery)
-            addBox(-3.8, 1.25, 20.5, 2.5, 2.3, 4.8, 0, {
-                front: '#0F2C59', side: '#0F2C59', dark: '#0A1E3F', top: '#1E3A8A'
-            });
-            addBox(-3.8, 1.15, 20.5, 2.58, 0.52, 4.86, 0, {
-                front: '#FF6B00', side: '#FF6B00', dark: '#EA580C'
-            });
-            addBox(-3.8, 2.52, 19.5, 0.9, 0.25, 0.4, 0, {
-                front: '#FF8800', side: '#FF8800', dark: '#FF6B00', top: '#FDBA74'
-            });
-
-            // 5 Northamptonshire Properties for the 5 Shift Levels
-            const houses = [
-                { x: -13.5, z: 8,   rotY: Math.PI / 2,  wall: '#9A3412', dark: '#7C2D12', num: '14' },
-                { x:  13.5, z: 4,   rotY: -Math.PI / 2, wall: '#B45309', dark: '#92400E', num: '28' },
-                { x: -13.5, z: -8,  rotY: Math.PI / 2,  wall: '#881337', dark: '#701A75', num: '7'  },
-                { x:  13.5, z: -12, rotY: -Math.PI / 2, wall: '#7C2D12', dark: '#5B21B6', num: '42' },
-                { x:  0,    z: -25, rotY: 0,            wall: '#1E293B', dark: '#0F172A', num: '99' }
-            ];
-
-            houses.forEach((h, idx) => {
-                // Main Brick House Body
-                addBox(h.x, 2.6, h.z, 7.6, 5.2, 6.4, h.rotY, {
-                    front: h.wall, side: h.wall, dark: h.dark
-                });
-                // Slate Pitched Roof
-                addRoof(h.x, 5.2, h.z, 8.2, 2.6, 7.0, h.rotY, '#334155');
-
-                // Front Door & Northants Security Orange Bell Box on Front Wall
-                const cos = Math.cos(h.rotY), sin = Math.sin(h.rotY);
-                const placeOnFront = (lx, ly, lz, w, height, d, col) => {
-                    const wx = h.x + (lx * cos + lz * sin);
-                    const wz = h.z + (lz * cos - lx * sin);
-                    addBox(wx, ly, wz, w, height, d, h.rotY, { front: col, side: col, dark: col });
-                };
-
-                // Blue Front Door
-                placeOnFront(0, 1.2, 3.25, 1.3, 2.4, 0.15, '#1D4ED8');
-                // Warm Lit Upstairs Windows
-                placeOnFront(-2.1, 3.5, 3.25, 1.5, 1.3, 0.12, '#FEF08A');
-                placeOnFront( 2.1, 3.5, 3.25, 1.5, 1.3, 0.12, '#FEF08A');
-                // Orange & Blue Northants Security Bell Box & Panel beside Door
-                placeOnFront(1.35, 1.65, 3.28, 0.65, 0.85, 0.22, '#FF6B00');
-                placeOnFront(1.35, 1.32, 3.30, 0.67, 0.24, 0.24, '#0F2C59');
-
-                // Calculate Player Target Spot in front of door
-                const doorSpotX = h.x + (0 * cos + 4.9 * sin);
-                const doorSpotZ = h.z + (4.9 * cos - 0 * sin);
-                houseTargets.push({
-                    houseX: h.x,
-                    houseZ: h.z,
-                    doorX: doorSpotX,
-                    doorZ: doorSpotZ,
-                    lookYaw: h.rotY + Math.PI,
-                    num: h.num
-                });
-            });
-        }
-        buildNorthamptonStreet();
-
-        // Project 3D World Vertex into Camera View Space
-        function toCameraSpace(v, cosY, sinY, cosP, sinP) {
-            const dx = v.x - player.x;
-            const dy = v.y - (player.y + Math.sin(player.bobPhase) * 0.055);
-            const dz = v.z - player.z;
-
-            // Rotate by Yaw
-            const rx = dx * cosY - dz * sinY;
-            const rz1 = dz * cosY + dx * sinY;
-
-            // Rotate by Pitch
-            const ry = dy * cosP - rz1 * sinP;
-            const rz = rz1 * cosP + dy * sinP;
-            return { x: rx, y: ry, z: rz };
-        }
-
-        // Clip Polygon against Near Plane (z = -0.35 in camera space looking down -Z)
-        function clipNearPlane(camVerts) {
-            const nearZ = -0.35;
-            const out = [];
-            for (let i = 0; i < camVerts.length; i++) {
-                const cur = camVerts[i];
-                const prev = camVerts[(i + camVerts.length - 1) % camVerts.length];
-                const curIn = cur.z <= nearZ;
-                const prevIn = prev.z <= nearZ;
-
-                if (curIn !== prevIn) {
-                    const t = (nearZ - prev.z) / (cur.z - prev.z);
-                    out.push({
-                        x: prev.x + t * (cur.x - prev.x),
-                        y: prev.y + t * (cur.y - prev.y),
-                        z: nearZ
-                    });
-                }
-                if (curIn) out.push(cur);
-            }
-            return out;
-        }
-
-        function render3DScene(now) {
-            // 1. Draw Sky & Horizon Ground Gradient
-            const horizonY = viewH * 0.5 + Math.tan(player.pitch) * fovScale;
-            const skyGrad = ctx.createLinearGradient(0, 0, 0, Math.max(10, horizonY));
-            skyGrad.addColorStop(0, '#07192B');
-            skyGrad.addColorStop(1, '#1E3A5F');
-            ctx.fillStyle = skyGrad;
-            ctx.fillRect(0, 0, viewW, Math.max(0, horizonY));
-
-            const groundGrad = ctx.createLinearGradient(0, Math.max(0, horizonY), 0, viewH);
-            groundGrad.addColorStop(0, '#143321');
-            groundGrad.addColorStop(1, '#1F4D2B');
-            ctx.fillStyle = groundGrad;
-            ctx.fillRect(0, Math.max(0, horizonY), viewW, viewH - Math.max(0, horizonY));
-
-            // 2. Transform & Depth-Sort All 3D Polygons (Painter's Algorithm)
-            const cosY = Math.cos(player.yaw), sinY = Math.sin(player.yaw);
-            const cosP = Math.cos(player.pitch), sinP = Math.sin(player.pitch);
-            const renderList = [];
-
-            for (let i = 0; i < worldFaces.length; i++) {
-                const face = worldFaces[i];
-                const camVerts = face.verts.map(v => toCameraSpace(v, cosY, sinY, cosP, sinP));
-                const clipped = clipNearPlane(camVerts);
-                if (clipped.length < 3) continue;
-
-                let sumZ = 0;
-                for (let j = 0; j < clipped.length; j++) sumZ += clipped[j].z;
-                const avgZ = sumZ / clipped.length;
-
-                renderList.push({
-                    pts: clipped.map(p => ({
-                        sx: viewW * 0.5 + (p.x / -p.z) * fovScale,
-                        sy: viewH * 0.5 - (p.y / -p.z) * fovScale
-                    })),
-                    depth: -avgZ,
-                    fill: face.fill,
-                    stroke: face.stroke
-                });
-            }
-
-            // Sort far-to-near
-            renderList.sort((a, b) => b.depth - a.depth);
-
-            // 3. Draw Polygons
-            ctx.lineWidth = 1;
-            for (let i = 0; i < renderList.length; i++) {
-                const item = renderList[i];
-                ctx.beginPath();
-                ctx.moveTo(item.pts[0].sx, item.pts[0].sy);
-                for (let j = 1; j < item.pts.length; j++) {
-                    ctx.lineTo(item.pts[j].sx, item.pts[j].sy);
-                }
-                ctx.closePath();
-                ctx.fillStyle = item.fill;
-                ctx.fill();
-                if (item.stroke) {
-                    ctx.strokeStyle = item.stroke;
-                    ctx.stroke();
-                }
-            }
-
-            // 4. Draw Floating Animated Target Beacon & Terrier Dog Sprite in 3D Space
-            const lvl = LEVELS[state.currentLevelIdx];
-            const target = houseTargets[lvl.houseIndex];
-            if (target) {
-                const bounceY = 8.4 + Math.sin(now * 0.005) * 0.45;
-                const beaconCam = toCameraSpace({ x: target.houseX, y: bounceY, z: target.houseZ }, cosY, sinY, cosP, sinP);
-                if (beaconCam.z < -0.5) {
-                    const bx = viewW * 0.5 + (beaconCam.x / -beaconCam.z) * fovScale;
-                    const by = viewH * 0.5 - (beaconCam.y / -beaconCam.z) * fovScale;
-                    const r = Math.max(12, (1.1 / -beaconCam.z) * fovScale);
-
-                    ctx.save();
-                    ctx.fillStyle = '#FF6B00';
-                    ctx.strokeStyle = '#FFFFFF';
-                    ctx.lineWidth = 2.5;
-                    ctx.beginPath();
-                    ctx.arc(bx, by, r, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.stroke();
-
-                    ctx.fillStyle = '#0F2C59';
-                    ctx.font = `900 ${Math.max(10, Math.round(r * 0.85))}px sans-serif`;
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText(`No.${target.num}`, bx, by);
-                    ctx.restore();
-                }
-
-                // Draw Barnaby the Terrier Dog if blocking the driveway
-                if (!state.dogClearedForLevel) {
-                    const dogCam = toCameraSpace({ x: target.doorX, y: 0.75, z: target.doorZ }, cosY, sinY, cosP, sinP);
-                    if (dogCam.z < -0.5) {
-                        const dx = viewW * 0.5 + (dogCam.x / -dogCam.z) * fovScale;
-                        const dy = viewH * 0.5 - (dogCam.y / -dogCam.z) * fovScale;
-                        const dSize = Math.max(18, Math.min(64, (1.5 / -dogCam.z) * fovScale));
-                        ctx.font = `${Math.round(dSize)}px sans-serif`;
-                        ctx.textAlign = 'center';
-                        ctx.fillText('🐕', dx, dy);
-                    }
-                }
-            }
-        }
-
-        /********************************************************************
-         * 5. DUAL-TOUCH MOBILE CONTROLS & KEYBOARD INPUT
-         ********************************************************************/
-        const keys = { w: false, a: false, s: false, d: false, left: false, right: false };
-        const touchMove = { f: false, b: false, l: false, r: false };
-
-        window.addEventListener('keydown', (e) => {
-            const k = e.key.toLowerCase();
-            if (k === 'w' || e.key === 'ArrowUp') keys.w = true;
-            if (k === 's' || e.key === 'ArrowDown') keys.s = true;
-            if (k === 'a') keys.a = true;
-            if (k === 'd') keys.d = true;
-            if (e.key === 'ArrowLeft') keys.left = true;
-            if (e.key === 'ArrowRight') keys.right = true;
-            if (e.key === ' ' && !state.inWiringModal && state.isPlaying) {
-                checkOpenPanelInteraction();
-            }
-            if (e.key === 'Escape' && state.inWiringModal) {
-                closeWiringModal();
-            }
+        document.getElementById('btn-shop').addEventListener('click', () => {
+            updateShopUI();
+            document.getElementById('shop-modal').classList.remove('hidden');
         });
-
-        window.addEventListener('keyup', (e) => {
-            const k = e.key.toLowerCase();
-            if (k === 'w' || e.key === 'ArrowUp') keys.w = false;
-            if (k === 's' || e.key === 'ArrowDown') keys.s = false;
-            if (k === 'a') keys.a = false;
-            if (k === 'd') keys.d = false;
-            if (e.key === 'ArrowLeft') keys.left = false;
-            if (e.key === 'ArrowRight') keys.right = false;
+        document.getElementById('btn-close-shop').addEventListener('click', () => {
+            document.getElementById('shop-modal').classList.add('hidden');
         });
-
-        // Multi-Touch Swipe-to-Look on Canvas
-        let lookPointerId = null;
-        let prevLook = { x: 0, y: 0 };
-
-        canvas.addEventListener('pointerdown', (e) => {
-            if (lookPointerId === null) {
-                lookPointerId = e.pointerId;
-                prevLook = { x: e.clientX, y: e.clientY };
-            }
-        });
-        window.addEventListener('pointermove', (e) => {
-            if (e.pointerId !== lookPointerId || state.inWiringModal || !state.isPlaying) return;
-            const dx = e.clientX - prevLook.x;
-            const dy = e.clientY - prevLook.y;
-            player.yaw -= dx * 0.005;
-            player.pitch = Math.max(-0.45, Math.min(0.45, player.pitch - dy * 0.004));
-            prevLook = { x: e.clientX, y: e.clientY };
-        });
-        window.addEventListener('pointerup', (e) => {
-            if (e.pointerId === lookPointerId) lookPointerId = null;
-        });
-        window.addEventListener('pointercancel', (e) => {
-            if (e.pointerId === lookPointerId) lookPointerId = null;
-        });
-
-        // D-Pad Hold Buttons
-        function bindHoldButton(id, prop) {
-            const btn = document.getElementById(id);
-            btn.addEventListener('pointerdown', (e) => { e.preventDefault(); touchMove[prop] = true; });
-            btn.addEventListener('pointerup', () => { touchMove[prop] = false; });
-            btn.addEventListener('pointerleave', () => { touchMove[prop] = false; });
-            btn.addEventListener('pointercancel', () => { touchMove[prop] = false; });
-        }
-        bindHoldButton('move-f', 'f');
-        bindHoldButton('move-b', 'b');
-        bindHoldButton('turn-l', 'l');
-        bindHoldButton('turn-r', 'r');
-
-        // One-Tap Sprint to Target House (Smoothly & instantly puts player at the door)
-        document.getElementById('btn-autowalk').addEventListener('click', () => {
-            if (!state.isPlaying) return;
-            const lvl = LEVELS[state.currentLevelIdx];
-            const target = houseTargets[lvl.houseIndex];
-            player.x = target.doorX;
-            player.z = target.doorZ;
-            player.yaw = target.lookYaw;
-            player.pitch = 0;
-            sfx.playTone(620, 'sine', 0.1, 0.12);
+        document.getElementById('btn-open-shop-outcome').addEventListener('click', () => {
+            document.getElementById('outcome-modal').classList.add('hidden');
+            updateShopUI();
+            document.getElementById('shop-modal').classList.remove('hidden');
         });
 
         /********************************************************************
-         * 6. BOSS DAVID WALKIE-TALKIE & CUSTOMER SMALL TALK
-         ********************************************************************/
-        let radioTimeout = null;
-        function triggerDavidJoke(customMessage = null) {
-            sfx.radioBeep();
-            const radioEl = document.getElementById('david-radio');
-            const textEl = document.getElementById('david-text');
-            const msg = customMessage || DAVID_DAD_JOKES[state.jokeIndex % DAVID_DAD_JOKES.length];
-            if (!customMessage) state.jokeIndex++;
-
-            textEl.textContent = `"${msg}"`;
-            radioEl.classList.remove('radio-hidden');
-            radioEl.classList.add('radio-visible');
-
-            if (radioTimeout) clearTimeout(radioTimeout);
-            radioTimeout = setTimeout(() => {
-                radioEl.classList.remove('radio-visible');
-                radioEl.classList.add('radio-hidden');
-            }, 6500);
-        }
-
-        let toastTimeout = null;
-        function triggerCustomerToast() {
-            const lvl = LEVELS[state.currentLevelIdx];
-            const toast = document.getElementById('customer-toast');
-            document.getElementById('customer-name').textContent = `${lvl.customer} (No. ${lvl.address.split(' ')[0]})`;
-            const quote = CUSTOMER_SMALL_TALK[Math.floor(Math.random() * CUSTOMER_SMALL_TALK.length)];
-            document.getElementById('customer-quote').textContent = `"${quote}"`;
-            document.getElementById('panel-smalltalk').textContent = `"${quote}" — ${lvl.customer}`;
-
-            toast.classList.remove('hidden');
-            if (toastTimeout) clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => toast.classList.add('hidden'), 5500);
-        }
-
-        document.getElementById('btn-joke').addEventListener('click', () => triggerDavidJoke());
-        document.getElementById('btn-mute').addEventListener('click', (e) => {
-            sfx.muted = !sfx.muted;
-            e.currentTarget.textContent = sfx.muted ? '🔇' : '🔊';
-        });
-
-        /********************************************************************
-         * 7. CUPPA TEA POWER-UP (SLOWS DOWN SLA TIMER)
-         ********************************************************************/
-        function useCuppaTea() {
-            if (!state.isPlaying || state.teaLeft <= 0 || state.teaSlowMoTimer > 0) return;
-            state.teaLeft--;
-            state.teaSlowMoTimer = 8.0;
-            sfx.teaSlurp();
-            updateHUD();
-            document.body.classList.add('tea-active-vignette');
-            triggerDavidJoke("Ahhh, nothing beats a proper builder's brew! Clock's slowed right down for ya mate!");
-        }
-        document.getElementById('btn-tea').addEventListener('click', useCuppaTea);
-        document.getElementById('btn-modal-tea').addEventListener('click', useCuppaTea);
-
-        /********************************************************************
-         * 8. SHIFT LEVEL START & DRIVEWAY DOG ENCOUNTER
+         * 5. GAMEFLOW & WIRING
          ********************************************************************/
         function startLevel(idx) {
             state.currentLevelIdx = idx;
             const lvl = LEVELS[idx];
-            state.timeLeft = lvl.timeLimit;
-            state.teaLeft = 2;
-            state.teaSlowMoTimer = 0;
+            state.timeLeft = lvl.timeLimit + (state.upgrades.tool_snips ? 10 : 0);
             state.connectedWires = [];
-            state.selectedWireId = null;
-            state.draggingWireId = null;
-            state.inWiringModal = false;
-            state.dogClearedForLevel = !lvl.dogObstacle;
             state.isPlaying = true;
-
-            document.body.classList.remove('tea-active-vignette');
             document.getElementById('outcome-modal').classList.add('hidden');
-            document.getElementById('wiring-modal').classList.add('hidden');
-            document.getElementById('dog-encounter').classList.add('hidden');
-
-            player.x = 0;
-            player.z = 16;
-            player.yaw = 0;
-            player.pitch = 0;
-
+            document.getElementById('shop-modal').classList.add('hidden');
+            
+            player.x = 0; player.z = 16.5; player.yaw = 0; player.pitch = 0;
             updateHUD();
-            triggerDavidJoke();
-            setTimeout(() => triggerCustomerToast(), 2000);
+            triggerDavidJoke(lvl.davidBriefing);
         }
 
         function updateHUD() {
             const lvl = LEVELS[state.currentLevelIdx];
-            document.getElementById('hud-level').textContent = `SHIFT ${lvl.level}/${LEVELS.length}`;
-            document.getElementById('hud-address').textContent = lvl.address;
-            document.getElementById('hud-score').textContent = `£${state.score}`;
+            document.getElementById('hud-level').textContent = `JOB ${lvl.level}/${LEVELS.length}`;
+            document.getElementById('hud-score').textContent = `£${state.cash}`;
             document.getElementById('tea-count').textContent = state.teaLeft;
-            document.getElementById('modal-tea-count').textContent = state.teaLeft;
-
-            const timeStr = `${Math.max(0, state.timeLeft).toFixed(1)}s`;
-            const hudTimer = document.getElementById('hud-timer');
-            const modalTimer = document.getElementById('modal-timer');
-            hudTimer.textContent = timeStr;
-            modalTimer.textContent = timeStr;
-
-            if (state.timeLeft < 10) {
-                hudTimer.style.color = '#F87171';
-                modalTimer.style.color = '#F87171';
-            } else if (state.teaSlowMoTimer > 0) {
-                hudTimer.style.color = '#FDE047';
-                modalTimer.style.color = '#FDE047';
-            } else {
-                hudTimer.style.color = '#FFFFFF';
-                modalTimer.style.color = '#FF6B00';
-            }
+            document.getElementById('hud-timer').textContent = `${Math.max(0, state.timeLeft).toFixed(1)}s`;
         }
 
-        function checkOpenPanelInteraction() {
-            const lvl = LEVELS[state.currentLevelIdx];
-            const target = houseTargets[lvl.houseIndex];
-            const dist = Math.hypot(player.x - target.doorX, player.z - target.doorZ);
-
-            if (dist < 5.8) {
-                if (!state.dogClearedForLevel) {
-                    document.getElementById('dog-encounter').classList.remove('hidden');
-                    sfx.dogBark();
-                    return;
-                }
-                openWiringModal();
-            }
+        function triggerDavidJoke(msg) {
+            sfx.playTone(1250, 'square', 0.06, 0.07);
+            const r = document.getElementById('david-radio');
+            document.getElementById('david-text').textContent = `"${msg || DAVID_DAD_JOKES[state.jokeIndex++ % DAVID_DAD_JOKES.length]}"`;
+            r.classList.remove('radio-hidden');
+            r.classList.add('radio-visible');
+            setTimeout(() => { r.classList.remove('radio-visible'); r.classList.add('radio-hidden'); }, 6000);
         }
 
-        document.getElementById('btn-open-panel').addEventListener('click', checkOpenPanelInteraction);
-
-        document.getElementById('btn-toss-biscuit').addEventListener('click', () => {
-            state.dogClearedForLevel = true;
-            document.getElementById('dog-encounter').classList.add('hidden');
-            sfx.wireSnap();
-            openWiringModal();
-        });
-
-        /********************************************************************
-         * 9. TOUCH-FRIENDLY ALARM PANEL WIRING MINIGAME (DRAG OR TAP)
-         ********************************************************************/
+        // Wiring modal trigger
         function openWiringModal() {
             state.inWiringModal = true;
             const lvl = LEVELS[state.currentLevelIdx];
-            document.getElementById('panel-title').textContent = `PANEL AT ${lvl.address.toUpperCase()}`;
+            document.getElementById('panel-title').textContent = `${lvl.panelRoomName.toUpperCase()} PANEL`;
             document.getElementById('wiring-modal').classList.remove('hidden');
-            document.getElementById('panel-prompt').classList.add('hidden');
-
             buildWiringBoard(lvl);
-
-            if (Math.random() < lvl.spiderChance && state.connectedWires.length === 0) {
-                spawnJunctionSpider();
-            } else {
-                document.getElementById('spider-hazard').classList.add('hidden');
-            }
         }
-
-        function closeWiringModal() {
+        document.getElementById('btn-open-panel').addEventListener('click', openWiringModal);
+        document.getElementById('btn-close-panel').addEventListener('click', () => {
             state.inWiringModal = false;
             document.getElementById('wiring-modal').classList.add('hidden');
-        }
-        document.getElementById('btn-close-panel').addEventListener('click', closeWiringModal);
-
-        function spawnJunctionSpider() {
-            state.spiderActive = true;
-            state.spiderHealth = 3;
-            document.getElementById('spider-hp').textContent = state.spiderHealth;
-            document.getElementById('spider-hazard').classList.remove('hidden');
-        }
-
-        document.getElementById('spider-target').addEventListener('pointerdown', (e) => {
-            e.stopPropagation();
-            if (!state.spiderActive) return;
-            state.spiderHealth--;
-            sfx.playTone(720, 'triangle', 0.08, 0.18);
-            document.getElementById('spider-hp').textContent = state.spiderHealth;
-            const sp = document.getElementById('spider-target');
-            sp.style.transform = `translate(${(Math.random() - 0.5) * 85}px, ${(Math.random() - 0.5) * 65}px)`;
-            if (state.spiderHealth <= 0) {
-                state.spiderActive = false;
-                document.getElementById('spider-hazard').classList.add('hidden');
-                sp.style.transform = '';
-            }
         });
 
         function buildWiringBoard(lvl) {
             const leftCol = document.getElementById('left-terminals');
             const rightCol = document.getElementById('right-terminals');
-            leftCol.innerHTML = '';
-            rightCol.innerHTML = '';
+            leftCol.innerHTML = ''; rightCol.innerHTML = '';
 
-            // Left Column: Incoming Sensor Wires
             lvl.wires.forEach(w => {
                 const isDone = state.connectedWires.includes(w.id);
                 const btn = document.createElement('button');
-                btn.dataset.wireId = w.id;
-                btn.className = `terminal-node ${isDone ? 'connected' : ''} ${state.selectedWireId === w.id ? 'selected' : ''}`;
-                btn.innerHTML = `
-                    <span class="flex items-center gap-2 truncate">
-                        <span class="rounded-full inline-block flex-shrink-0" style="width:12px;height:12px;background:${w.color}"></span>
-                        <span class="truncate">${w.label}</span>
-                    </span>
-                    <span id="left-pin-${w.id}" class="rounded-full flex items-center justify-center ml-2 flex-shrink-0" style="width:20px;height:20px;border:2px solid #fff;background:${w.color};color:#07192B;font-size:11px;">
-                        ${isDone ? '✓' : ''}
-                    </span>
-                `;
-
-                // Support both Tap-to-Select AND Touch Dragging from Left Terminal
-                btn.addEventListener('pointerdown', (e) => {
-                    e.preventDefault();
-                    selectLeftWire(w.id);
-                    if (!isDone && !state.spiderActive) {
-                        state.draggingWireId = w.id;
-                        const rect = document.getElementById('pcb-container').getBoundingClientRect();
-                        state.dragPointerPos = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-                        updateWireLines();
+                btn.className = `terminal-node ${isDone ? 'connected' : ''}`;
+                btn.innerHTML = `<span>${w.label}</span><span>${isDone ? '✓' : ''}</span>`;
+                btn.addEventListener('click', () => {
+                    if (!isDone) {
+                        state.connectedWires.push(w.id);
+                        sfx.wireSnap();
+                        buildWiringBoard(lvl);
+                        if (state.connectedWires.length === lvl.wires.length) {
+                            completeLevel();
+                        }
                     }
                 });
                 leftCol.appendChild(btn);
             });
-
-            // Right Column: Target PCB Terminals
-            let rightWires = [...lvl.wires];
-            if (lvl.scrambledRight) {
-                rightWires.sort((a, b) => a.targetLabel.localeCompare(b.targetLabel));
-            }
-
-            rightWires.forEach(w => {
-                const isDone = state.connectedWires.includes(w.id);
-                const btn = document.createElement('button');
-                btn.dataset.targetId = w.id;
-                btn.className = `terminal-node ${isDone ? 'connected' : ''}`;
-                btn.style.borderColor = isDone ? '#22C55E' : '#FF6B00';
-                btn.innerHTML = `
-                    <span id="right-pin-${w.id}" class="rounded-full flex items-center justify-center mr-2 flex-shrink-0" style="width:20px;height:20px;border:2px solid #fff;background:${isDone ? w.color : '#1E293B'}">
-                        <span class="rounded-full" style="width:8px;height:8px;background:${w.color}"></span>
-                    </span>
-                    <span class="truncate text-right flex-1">${w.targetLabel}</span>
-                    <span class="ml-2 rounded px-1.5 py-0.5" style="font-size:10px;background:#0F172A;color:#CBD5E1;">${w.code}</span>
-                `;
-                btn.addEventListener('pointerdown', (e) => {
-                    e.preventDefault();
-                    connectRightTerminal(w.id);
-                });
-                rightCol.appendChild(btn);
-            });
-
-            requestAnimationFrame(updateWireLines);
-            document.getElementById('wiring-progress').textContent = `${state.connectedWires.length} / ${lvl.wires.length} FITTED`;
         }
 
-        // Live Drag-to-Connect across PCB Board
-        const pcbContainer = document.getElementById('pcb-container');
-        pcbContainer.addEventListener('pointermove', (e) => {
-            if (!state.draggingWireId) return;
-            const rect = pcbContainer.getBoundingClientRect();
-            state.dragPointerPos = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-            updateWireLines();
-        });
-
-        window.addEventListener('pointerup', (e) => {
-            if (!state.draggingWireId) return;
-            const el = document.elementFromPoint(e.clientX, e.clientY);
-            const targetBtn = el ? el.closest('[data-target-id]') : null;
-            state.draggingWireId = null;
-            state.dragPointerPos = null;
-            if (targetBtn) {
-                connectRightTerminal(targetBtn.dataset.targetId);
-            } else {
-                updateWireLines();
-            }
-        });
-
-        function selectLeftWire(wireId) {
-            if (state.spiderActive) {
-                sfx.sparkError();
-                return;
-            }
-            if (state.connectedWires.includes(wireId)) return;
-            state.selectedWireId = wireId;
-            sfx.playTone(460, 'sine', 0.06, 0.12);
-
-            document.querySelectorAll('#left-terminals button').forEach(b => {
-                b.classList.toggle('selected', b.dataset.wireId === wireId);
-            });
-        }
-
-        function connectRightTerminal(targetId) {
-            if (state.spiderActive) {
-                sfx.sparkError();
-                return;
-            }
-            if (!state.selectedWireId) return;
-
-            const lvl = LEVELS[state.currentLevelIdx];
-            if (state.selectedWireId === targetId) {
-                sfx.wireSnap();
-                state.connectedWires.push(targetId);
-                state.selectedWireId = null;
-                buildWiringBoard(lvl);
-
-                if (state.connectedWires.length === lvl.wires.length) {
-                    completeShiftLevelSuccess();
-                }
-            } else {
-                // Wrong terminal spark penalty (-2.5s)
-                sfx.sparkError();
-                state.timeLeft = Math.max(0, state.timeLeft - 2.5);
-                state.selectedWireId = null;
-                pcbContainer.style.backgroundColor = '#450A0A';
-                setTimeout(() => { pcbContainer.style.backgroundColor = '#071A2E'; }, 240);
-                buildWiringBoard(lvl);
-            }
-        }
-
-        function updateWireLines() {
-            const svg = document.getElementById('wire-svg');
-            svg.innerHTML = '';
-            const containerRect = pcbContainer.getBoundingClientRect();
-            const lvl = LEVELS[state.currentLevelIdx];
-
-            // Draw completed connections
-            state.connectedWires.forEach(wId => {
-                const wireObj = lvl.wires.find(w => w.id === wId);
-                const leftPin = document.getElementById(`left-pin-${wId}`);
-                const rightPin = document.getElementById(`right-pin-${wId}`);
-                if (!leftPin || !rightPin || !wireObj) return;
-
-                const lRect = leftPin.getBoundingClientRect();
-                const rRect = rightPin.getBoundingClientRect();
-                drawBezierWire(
-                    svg,
-                    lRect.left + lRect.width / 2 - containerRect.left,
-                    lRect.top + lRect.height / 2 - containerRect.top,
-                    rRect.left + rRect.width / 2 - containerRect.left,
-                    rRect.top + rRect.height / 2 - containerRect.top,
-                    wireObj.color,
-                    false
-                );
-            });
-
-            // Draw active finger-dragged wire
-            if (state.draggingWireId && state.dragPointerPos) {
-                const wireObj = lvl.wires.find(w => w.id === state.draggingWireId);
-                const leftPin = document.getElementById(`left-pin-${state.draggingWireId}`);
-                if (leftPin && wireObj) {
-                    const lRect = leftPin.getBoundingClientRect();
-                    drawBezierWire(
-                        svg,
-                        lRect.left + lRect.width / 2 - containerRect.left,
-                        lRect.top + lRect.height / 2 - containerRect.top,
-                        state.dragPointerPos.x,
-                        state.dragPointerPos.y,
-                        wireObj.color,
-                        true
-                    );
-                }
-            }
-        }
-
-        function drawBezierWire(svg, x1, y1, x2, y2, color, isDashed) {
-            const cx1 = x1 + (x2 - x1) * 0.45;
-            const cx2 = x1 + (x2 - x1) * 0.55;
-            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            path.setAttribute('d', `M ${x1} ${y1} C ${cx1} ${y1}, ${cx2} ${y2}, ${x2} ${y2}`);
-            path.setAttribute('stroke', color);
-            path.setAttribute('stroke-width', '6');
-            path.setAttribute('fill', 'none');
-            path.setAttribute('stroke-linecap', 'round');
-            if (isDashed) path.setAttribute('stroke-dasharray', '8 6');
-            svg.appendChild(path);
-        }
-
-        /********************************************************************
-         * 10. WIN / STICKY-FINGERS KEV BURGLAR ROBBERY OUTCOMES
-         ********************************************************************/
-        function completeShiftLevelSuccess() {
+        function completeLevel() {
             state.isPlaying = false;
-            state.inWiringModal = false;
             document.getElementById('wiring-modal').classList.add('hidden');
-            sfx.alarmArmedSuccess();
-
-            const lvl = LEVELS[state.currentLevelIdx];
-            const timeBonus = Math.round(state.timeLeft * 10);
-            const jobFee = 150 + timeBonus;
-            state.score += jobFee;
+            const bonus = state.upgrades.gear_hivis ? 1.2 : 1.0;
+            const earned = Math.round(150 * bonus);
+            state.cash += earned;
             updateHUD();
 
-            const modal = document.getElementById('outcome-modal');
-            const badge = document.getElementById('outcome-badge');
-            const title = document.getElementById('outcome-title');
-            const stage = document.getElementById('outcome-stage');
-            const davidQuote = document.getElementById('outcome-david-quote');
-            const btnRetry = document.getElementById('btn-retry-level');
-            const btnNext = document.getElementById('btn-next-level');
-
-            badge.style.background = '#22C55E';
-            badge.style.color = '#052E16';
-            badge.textContent = "SYSTEM ARMED • BELL BOX FLASHING";
-
-            const isFinalLevel = state.currentLevelIdx === LEVELS.length - 1;
-            title.textContent = isFinalLevel ? "NORTHANTS ENGINEER OF THE YEAR!" : `${lvl.address.split(',')[0]} SECURED!`;
-
-            stage.innerHTML = `
-                <div class="flex flex-col items-center">
-                    <div class="rounded-2xl bg-ns-orange flex items-center justify-center shadow-lg mb-2" style="width:54px;height:54px;border:2px solid #fff;font-size:28px;">
-                        🛡️
-                    </div>
-                    <div class="font-tech font-extrabold" style="font-size:18px;color:#4ADE80;">+£${jobFee} ADDED TO PAY PACKET</div>
-                    <p style="font-size:11.5px;color:#BFDBFE;margin:4px 0 0;">${lvl.customer} gave you a 5-star review and a packet of Chocolate Hobnobs!</p>
-                </div>
-            `;
-
-            davidQuote.textContent = `"Spot on mate! Why did the alarm panel get promoted? Because it had great connections! Over."`;
-
-            btnRetry.classList.add('hidden');
-            btnNext.classList.remove('hidden');
-            btnNext.textContent = isFinalLevel ? "START NEW SHIFT FROM LEVEL 1 🚐" : "NEXT JOB ON SHIFT →";
-
-            modal.classList.remove('hidden');
+            document.getElementById('outcome-title').textContent = "PROPERTY PROTECTED!";
+            document.getElementById('outcome-stage').innerHTML = `<div class="font-tech font-extrabold text-emerald-400 text-xl">+£${earned} ADDED TO PAY PACKET!</div>`;
+            document.getElementById('outcome-modal').classList.remove('hidden');
         }
 
-        function triggerBurglarRobberyFail() {
-            state.isPlaying = false;
-            state.inWiringModal = false;
-            document.getElementById('wiring-modal').classList.add('hidden');
-            document.getElementById('dog-encounter').classList.add('hidden');
-            sfx.burglarSiren();
-
-            const lvl = LEVELS[state.currentLevelIdx];
-            const modal = document.getElementById('outcome-modal');
-            const badge = document.getElementById('outcome-badge');
-            const title = document.getElementById('outcome-title');
-            const stage = document.getElementById('outcome-stage');
-            const davidQuote = document.getElementById('outcome-david-quote');
-            const btnRetry = document.getElementById('btn-retry-level');
-            const btnNext = document.getElementById('btn-next-level');
-
-            badge.style.background = '#EF4444';
-            badge.style.color = '#FFFFFF';
-            badge.textContent = "SLA EXPIRED • ALARM UNARMED!";
-            title.textContent = "A BURGLAR ROBBED THE HOUSE!";
-
-            stage.innerHTML = `
-                <div class="w-full h-full flex flex-col justify-between items-center relative">
-                    <div class="font-bold uppercase" style="font-size:11px;color:#FCA5A5;">🔴 LIVE CCTV: ${lvl.address}</div>
-                    <div class="burglar-run flex items-center gap-2.5 m-auto">
-                        <div style="font-size:44px;">🦹‍♂️</div>
-                        <div class="font-tech font-extrabold px-2.5 py-1 rounded-lg shadow" style="background:#FEF3C7;color:#0F172A;border:2px solid #F59E0B;font-size:11.5px;">
-                            💰 SWIPED THE TELLY & TEAPOT!
-                        </div>
-                    </div>
-                    <div style="font-size:11px;color:#93C5FD;">Without the Northants Security bell box live, Sticky-Fingers Kev walked right in!</div>
-                </div>
-            `;
-
-            davidQuote.textContent = `"Oof! Sticky-Fingers Kev nicked their 60-inch telly! Have a quick brew and let's re-wire that panel properly!"`;
-
-            btnRetry.classList.remove('hidden');
-            btnNext.classList.add('hidden');
-            modal.classList.remove('hidden');
-        }
-
-        document.getElementById('btn-retry-level').addEventListener('click', () => startLevel(state.currentLevelIdx));
         document.getElementById('btn-next-level').addEventListener('click', () => {
-            const nextIdx = (state.currentLevelIdx + 1) % LEVELS.length;
-            if (nextIdx === 0) state.score = 0;
-            startLevel(nextIdx);
+            const next = (state.currentLevelIdx + 1) % LEVELS.length;
+            startLevel(next);
         });
+
         document.getElementById('btn-start-game').addEventListener('click', () => {
             sfx.init();
             document.getElementById('start-modal').classList.add('hidden');
@@ -1798,81 +1021,34 @@
         });
 
         /********************************************************************
-         * 11. MAIN 60FPS GAME LOOP
-         ********************************************************************/
-        let lastTime = performance.now();
-
+         * 6. RENDER LOOP
+         ******************************************************************** */
         function gameLoop(now) {
             requestAnimationFrame(gameLoop);
-            const dt = Math.min(0.1, (now - lastTime) / 1000);
-            lastTime = now;
+            if (!renderer) initWebGL();
 
-            if (state.isPlaying) {
-                let timeRate = 1.0;
-                if (state.teaSlowMoTimer > 0) {
-                    state.teaSlowMoTimer = Math.max(0, state.teaSlowMoTimer - dt);
-                    timeRate = 0.35;
-                    if (state.teaSlowMoTimer === 0) {
-                        document.body.classList.remove('tea-active-vignette');
-                    }
-                }
-
-                state.timeLeft -= dt * timeRate;
-                updateHUD();
-
-                if (state.timeLeft <= 0) {
-                    triggerBurglarRobberyFail();
-                    return;
-                }
-
-                if (!state.inWiringModal) {
-                    const turnSpeed = 2.1;
-                    if (keys.left || touchMove.l) player.yaw += turnSpeed * dt;
-                    if (keys.right || touchMove.r) player.yaw -= turnSpeed * dt;
-
-                    let moveZ = 0, moveX = 0;
-                    if (keys.w || touchMove.f) moveZ -= 1;
-                    if (keys.s || touchMove.b) moveZ += 1;
-                    if (keys.a) moveX -= 1;
-                    if (keys.d) moveX += 1;
-
-                    if (moveZ !== 0 || moveX !== 0) {
-                        const len = Math.hypot(moveX, moveZ);
-                        moveX /= len;
-                        moveZ /= len;
-
-                        const sinY = Math.sin(player.yaw);
-                        const cosY = Math.cos(player.yaw);
-
-                        player.x += (moveX * cosY + moveZ * sinY) * player.speed * dt;
-                        player.z += (moveZ * cosY - moveX * sinY) * player.speed * dt;
-
-                        player.x = Math.max(-11.5, Math.min(11.5, player.x));
-                        player.z = Math.max(-22, Math.min(23, player.z));
-                        player.bobPhase += dt * 11;
-                    }
-
-                    const lvl = LEVELS[state.currentLevelIdx];
-                    const target = houseTargets[lvl.houseIndex];
-                    const dist = Math.hypot(player.x - target.doorX, player.z - target.doorZ);
-
-                    const promptEl = document.getElementById('panel-prompt');
-                    const objText = document.getElementById('hud-objective');
-                    if (dist < 5.8) {
-                        promptEl.classList.remove('hidden');
-                        objText.textContent = "Tap 'Fit Alarm Panel' below!";
-                    } else {
-                        promptEl.classList.add('hidden');
-                        objText.textContent = `Go to No. ${target.num} (${Math.round(dist)}m)`;
-                    }
-                }
+            if (renderer && scene && camera) {
+                camera.position.set(player.x, player.y, player.z);
+                camera.rotation.set(player.pitch, player.yaw, 0, 'YXZ');
+                renderer.render(scene, camera);
             }
 
-            render3DScene(now);
+            if (state.isPlaying) {
+                state.timeLeft -= 0.016;
+                updateHUD();
+                if (state.timeLeft <= 0) {
+                    state.isPlaying = false;
+                    document.getElementById('outcome-title').textContent = "BURGLAR ROBBED HOUSE!";
+                    document.getElementById('outcome-modal').classList.remove('hidden');
+                }
+            }
         }
-
-        // Start rendering immediately (<50ms startup!)
         requestAnimationFrame(gameLoop);
+
+        window.addEventListener('resize', () => {
+            viewW = window.innerWidth; viewH = window.innerHeight;
+            if (renderer) { renderer.setSize(viewW, viewH); camera.aspect = viewW / viewH; camera.updateProjectionMatrix(); }
+        });
     </script>
 </body>
 </html>
