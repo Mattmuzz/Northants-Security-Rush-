@@ -3,22 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#0f2537">
+    <meta name="theme-color" content="#06101e">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Northants Security Rush - Max 3D WebGL Edition</title>
+    <title>Northants Security Rush v4.0 ULTRA 3D</title>
+
+    <!-- Automatic Service Worker Unregistration to Prevent Stale Mobile Caching -->
+    <script>
+        (function() {
+            try {
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                        for (var i = 0; i < registrations.length; i++) {
+                            registrations[i].unregister();
+                        }
+                    });
+                }
+                if ('caches' in window) {
+                    caches.keys().then(function(names) {
+                        for (var i = 0; i < names.length; i++) {
+                            caches.delete(names[i]);
+                        }
+                    });
+                }
+            } catch (e) {}
+        })();
+    </script>
 
     <!-- Embedded Web App Manifest for Android APK / PWA Packaging -->
-    <link rel="manifest" href='data:application/manifest+json,{"name":"Northants Security Rush","short_name":"NS Rush","description":"3D Alarm Engineer Game for Northants Security","start_url":"./index.html","display":"fullscreen","orientation":"any","background_color":"#071320","theme_color":"#ff6b00"}'>
+    <link rel="manifest" href='data:application/manifest+json,{"name":"Northants Security Rush v4.0 ULTRA 3D","short_name":"NS Rush v4","description":"Ultra 3D Alarm Engineer Simulator for Northants Security","start_url":"./index.html","display":"fullscreen","orientation":"any","background_color":"#06101e","theme_color":"#ff6b00"}'>
 
     <!-- Three.js r128 Hardware-Accelerated WebGL 3D Engine -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <style>
         :root {
-            --ns-blue: #0f2537;
-            --ns-navy: #071320;
+            --ns-blue: #06101e;
+            --ns-panel: #0f2537;
             --ns-orange: #ff6b00;
             --ns-amber: #ff9500;
             --ns-green: #22c55e;
@@ -36,7 +58,7 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background: var(--ns-navy);
+            background: var(--ns-blue);
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             color: #ffffff;
         }
@@ -72,9 +94,25 @@
             outline: none;
             font-family: inherit;
             touch-action: manipulation;
-            transition: transform 0.08s ease;
+            transition: transform 0.08s ease, box-shadow 0.15s ease;
         }
         button:active { transform: scale(0.95); }
+
+        .version-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(90deg, #ff6b00 0%, #fbbf24 100%);
+            color: #06101e;
+            font-weight: 900;
+            font-size: 11px;
+            padding: 4px 12px;
+            border-radius: 999px;
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 18px rgba(255, 107, 0, 0.85);
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
 
         .hud-top {
             display: flex;
@@ -85,14 +123,14 @@
             width: 100%;
         }
         .hud-card {
-            background: rgba(15, 37, 55, 0.92);
+            background: rgba(6, 16, 30, 0.92);
             border: 2px solid var(--ns-orange);
             border-radius: 14px;
             padding: 6px 10px;
             display: flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.7);
         }
         .ns-logo {
             width: 34px;
@@ -120,7 +158,7 @@
         }
 
         #compassBar {
-            background: rgba(7, 19, 32, 0.92);
+            background: rgba(6, 16, 30, 0.94);
             border: 2px solid #38bdf8;
             border-radius: 999px;
             padding: 4px 14px;
@@ -130,18 +168,18 @@
             font-size: 12px;
             font-weight: 900;
             color: #fde047;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.6);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.65);
             margin-top: 4px;
         }
 
         /* Walkie-Talkie Radio */
         #davidRadio {
-            max-width: 375px;
-            background: rgba(15, 37, 55, 0.96);
+            max-width: 385px;
+            background: rgba(6, 16, 30, 0.96);
             border: 2px solid var(--ns-orange);
             border-radius: 16px;
             padding: 10px 12px;
-            box-shadow: 0 12px 28px rgba(0,0,0,0.75);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.8);
             transition: transform 0.25s ease, opacity 0.25s ease;
             margin-top: 6px;
         }
@@ -154,15 +192,16 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 22px;
-            height: 22px;
-            border: 2px solid rgba(255, 107, 0, 0.9);
+            width: 24px;
+            height: 24px;
+            border: 2px solid rgba(255, 107, 0, 0.92);
             border-radius: 50%;
             pointer-events: none;
             z-index: 6;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 0 8px rgba(255,107,0,0.5);
         }
         #crosshair::after {
             content: '';
@@ -184,7 +223,7 @@
             gap: 8px;
             z-index: 20;
             width: 92%;
-            max-width: 390px;
+            max-width: 400px;
             pointer-events: none;
         }
         .action-btn {
@@ -199,14 +238,14 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            box-shadow: 0 10px 24px rgba(0,0,0,0.75);
+            box-shadow: 0 10px 24px rgba(0,0,0,0.8);
         }
 
         @keyframes pulse-orange {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 0, 0.85); }
-            50% { box-shadow: 0 0 0 12px rgba(255, 107, 0, 0); }
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 0, 0.9); }
+            50% { box-shadow: 0 0 0 13px rgba(255, 107, 0, 0); }
         }
-        .pulse-orange { animation: pulse-orange 1.5s infinite; }
+        .pulse-orange { animation: pulse-orange 1.4s infinite; }
 
         /* Bottom D-Pad & Controls */
         .hud-bottom {
@@ -217,7 +256,7 @@
             gap: 8px;
         }
         .dpad-card {
-            background: rgba(15, 37, 55, 0.9);
+            background: rgba(6, 16, 30, 0.9);
             border: 2px solid #2563eb;
             border-radius: 16px;
             padding: 6px;
@@ -249,8 +288,8 @@
         .modal-backdrop {
             position: fixed;
             inset: 0;
-            background: rgba(4, 12, 24, 0.82);
-            backdrop-filter: blur(4px);
+            background: rgba(4, 10, 20, 0.84);
+            backdrop-filter: blur(5px);
             z-index: 100;
             display: flex;
             align-items: center;
@@ -260,15 +299,15 @@
         }
         .modal-card {
             width: 100%;
-            max-width: 670px;
+            max-width: 675px;
             max-height: 92vh;
-            background: var(--ns-blue);
+            background: linear-gradient(180deg, #0f2537 0%, #06101e 100%);
             border: 4px solid var(--ns-orange);
             border-radius: 24px;
             padding: 18px;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 24px 50px rgba(0,0,0,0.88);
+            box-shadow: 0 24px 55px rgba(0,0,0,0.92);
             overflow-y: auto;
         }
 
@@ -276,9 +315,9 @@
         #pcbBoard {
             position: relative;
             background:
-                radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.14) 0%, transparent 70%),
-                repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 18px),
-                repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 18px),
+                radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.16) 0%, transparent 70%),
+                repeating-linear-gradient(90deg, rgba(255,255,255,0.035) 0px, rgba(255,255,255,0.035) 1px, transparent 1px, transparent 18px),
+                repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0px, rgba(255,255,255,0.035) 1px, transparent 1px, transparent 18px),
                 linear-gradient(135deg, #065f46 0%, #064e3b 55%, #022c22 100%);
             border: 6px solid #334155;
             border-radius: 16px;
@@ -289,18 +328,17 @@
             align-items: stretch;
             overflow: hidden;
             touch-action: none;
-            box-shadow: inset 0 0 28px rgba(0,0,0,0.85);
+            box-shadow: inset 0 0 32px rgba(0,0,0,0.88);
         }
-        /* Central Microchip IC Decoration */
         #pcbChip {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 72px;
-            height: 96px;
+            width: 78px;
+            height: 102px;
             background: #0f172a;
-            border: 2px solid #475569;
+            border: 2px solid #64748b;
             border-radius: 6px;
             display: flex;
             flex-direction: column;
@@ -312,7 +350,7 @@
             text-align: center;
             pointer-events: none;
             z-index: 2;
-            box-shadow: 0 6px 14px rgba(0,0,0,0.65);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.75);
         }
         .term-col {
             width: 41%;
@@ -344,7 +382,7 @@
         }
         .term-btn.fluke-hint {
             border-color: #4ade80;
-            box-shadow: 0 0 16px #22c55e;
+            box-shadow: 0 0 18px #22c55e;
             background: #064e3b;
         }
         .term-btn.connected {
@@ -386,7 +424,7 @@
             padding-bottom: 6px;
         }
         .shop-item {
-            background: #061729;
+            background: #061325;
             border: 2px solid #1d4ed8;
             border-radius: 14px;
             padding: 12px;
@@ -433,10 +471,12 @@
 
     <!-- INTERACTIVE 3D DOOR & PANEL ACTION PROMPTS -->
     <div id="promptStack">
-        <button type="button" id="doorActionBtn" class="action-btn" style="display:none;background:#1d4ed8;color:#fff;border:2px solid #93c5fd;" onclick="window.interactNearestDoor()">
+        <button type="button" id="doorActionBtn" class="action-btn" style="display:none;background:#1d4ed8;color:#fff;border:2px solid #93c5fd;"
+            onclick="window.useDoor(); return false;" ontouchend="window.useDoor(); return false;">
             🚪 <span id="doorActionText">OPEN DOOR (E / TAP)</span>
         </button>
-        <button type="button" id="wireActionBtn" class="action-btn pulse-orange" style="display:none;background:#ff6b00;color:#0f2537;border:2px solid #ffffff;" onclick="window.openPanelModal()">
+        <button type="button" id="wireActionBtn" class="action-btn pulse-orange" style="display:none;background:#ff6b00;color:#06101e;border:2px solid #ffffff;"
+            onclick="window.openWiring(); return false;" ontouchend="window.openWiring(); return false;">
             🪛 WIRE ALARM PANEL (SPACE / TAP)
         </button>
     </div>
@@ -448,11 +488,12 @@
                 <div class="hud-card interactive">
                     <div class="ns-logo">NS</div>
                     <div>
-                        <div style="display:flex;align-items:center;gap:6px;">
+                        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                             <span style="font-weight:900;font-size:12px;color:#ff6b00;">NORTHANTS SECURITY</span>
                             <span id="hudJobBadge" style="background:#1e3a8a;padding:2px 6px;border-radius:5px;font-size:10px;font-weight:800;">JOB 1/5</span>
+                            <span class="version-pill" style="font-size:9px;padding:2px 7px;">✨ v4.0 ULTRA 3D</span>
                         </div>
-                        <div id="hudLocationText" style="font-size:11px;color:#bfdbfe;font-weight:700;">
+                        <div id="hudLocationText" style="font-size:11px;color:#bfdbfe;font-weight:700;margin-top:2px;">
                             #12 Kettering Rd • <span id="hudRoomName" style="color:#fde047;">Avenue</span>
                         </div>
                     </div>
@@ -475,13 +516,16 @@
                         <div style="font-size:9px;color:#93c5fd;font-weight:800;text-transform:uppercase;">Wallet</div>
                         <div id="hudCashText" style="font-size:16px;font-weight:900;color:#4ade80;">£100</div>
                     </div>
-                    <button type="button" class="hud-btn" style="background:#10b981;color:#04121f;" onclick="window.openShop()">
+                    <button type="button" class="hud-btn" style="background:#10b981;color:#04121f;"
+                        onclick="window.openShop(); return false;" ontouchend="window.openShop(); return false;">
                         🛒 <span class="hide-sm">Shop</span>
                     </button>
-                    <button type="button" class="hud-btn" style="background:#f59e0b;color:#04121f;" onclick="window.toggleTorch()">
+                    <button type="button" class="hud-btn" style="background:#f59e0b;color:#04121f;"
+                        onclick="window.toggleTorch(); return false;" ontouchend="window.toggleTorch(); return false;">
                         🔦 <span id="hudTorchState">ON</span>
                     </button>
-                    <button type="button" class="hud-btn" style="background:#1d4ed8;" onclick="window.radioDavid()">
+                    <button type="button" class="hud-btn" style="background:#1d4ed8;"
+                        onclick="window.davidRadio(); return false;" ontouchend="window.davidRadio(); return false;">
                         📻 <span class="hide-sm">David</span>
                     </button>
                 </div>
@@ -493,7 +537,8 @@
                     <span id="compassArrow">⬆️</span>
                     <span id="compassLabel">Target: House #12 Front Door (12m)</span>
                 </div>
-                <button type="button" class="hud-btn interactive" style="background:#334155;border:1px solid #94a3b8;padding:4px 10px;font-size:11px;margin-top:4px;border-radius:999px;" onclick="window.rerollStreet()">
+                <button type="button" class="hud-btn interactive" style="background:#334155;border:1px solid #94a3b8;padding:4px 10px;font-size:11px;margin-top:4px;border-radius:999px;"
+                    onclick="window.rerollStreet(); return false;" ontouchend="window.rerollStreet(); return false;">
                     🎲 Re-Roll 8 Houses
                 </button>
             </div>
@@ -510,7 +555,7 @@
                             <span style="font-size:10px;color:#4ade80;font-weight:800;">● LIVE</span>
                         </div>
                         <div id="davidRadioText" style="font-size:12px;line-height:1.35;margin-top:3px;color:#f1f5f9;">
-                            "Welcome to Northamptonshire! Follow the orange marker to House #12!"
+                            "Welcome to v4.0 ULTRA 3D! Check out the golden-hour shadows and spinning amber van beacon!"
                         </div>
                     </div>
                 </div>
@@ -533,10 +578,12 @@
             </div>
 
             <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;" class="interactive">
-                <button type="button" id="quickWalkBtn" class="hud-btn" style="background:#1e3a8a;border:2px solid #60a5fa;padding:9px 13px;font-size:12px;" onclick="window.sprintToTarget()">
+                <button type="button" id="quickWalkBtn" class="hud-btn" style="background:#1e3a8a;border:2px solid #60a5fa;padding:9px 13px;font-size:12px;"
+                    onclick="window.sprintToTarget(); return false;" ontouchend="window.sprintToTarget(); return false;">
                     ⚡ <span id="quickWalkText">SPRINT TO HOUSE #12</span>
                 </button>
-                <button type="button" class="hud-btn" style="background:#ff6b00;color:#0f2537;border:2px solid #fff;padding:9px 13px;font-size:12px;" onclick="window.useTea()">
+                <button type="button" class="hud-btn" style="background:#ff6b00;color:#06101e;border:2px solid #fff;padding:9px 13px;font-size:12px;"
+                    onclick="window.drinkTea(); return false;" ontouchend="window.drinkTea(); return false;">
                     ☕ CUPPA TEA (<span id="hudTeaCount">2</span>)
                 </button>
             </div>
@@ -547,37 +594,41 @@
     <!-- TITLE / START SHIFT MODAL                                           -->
     <!-- =================================================================== -->
     <div id="titleModal" class="modal-backdrop">
-        <div class="modal-card" style="text-align:center;max-width:575px;">
+        <div class="modal-card" style="text-align:center;max-width:595px;">
+            <div style="margin-bottom:10px;">
+                <span class="version-pill">✨ v4.0 ULTRA 3D — REAL-TIME SHADOWS &amp; BUMP TEXTURES</span>
+            </div>
+
             <div style="display:inline-flex;align-items:center;justify-content:center;gap:10px;margin:0 auto 8px;">
-                <div class="ns-logo" style="width:46px;height:46px;font-size:22px;">NS</div>
+                <div class="ns-logo" style="width:48px;height:48px;font-size:22px;">NS</div>
                 <div style="text-align:left;">
-                    <div style="font-size:11px;font-weight:900;color:#ff6b00;letter-spacing:0.08em;">MAX WEBGL 3D EDITION</div>
-                    <div style="font-size:24px;font-weight:900;line-height:1.1;">NORTHANTS <span style="color:#ff6b00;">SECURITY RUSH</span></div>
+                    <div style="font-size:11px;font-weight:900;color:#ff6b00;letter-spacing:0.08em;">NORTHAMPTONSHIRE INTRUDER &amp; FIRE</div>
+                    <div style="font-size:25px;font-weight:900;line-height:1.1;">NORTHANTS <span style="color:#ff6b00;">SECURITY RUSH</span></div>
                 </div>
             </div>
 
-            <p style="font-size:13px;color:#cbd5e1;line-height:1.45;margin:8px 0 14px;">
-                Explore a hardware-accelerated 3D Northamptonshire street with <strong>8 randomly generated houses (#10–#17)</strong>, brick & mortar textures, striped lawns, garden paths, 3D engineer tool hands, a real-time 3D SpotLight headtorch cone, and a realistic PCB alarm panel!
+            <p style="font-size:13px;color:#cbd5e1;line-height:1.45;margin:6px 0 12px;">
+                Experience hardware-accelerated <strong>Golden-Hour Dusk 3D</strong> with <strong>real-time dynamic shadows</strong>, bump-mapped Northamptonshire brickwork, pitched roofs with chimneys, porch canopies, glowing streetlamps, a spinning amber van beacon, and <strong>8 enterable multi-room homes (#10–#17)</strong>!
             </p>
 
-            <div style="background:#061729;border:1px solid #1e40af;border-radius:14px;padding:10px 12px;text-align:left;font-size:12px;color:#93c5fd;margin-bottom:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                <div>🧱 <strong>Max WebGL 3D:</strong> Textured brick, slate roofs, striped grass & 3D SpotLight torch!</div>
-                <div>🏘️ <strong>8 Enterable Houses:</strong> #10, #12, #14, #16 (North) & #11, #13, #15, #17 (South)!</div>
-                <div>🚪 <strong>Draught Bonus:</strong> Shut front door inside for a +£25 tip!</div>
-                <div>🛒 <strong>£100 Starting Cash:</strong> Buy Knipex Snips, Fluke & Vans!</div>
+            <div style="background:#06101e;border:1px solid #1e40af;border-radius:14px;padding:10px 12px;text-align:left;font-size:12px;color:#93c5fd;margin-bottom:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <div>🌅 <strong>Golden-Hour Shadows:</strong> Real-time 3D sun &amp; streetlamp pools of light!</div>
+                <div>🧱 <strong>3D Bump Maps:</strong> Recessed brick mortar, roof slates &amp; striped grass!</div>
+                <div>🚨 <strong>Spinning Van Beacon:</strong> Rotating amber roof strobe &amp; NS livery!</div>
+                <div>🛒 <strong>£100 Starting Cash:</strong> Buy Knipex Snips, Fluke &amp; Custom Vans!</div>
             </div>
 
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
                 <button type="button" style="flex:0.8;min-width:120px;padding:14px;border-radius:14px;background:#3b82f6;color:#ffffff;font-weight:900;font-size:13px;"
-                    onclick="window.rerollStreet()">
+                    onclick="window.rerollStreet(); return false;" ontouchend="window.rerollStreet(); return false;">
                     🎲 RE-ROLL STREET
                 </button>
                 <button type="button" style="flex:1;min-width:130px;padding:14px;border-radius:14px;background:#10b981;color:#04121f;font-weight:900;font-size:14px;"
-                    onclick="window.openShop()">
+                    onclick="window.openShop(); return false;" ontouchend="window.openShop(); return false;">
                     🛒 SHOP (£<span id="titleCashLabel">100</span>)
                 </button>
-                <button type="button" class="pulse-orange" style="flex:1.6;min-width:190px;padding:15px;border-radius:14px;background:#ff6b00;color:#0f2537;font-weight:900;font-size:16px;"
-                    onclick="window.startShift()">
+                <button type="button" class="pulse-orange" style="flex:1.6;min-width:190px;padding:15px;border-radius:14px;background:#ff6b00;color:#06101e;font-weight:900;font-size:16px;"
+                    onclick="window.startShift(); return false;" ontouchend="window.startShift(); return false;">
                     🚐 START SHIFT →
                 </button>
             </div>
@@ -592,14 +643,14 @@
             <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #1e3a8a;padding-bottom:10px;">
                 <div>
                     <h2 style="margin:0;font-size:20px;font-weight:900;color:#ff6b00;">🛒 NORTHANTS TRADE COUNTER SHOP</h2>
-                    <div style="font-size:11.5px;color:#93c5fd;">Upgrade your 3D van on the street, tools & lunchbox!</div>
+                    <div style="font-size:11.5px;color:#93c5fd;">Upgrade your 3D van on the street, VDE tools &amp; lunchbox!</div>
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;">
-                    <div style="background:#061729;border:2px solid #4ade80;padding:6px 12px;border-radius:10px;font-weight:900;color:#4ade80;font-size:15px;" id="shopWalletText">
+                    <div style="background:#06101e;border:2px solid #4ade80;padding:6px 12px;border-radius:10px;font-weight:900;color:#4ade80;font-size:15px;" id="shopWalletText">
                         £100
                     </div>
                     <button type="button" style="background:#1e293b;color:#fff;width:36px;height:36px;border-radius:10px;font-weight:900;font-size:16px;"
-                        onclick="window.closeShop()">✕</button>
+                        onclick="window.closeShop(); return false;" ontouchend="window.closeShop(); return false;">✕</button>
                 </div>
             </div>
 
@@ -611,12 +662,12 @@
 
             <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;">
                 <button type="button" style="background:#334155;color:#cbd5e1;padding:10px 14px;border-radius:10px;font-size:11px;font-weight:700;"
-                    onclick="window.resetAllProgress()">
+                    onclick="window.resetAllProgress(); return false;" ontouchend="window.resetAllProgress(); return false;">
                     Reset Save
                 </button>
-                <button type="button" style="background:#ff6b00;color:#0f2537;padding:12px 24px;border-radius:12px;font-weight:900;font-size:14px;"
-                    onclick="window.closeShop()">
-                    DONE & BACK TO STREET →
+                <button type="button" style="background:#ff6b00;color:#06101e;padding:12px 24px;border-radius:12px;font-weight:900;font-size:14px;"
+                    onclick="window.closeShop(); return false;" ontouchend="window.closeShop(); return false;">
+                    DONE &amp; BACK TO STREET →
                 </button>
             </div>
         </div>
@@ -627,18 +678,18 @@
     <!-- =================================================================== -->
     <div id="wireModal" class="modal-backdrop" style="display:none;">
         <div class="modal-card" style="background:linear-gradient(180deg,#e2e8f0 0%,#cbd5e1 100%);color:#0f172a;border-color:#64748b;padding:14px;">
-            <div style="background:#0f2537;color:#fff;padding:10px 12px;border-radius:14px;margin-bottom:10px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;border-bottom:3px solid #ff6b00;">
+            <div style="background:#06101e;color:#fff;padding:10px 12px;border-radius:14px;margin-bottom:10px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;border-bottom:3px solid #ff6b00;">
                 <div>
-                    <span style="background:#ff6b00;color:#0f2537;font-weight:900;padding:2px 6px;border-radius:4px;font-size:10px;">NS-EURO 46 PANEL</span>
+                    <span style="background:#ff6b00;color:#06101e;font-weight:900;padding:2px 6px;border-radius:4px;font-size:10px;">NS-EURO 46 PANEL</span>
                     <span id="wireModalTitle" style="font-weight:900;font-size:13px;margin-left:6px;">#12 HALLWAY PANEL</span>
                 </div>
                 <div id="lcdStatusDisplay" style="background:#84cc16;color:#1a2e05;font-family:monospace;font-weight:900;padding:5px 10px;border-radius:6px;font-size:12px;border:2px solid #365314;box-shadow:inset 0 2px 6px rgba(0,0,0,0.35);">
-                    NORTHANTS SEC V4.2 [0/3]
+                    NORTHANTS SEC V4.0 [0/3]
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;">
                     <span id="wireModalTimer" style="font-weight:900;font-size:16px;color:#ff6b00;">60.0s</span>
                     <button type="button" style="background:#ef4444;color:#fff;padding:6px 10px;border-radius:8px;font-weight:900;font-size:12px;"
-                        onclick="window.closePanelModal()">✕</button>
+                        onclick="window.closePanelModal(); return false;" ontouchend="window.closePanelModal(); return false;">✕</button>
                 </div>
             </div>
 
@@ -649,9 +700,9 @@
 
             <div id="pcbBoard">
                 <div id="pcbChip">
-                    <div style="color:#ff6b00;font-weight:900;">NS-ARM32</div>
+                    <div style="color:#ff6b00;font-weight:900;">NS-ARM64</div>
                     <div style="margin-top:4px;font-size:8px;">NORTHANTS<br>SEC LOGIC</div>
-                    <div style="margin-top:6px;width:8px;height:8px;border-radius:50%;background:#22c55e;"></div>
+                    <div style="margin-top:6px;width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e;"></div>
                 </div>
                 <div class="term-col" id="leftTermCol"></div>
                 <svg id="wireSvgLayer" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:8;"></svg>
@@ -672,9 +723,9 @@
             </div>
             <h2 id="resultHeading" style="margin:4px 0 10px;font-size:24px;font-weight:900;">PROPERTY PROTECTED!</h2>
 
-            <div id="resultVisualBox" style="background:#061322;border:2px solid #1e40af;border-radius:16px;padding:14px;min-height:145px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-bottom:12px;"></div>
+            <div id="resultVisualBox" style="background:#06101e;border:2px solid #1e40af;border-radius:16px;padding:14px;min-height:145px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-bottom:12px;"></div>
 
-            <div style="background:#061729;border:1px solid #ff6b00;border-radius:14px;padding:10px 12px;text-align:left;display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+            <div style="background:#06101e;border:1px solid #ff6b00;border-radius:14px;padding:10px 12px;text-align:left;display:flex;align-items:center;gap:10px;margin-bottom:14px;">
                 <div style="font-size:26px;">📻</div>
                 <div>
                     <div style="font-size:10px;font-weight:900;color:#ff6b00;text-transform:uppercase;">BOSS DAVID DEBRIEF:</div>
@@ -684,11 +735,11 @@
 
             <div style="display:flex;gap:10px;">
                 <button type="button" style="flex:1;padding:13px;border-radius:12px;background:#10b981;color:#04121f;font-weight:900;font-size:13.5px;"
-                    onclick="window.openShop()">
+                    onclick="window.openShop(); return false;" ontouchend="window.openShop(); return false;">
                     🛒 TRADE SHOP
                 </button>
-                <button type="button" id="resultNextBtn" style="flex:1.4;padding:13px;border-radius:12px;background:#ff6b00;color:#0f2537;font-weight:900;font-size:14px;"
-                    onclick="window.nextOrRetryJob()">
+                <button type="button" id="resultNextBtn" style="flex:1.4;padding:13px;border-radius:12px;background:#ff6b00;color:#06101e;font-weight:900;font-size:14px;"
+                    onclick="window.nextOrRetryJob(); return false;" ontouchend="window.nextOrRetryJob(); return false;">
                     NEXT PROPERTY →
                 </button>
             </div>
@@ -697,9 +748,18 @@
 
     <script>
         /********************************************************************
-         * 1. TOP-OF-SCRIPT GLOBAL HANDLERS (GUARANTEED BUTTON RESPONSE)
+         * 1. TOP-OF-SCRIPT GLOBAL HANDLERS (GUARANTEED MOBILE & APK RESPONSE)
          ********************************************************************/
+        var lastActionTimestamp = 0;
+        function debounceTap() {
+            var now = Date.now();
+            if (now - lastActionTimestamp < 220) return false;
+            lastActionTimestamp = now;
+            return true;
+        }
+
         window.startShift = function() {
+            if (!debounceTap()) return;
             var tm = document.getElementById('titleModal');
             if (tm) tm.style.display = 'none';
             var sm = document.getElementById('shopModal');
@@ -714,6 +774,7 @@
         };
 
         window.openShop = function() {
+            if (!debounceTap()) return;
             audio.init();
             renderShopItems();
             var sm = document.getElementById('shopModal');
@@ -721,49 +782,24 @@
         };
 
         window.closeShop = function() {
+            if (!debounceTap()) return;
             var sm = document.getElementById('shopModal');
             if (sm) sm.style.display = 'none';
         };
 
         window.rerollStreet = function() {
+            if (!debounceTap()) return;
             audio.coin();
             generateRandomNeighborhood();
             rebuild3DStreetWorld();
             updateActiveAlarmPanelCoords();
             var job = JOBS[game.jobIdx];
             var h = HOUSES[job.houseIdx];
-            showDavidMessage("Street re-rolled! 8 fresh 3D Northants properties generated. Target #" + h.num + " is " + h.styleName + "!");
+            showDavidMessage("v4.0 Street re-rolled! 8 fresh 3D Northants properties generated. Target #" + h.num + " is " + h.styleName + "!");
         };
 
-        window.useTea = function() {
-            if (!game.active || game.teaCount <= 0) {
-                audio.buzz();
-                return;
-            }
-            game.teaCount--;
-            game.teaSlowTimer = game.upgrades.snack_mug ? 14.0 : 7.0;
-            saveProgress();
-            audio.coin();
-            showDavidMessage(game.upgrades.snack_mug
-                ? "Sports Direct Giant Mug deployed! SLA countdown slowed for 14 seconds!"
-                : "Proper Yorkshire Brew! SLA timer slowed down for 7 seconds!");
-        };
-
-        window.toggleTorch = function() {
-            game.torchOn = !game.torchOn;
-            audio.tone(game.torchOn ? 920 : 480, 'triangle', 0.06, 0.14);
-            var el = document.getElementById('hudTorchState');
-            if (el) el.textContent = game.torchOn ? 'ON' : 'OFF';
-            if (headtorchLight) headtorchLight.intensity = game.torchOn ? 2.6 : 0.0;
-        };
-
-        window.radioDavid = function() {
-            var joke = DAVID_JOKES[game.jokeCounter % DAVID_JOKES.length];
-            game.jokeCounter++;
-            showDavidMessage(joke);
-        };
-
-        window.interactNearestDoor = function() {
+        window.useDoor = function() {
+            if (!debounceTap()) return;
             var d = game.nearestDoor;
             if (!d) return;
             d.isOpen = !d.isOpen;
@@ -779,8 +815,10 @@
                 showDavidMessage("Proper polite engineer! Customer tipped you +£25 Draught Bonus for shutting the front door behind you!");
             }
         };
+        window.interactNearestDoor = window.useDoor;
 
-        window.openPanelModal = function() {
+        window.openWiring = function() {
+            if (!debounceTap()) return;
             if (!game.active) return;
             game.phase = 'wiring';
             game.toolSwing = 1.0;
@@ -804,6 +842,7 @@
             renderPCBBoard();
             spawnPanelSpiders(job.spiders);
         };
+        window.openPanelModal = window.openWiring;
 
         window.closePanelModal = function() {
             game.phase = 'street';
@@ -812,9 +851,46 @@
             document.getElementById('wireModal').style.display = 'none';
         };
 
+        window.toggleTorch = function() {
+            if (!debounceTap()) return;
+            game.torchOn = !game.torchOn;
+            audio.tone(game.torchOn ? 920 : 480, 'triangle', 0.06, 0.14);
+            var el = document.getElementById('hudTorchState');
+            if (el) el.textContent = game.torchOn ? 'ON' : 'OFF';
+            if (headtorchLight) headtorchLight.intensity = game.torchOn ? 3.2 : 0.0;
+        };
+
+        window.drinkTea = function() {
+            if (!debounceTap()) return;
+            if (!game.active || game.teaCount <= 0) {
+                audio.buzz();
+                return;
+            }
+            game.teaCount--;
+            game.teaSlowTimer = game.upgrades.snack_mug ? 14.0 : 7.0;
+            saveProgress();
+            audio.coin();
+            showDavidMessage(game.upgrades.snack_mug
+                ? "Sports Direct Giant Mug deployed! SLA countdown slowed for 14 seconds!"
+                : "Proper Yorkshire Brew! SLA timer slowed down for 7 seconds!");
+        };
+        window.useTea = window.drinkTea;
+
+        window.davidRadio = function() {
+            if (!debounceTap()) return;
+            var joke = DAVID_JOKES[game.jokeCounter % DAVID_JOKES.length];
+            game.jokeCounter++;
+            showDavidMessage(joke);
+        };
+        window.radioDavid = window.davidRadio;
+
         window.sprintToTarget = function() {
+            if (!debounceTap()) return;
             if (!game.active) {
-                window.startShift();
+                var tm = document.getElementById('titleModal');
+                if (tm) tm.style.display = 'none';
+                audio.init();
+                loadJobLevel(game.jobIdx);
                 return;
             }
             var job = JOBS[game.jobIdx];
@@ -854,36 +930,36 @@
                     player.x = h.cx - 2.4; player.z = h.cz - s * 2.3; player.yaw = s === 1 ? 0 : Math.PI;
                 }
             } else {
-                window.openPanelModal();
+                window.openWiring();
             }
         };
 
         /********************************************************************
          * 2. GAME STATE, SHOP ITEMS & 8 RANDOMIZED BUILDINGS DATA
          ********************************************************************/
-        var SAVE_STORAGE_KEY = 'northants_security_rush_webgl_v7';
+        var SAVE_STORAGE_KEY = 'northants_security_rush_v4_ultra3d';
 
         var SHOP_ITEMS = [
             { id: 'tool_snips', name: 'Knipex Pro Snips', icon: '✂️', cost: 80, desc: '+10s SLA timer on every shift & super-fast terminations.' },
             { id: 'tool_fluke', name: 'Fluke Digital Meter', icon: '📟', cost: 150, desc: 'Highlights the matching PCB terminal in bright green!' },
             { id: 'gear_hivis', name: 'NS Hi-Vis Bomber', icon: '🦺', cost: 75, desc: 'Smart uniform! Customers tip +25% extra on every job.' },
             { id: 'van_custom', name: 'Signwritten NS Custom', icon: '🚐', cost: 250, desc: 'Upgrades your 3D van on the street to Orange & Blue NS Livery!' },
-            { id: 'van_sprinter', name: 'PIR-Detect Sprinter', icon: '🚨', cost: 600, desc: 'Pro 3D mobile workshop with roof racks, beacons & gold alloys!' },
+            { id: 'van_sprinter', name: 'PIR-Detect Sprinter', icon: '🚨', cost: 600, desc: 'Pro 3D mobile workshop with twin beacons, ladder racks & gold alloys!' },
             { id: 'snack_tea', name: 'Yorkshire Tea Refill', icon: '☕', cost: 20, desc: 'Adds +2 steaming mugs of builder\'s tea to your flask.', consumable: true },
             { id: 'snack_greggs', name: 'Greggs Sausage Roll', icon: '🥐', cost: 30, desc: 'Permanent +35% faster walking speed down the street!' },
             { id: 'snack_mug', name: 'Sports Direct Giant Mug', icon: '🍺', cost: 90, desc: 'Doubles your Cuppa Tea time-slow duration to 14 seconds!' }
         ];
 
         var WALL_FINISHES = [
-            { name: 'Northants Red Brick', base: '#8c2d19', mortar: '#cbd5e1' },
-            { name: 'Cotswold Buff Stone', base: '#b47b26', mortar: '#e2e8f0' },
-            { name: 'White Cornish Render', base: '#dbeafe', mortar: '#94a3b8' },
-            { name: 'Warm Terracotta Brick', base: '#9a3412', mortar: '#d6d3d1' },
-            { name: 'Heritage Brown Brick', base: '#5c2d16', mortar: '#a8a29e' },
-            { name: 'Victorian Crimson Brick', base: '#7f1d1d', mortar: '#cbd5e1' }
+            { name: 'Northants Multi-Red Brick', base: '#8c2d19', alt: '#7c2414', mortar: '#cbd5e1' },
+            { name: 'Cotswold Buff Stone', base: '#b47b26', alt: '#a1691b', mortar: '#e2e8f0' },
+            { name: 'White Cornish Render', base: '#dbeafe', alt: '#cbd5e1', mortar: '#94a3b8' },
+            { name: 'Warm Terracotta Brick', base: '#9a3412', alt: '#7c2d12', mortar: '#d6d3d1' },
+            { name: 'Heritage Brown Brick', base: '#5c2d16', alt: '#451f0d', mortar: '#a8a29e' },
+            { name: 'Victorian Crimson Brick', base: '#7f1d1d', alt: '#631414', mortar: '#cbd5e1' }
         ];
 
-        var ROOF_COLORS = [0x1e293b, 0x7c2d12, 0x334155, 0x3f3f46];
+        var ROOF_COLORS = [0x1e293b, 0x7c2d12, 0x334155, 0x27272a];
         var DOOR_COLORS = [0xff6b00, 0x0284c7, 0xdc2626, 0x059669, 0x4f46e5, 0xd97706];
         var ORNAMENTS = ['tree_and_flowers', 'bins_and_flowers', 'tree', 'bins'];
 
@@ -918,6 +994,7 @@
                     side: p.side,
                     styleName: wf.name,
                     brickBase: wf.base,
+                    brickAlt: wf.alt,
                     brickMortar: wf.mortar,
                     roofHex: rc,
                     doorHex: dc,
@@ -937,7 +1014,7 @@
                 spiders: 0,
                 baseTime: 85,
                 basePay: 120,
-                briefing: 'Job 1 at #12 Kettering Rd! Walk up the garden path across the lawn to #12, open the front door (close it inside for +£25 Draught Bonus!) and wire the Hallway panel.',
+                briefing: 'v4.0 ULTRA 3D Shift! Walk past your flashing Northants Security van up the garden path to #12, open the front door (close it inside for +£25 Draught Bonus!) and wire the Hallway panel.',
                 wires: [
                     { id: '12v', label: '12V + POWER', target: '12V + AUX', color: '#ef4444' },
                     { id: '0v',  label: '0V - GROUND', target: '0V - NEG',  color: '#3b82f6' },
@@ -954,7 +1031,7 @@
                 spiders: 1,
                 baseTime: 82,
                 basePay: 150,
-                briefing: 'Cross the road to #13 on the South side! Walk up #13\'s garden path, head into the Living Room Lounge past the 60-inch telly, and wire the 4-zone panel!',
+                briefing: 'Cross the tarmac road to #13 on the South side! Walk up #13\'s garden path, head into the Living Room Lounge past the 60-inch telly, and wire the 4-zone panel!',
                 wires: [
                     { id: '12v', label: '12V + POWER', target: '12V + AUX', color: '#ef4444' },
                     { id: '0v',  label: '0V - GROUND', target: '0V - NEG',  color: '#3b82f6' },
@@ -1071,7 +1148,7 @@
             x: -26.0,
             y: 1.65,
             z: 0.0,
-            yaw: -Math.PI / 2, // Facing East straight down the central road
+            yaw: -Math.PI / 2,
             pitch: -0.02,
             bob: 0,
             radius: 0.36
@@ -1185,16 +1262,17 @@
         }
 
         /********************************************************************
-         * 5. HIGH-RES PROCEDURAL CANVAS TEXTURES FOR THREE.JS WEBGL
+         * 5. HIGH-RES PROCEDURAL TEXTURES WITH BUMP MAPS (v4.0 ULTRA 3D)
          ********************************************************************/
         var TEX = {};
 
-        function makeCanvasTexture(drawFn, repeatX, repeatY) {
+        function makeCanvasTexture(drawFn, repeatX, repeatY, size) {
+            var dim = size || 256;
             var c = document.createElement('canvas');
-            c.width = 256;
-            c.height = 256;
+            c.width = dim;
+            c.height = dim;
             var g = c.getContext('2d');
-            drawFn(g, 256, 256);
+            drawFn(g, dim, dim);
             if (typeof THREE === 'undefined') return null;
             var t = new THREE.CanvasTexture(c);
             t.wrapS = THREE.RepeatWrapping;
@@ -1203,8 +1281,8 @@
             return t;
         }
 
-        function makeBrickTexture(baseCol, mortarCol, repX, repY) {
-            return makeCanvasTexture(function(g, w, h) {
+        function makeBrickMaterial(baseCol, altCol, mortarCol, repX, repY) {
+            var colorMap = makeCanvasTexture(function(g, w, h) {
                 g.fillStyle = mortarCol;
                 g.fillRect(0, 0, w, h);
                 var rows = 8, cols = 4;
@@ -1212,41 +1290,90 @@
                 for (var r = 0; r < rows; r++) {
                     var offset = (r % 2 === 1) ? bw * 0.5 : 0;
                     for (var c = -1; c <= cols; c++) {
-                        g.fillStyle = baseCol;
+                        g.fillStyle = ((r + c) % 2 === 0) ? baseCol : (altCol || baseCol);
                         g.fillRect(c * bw + offset + 3, r * bh + 3, bw - 6, bh - 6);
-                        g.fillStyle = 'rgba(0,0,0,0.12)';
-                        g.fillRect(c * bw + offset + 3, r * bh + bh - 8, bw - 6, 5);
+                        // Highlight top edge & shadow bottom edge
+                        g.fillStyle = 'rgba(255,255,255,0.12)';
+                        g.fillRect(c * bw + offset + 3, r * bh + 3, bw - 6, 3);
+                        g.fillStyle = 'rgba(0,0,0,0.22)';
+                        g.fillRect(c * bw + offset + 3, r * bh + bh - 7, bw - 6, 4);
                     }
                 }
-            }, repX || 3, repY || 2);
+            }, repX || 3, repY || 2, 256);
+
+            return new THREE.MeshStandardMaterial({
+                map: colorMap,
+                bumpMap: TEX.brickBump,
+                bumpScale: 0.08,
+                roughness: 0.85,
+                metalness: 0.05
+            });
         }
 
         function initProceduralTextures() {
             if (typeof THREE === 'undefined') return;
 
-            // Striped Mowed Green Lawn Texture
+            // Shared Recessed Mortar Brick Bump Map
+            TEX.brickBump = makeCanvasTexture(function(g, w, h) {
+                g.fillStyle = '#111111'; // Deep recessed mortar
+                g.fillRect(0, 0, w, h);
+                var rows = 8, cols = 4;
+                var bh = h / rows, bw = w / cols;
+                for (var r = 0; r < rows; r++) {
+                    var offset = (r % 2 === 1) ? bw * 0.5 : 0;
+                    for (var c = -1; c <= cols; c++) {
+                        g.fillStyle = '#e5e5e5'; // Raised brick face
+                        g.fillRect(c * bw + offset + 4, r * bh + 4, bw - 8, bh - 8);
+                    }
+                }
+            }, 3, 2, 256);
+
+            // Roof Slate Tile Bump Map
+            TEX.roofBump = makeCanvasTexture(function(g, w, h) {
+                g.fillStyle = '#444444';
+                g.fillRect(0, 0, w, h);
+                var rows = 8;
+                var rh = h / rows;
+                for (var r = 0; r < rows; r++) {
+                    var grad = g.createLinearGradient(0, r * rh, 0, (r + 1) * rh);
+                    grad.addColorStop(0, '#333333');
+                    grad.addColorStop(0.85, '#ffffff');
+                    grad.addColorStop(1, '#111111');
+                    g.fillStyle = grad;
+                    g.fillRect(0, r * rh, w, rh);
+                }
+            }, 4, 4, 256);
+
+            // Striped Freshly-Mowed Green Lawn Texture + Bump
             TEX.lawn = makeCanvasTexture(function(g, w, h) {
                 for (var i = 0; i < 8; i++) {
                     g.fillStyle = (i % 2 === 0) ? '#15803d' : '#16a34a';
                     g.fillRect(i * (w / 8), 0, w / 8, h);
                 }
-                g.fillStyle = 'rgba(255,255,255,0.04)';
-                for (var j = 0; j < 220; j++) {
+                g.fillStyle = 'rgba(255,255,255,0.06)';
+                for (var j = 0; j < 350; j++) {
                     g.fillRect(Math.random() * w, Math.random() * h, 2, 5);
                 }
-            }, 4, 4);
+            }, 4, 4, 256);
 
-            // Tarmac Road with White Center Line
+            // Speckled Tarmac Road with Crisp White Center Line & Double Yellows
             TEX.road = makeCanvasTexture(function(g, w, h) {
                 g.fillStyle = '#1e293b';
                 g.fillRect(0, 0, w, h);
-                g.fillStyle = '#334155';
-                for (var i = 0; i < 400; i++) {
+                for (var i = 0; i < 600; i++) {
+                    g.fillStyle = (i % 2 === 0) ? '#334155' : '#0f172a';
                     g.fillRect(Math.random() * w, Math.random() * h, 2, 2);
                 }
+                // Curb-side Double Yellow Lines
+                g.fillStyle = '#eab308';
+                g.fillRect(0, 8, w, 4);
+                g.fillRect(0, 16, w, 4);
+                g.fillRect(0, h - 20, w, 4);
+                g.fillRect(0, h - 12, w, 4);
+                // Dashed White Center Line
                 g.fillStyle = '#f8fafc';
-                g.fillRect(40, h * 0.46, w - 80, h * 0.08);
-            }, 10, 1);
+                g.fillRect(36, h * 0.46, w - 72, h * 0.08);
+            }, 10, 1, 256);
 
             // Concrete Pavement Slabs
             TEX.pavement = makeCanvasTexture(function(g, w, h) {
@@ -1260,92 +1387,130 @@
                 for (var y = 0; y <= h; y += 64) {
                     g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke();
                 }
-            }, 14, 2);
+            }, 14, 2, 256);
 
             // Flagstone Garden Path
             TEX.path = makeCanvasTexture(function(g, w, h) {
-                g.fillStyle = '#94a3b8';
+                g.fillStyle = '#64748b';
                 g.fillRect(0, 0, w, h);
                 g.fillStyle = '#cbd5e1';
                 g.fillRect(8, 8, 110, 110);
+                g.fillStyle = '#94a3b8';
                 g.fillRect(132, 8, 112, 110);
                 g.fillRect(8, 132, 110, 112);
+                g.fillStyle = '#cbd5e1';
                 g.fillRect(132, 132, 112, 112);
-            }, 1, 4);
+            }, 1, 4, 256);
+
+            // Patterned Hallway Wallpaper
+            TEX.wallpaper = makeCanvasTexture(function(g, w, h) {
+                g.fillStyle = '#f1f5f9';
+                g.fillRect(0, 0, w, h);
+                g.fillStyle = '#e2e8f0';
+                for (var x = 0; x < w; x += 32) {
+                    g.fillRect(x, 0, 12, h);
+                }
+                // Dado & Skirting Board
+                g.fillStyle = '#cbd5e1';
+                g.fillRect(0, h - 22, w, 22);
+            }, 4, 1, 256);
 
             // Kitchen Chequered Floor Tiles
             TEX.kitchenTile = makeCanvasTexture(function(g, w, h) {
                 var s = 64;
                 for (var y = 0; y < h; y += s) {
                     for (var x = 0; x < w; x += s) {
-                        g.fillStyle = ((x / s + y / s) % 2 === 0) ? '#e2e8f0' : '#94a3b8';
+                        g.fillStyle = ((x / s + y / s) % 2 === 0) ? '#f8fafc' : '#475569';
                         g.fillRect(x, y, s, s);
                     }
                 }
-            }, 2, 2);
+            }, 2, 2, 256);
 
-            // Wood Grain Door with Brass Handle
+            // Wood Grain Panelled Door with Brass Handle
             TEX.doorWood = makeCanvasTexture(function(g, w, h) {
                 g.fillStyle = '#ffffff';
                 g.fillRect(0, 0, w, h);
-                g.strokeStyle = 'rgba(0,0,0,0.28)';
+                g.strokeStyle = 'rgba(0,0,0,0.34)';
                 g.lineWidth = 8;
                 g.strokeRect(24, 20, w - 48, h * 0.4 - 24);
                 g.strokeRect(24, h * 0.45, w - 48, h * 0.48);
-                // Brass Handle
+                // Brass Lever Handle
                 g.fillStyle = '#facc15';
                 g.beginPath();
-                g.arc(w - 34, h * 0.52, 11, 0, Math.PI * 2);
+                g.arc(w - 34, h * 0.52, 12, 0, Math.PI * 2);
                 g.fill();
-            }, 1, 1);
+                g.fillRect(w - 58, h * 0.50, 26, 6);
+            }, 1, 1, 256);
 
-            // Northants Security Van Livery Side Texture
+            // Northants Security High-Res Van Livery Texture
             TEX.vanLivery = makeCanvasTexture(function(g, w, h) {
-                g.fillStyle = '#0f2537';
+                g.fillStyle = '#06101e';
                 g.fillRect(0, 0, w, h);
+                // Orange & Reflective Chevron Stripes
                 g.fillStyle = '#ff6b00';
-                g.fillRect(0, h * 0.56, w, h * 0.18);
+                g.fillRect(0, h * 0.54, w, h * 0.20);
+                g.fillStyle = '#38bdf8';
+                g.fillRect(0, h * 0.74, w, h * 0.05);
+                // Branding Text
                 g.fillStyle = '#ffffff';
-                g.font = '900 24px sans-serif';
+                g.font = '900 38px sans-serif';
                 g.textAlign = 'center';
-                g.fillText('NORTHANTS SECURITY', w * 0.5, h * 0.36);
-                g.fillStyle = '#0f2537';
-                g.font = '900 17px sans-serif';
-                g.fillText('24HR INTRUDER ALARMS', w * 0.5, h * 0.68);
-            }, 1, 1);
+                g.fillText('NORTHANTS SECURITY', w * 0.5, h * 0.30);
+                g.fillStyle = '#fbbf24';
+                g.font = '900 22px sans-serif';
+                g.fillText('NSI GOLD • 24HR INTRUDER & FIRE', w * 0.5, h * 0.44);
+                g.fillStyle = '#06101e';
+                g.font = '900 26px sans-serif';
+                g.fillText('01604 • NORTHAMPTON', w * 0.5, h * 0.68);
+            }, 1, 1, 512);
+
+            // Golden-Hour Sunset Sky Dome Texture
+            TEX.skyDome = makeCanvasTexture(function(g, w, h) {
+                var grad = g.createLinearGradient(0, 0, 0, h);
+                grad.addColorStop(0.0, '#040b16');
+                grad.addColorStop(0.42, '#1e1b4b');
+                grad.addColorStop(0.68, '#7c2d12');
+                grad.addColorStop(0.84, '#ea580c');
+                grad.addColorStop(1.0, '#fde047');
+                g.fillStyle = grad;
+                g.fillRect(0, 0, w, h);
+            }, 1, 1, 512);
         }
 
         function makeHouseNumberPlaqueTexture(numStr, isTarget) {
             return makeCanvasTexture(function(g, w, h) {
-                g.fillStyle = isTarget ? '#ff6b00' : '#0f2537';
+                g.fillStyle = isTarget ? '#ff6b00' : '#06101e';
                 g.fillRect(0, 0, w, h);
                 g.strokeStyle = '#ffffff';
                 g.lineWidth = 12;
                 g.strokeRect(8, 8, w - 16, h - 16);
-                g.fillStyle = isTarget ? '#0f2537' : '#ffffff';
+                g.fillStyle = isTarget ? '#06101e' : '#ffffff';
                 g.font = '900 110px sans-serif';
                 g.textAlign = 'center';
                 g.textBaseline = 'middle';
                 g.fillText('#' + numStr, w * 0.5, h * 0.45);
                 g.font = '900 32px sans-serif';
                 g.fillText(isTarget ? 'TARGET JOB' : 'NORTHANTS', w * 0.5, h * 0.82);
-            }, 1, 1);
+            }, 1, 1, 256);
         }
 
         /********************************************************************
-         * 6. THREE.JS WEBGL SCENE, 3D SPOTLIGHT TORCH & 3D ENGINEER HANDS
+         * 6. THREE.JS v4.0 ULTRA 3D SCENE, REAL-TIME SHADOWS & VAN BEACON
          ********************************************************************/
         var scene = null;
         var camera = null;
         var renderer = null;
         var streetGroup = null;
         var vanGroup = null;
+        var vanBeaconLight = null;
+        var vanBeaconRotor = null;
         var targetConeMesh = null;
         var activePanelLED = null;
         var headtorchLight = null;
         var headtorchTarget = null;
         var leftHandGroup = null;
         var rightHandGroup = null;
+        var bellboxStrobes = [];
 
         var worldDoors = [];
         var colliders = [];
@@ -1354,28 +1519,53 @@
             if (typeof THREE === 'undefined') return;
             var container = document.getElementById('webglContainer');
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x0b192c);
-            scene.fog = new THREE.FogExp2(0x0b192c, 0.015);
+            scene.background = new THREE.Color(0x1b1534);
+            scene.fog = new THREE.FogExp2(0x231934, 0.012);
 
-            camera = new THREE.PerspectiveCamera(68, window.innerWidth / window.innerHeight, 0.15, 130);
+            camera = new THREE.PerspectiveCamera(68, window.innerWidth / window.innerHeight, 0.15, 160);
             camera.rotation.order = 'YXZ';
 
             renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            if (THREE.ACESFilmicToneMapping) {
+                renderer.toneMapping = THREE.ACESFilmicToneMapping;
+                renderer.toneMappingExposure = 1.12;
+            }
             container.innerHTML = '';
             container.appendChild(renderer.domElement);
 
-            // Ambient & Directional Sunlight
-            var hemi = new THREE.HemisphereLight(0x93c5fd, 0x1e293b, 0.72);
+            initProceduralTextures();
+
+            // Golden-Hour Sunset Sky Dome
+            var skyGeo = new THREE.SphereGeometry(125, 24, 16);
+            var skyMat = new THREE.MeshBasicMaterial({ map: TEX.skyDome, side: THREE.BackSide, fog: false });
+            var skyMesh = new THREE.Mesh(skyGeo, skyMat);
+            scene.add(skyMesh);
+
+            // Warm Dusk Hemisphere Light
+            var hemi = new THREE.HemisphereLight(0xfdba74, 0x1e293b, 0.58);
             scene.add(hemi);
 
-            var dirLight = new THREE.DirectionalLight(0xfffbeb, 0.85);
-            dirLight.position.set(-18, 28, 14);
-            scene.add(dirLight);
+            // Golden-Hour Directional Sun Casting Real-Time 3D Shadows
+            var sunLight = new THREE.DirectionalLight(0xffedd5, 1.15);
+            sunLight.position.set(-28, 24, 18);
+            sunLight.castShadow = true;
+            sunLight.shadow.mapSize.width = 1024;
+            sunLight.shadow.mapSize.height = 1024;
+            sunLight.shadow.camera.near = 2;
+            sunLight.shadow.camera.far = 95;
+            sunLight.shadow.camera.left = -38;
+            sunLight.shadow.camera.right = 38;
+            sunLight.shadow.camera.top = 30;
+            sunLight.shadow.camera.bottom = -30;
+            sunLight.shadow.bias = -0.0008;
+            scene.add(sunLight);
 
             // Real-Time 3D SpotLight Headtorch attached to Camera
-            headtorchLight = new THREE.SpotLight(0xfffbeb, 2.6, 26, Math.PI / 4.2, 0.45, 1.2);
+            headtorchLight = new THREE.SpotLight(0xfffbeb, 3.2, 28, Math.PI / 4.0, 0.45, 1.2);
             headtorchLight.position.set(0, 0, 0);
             headtorchTarget = new THREE.Object3D();
             headtorchTarget.position.set(0, 0, -5);
@@ -1383,11 +1573,10 @@
             camera.add(headtorchTarget);
             headtorchLight.target = headtorchTarget;
 
-            // Build 3D First-Person Engineer Hands & Tools attached to Camera
+            // Build 3D First-Person Engineer Hands & VDE Tools attached to Camera
             build3DEngineerHands();
             scene.add(camera);
 
-            initProceduralTextures();
             generateRandomNeighborhood();
             rebuild3DStreetWorld();
             updateActiveAlarmPanelCoords();
@@ -1397,41 +1586,54 @@
             leftHandGroup = new THREE.Group();
             rightHandGroup = new THREE.Group();
 
-            var sleeveMat = new THREE.MeshLambertMaterial({ color: 0x0f2537 });
-            var cuffMat = new THREE.MeshLambertMaterial({ color: 0xff6b00 });
-            var toolYellowMat = new THREE.MeshLambertMaterial({ color: 0xfacc15 });
-            var steelMat = new THREE.MeshLambertMaterial({ color: 0xcbd5e1 });
+            var sleeveMat = new THREE.MeshStandardMaterial({ color: 0x06101e, roughness: 0.7 });
+            var cuffMat = new THREE.MeshStandardMaterial({ color: 0xff6b00, roughness: 0.4, emissive: 0x331200 });
+            var stripMat = new THREE.MeshBasicMaterial({ color: 0xd9f99d });
+            var toolYellowMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.3 });
+            var vdeRedMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.35 });
+            var steelMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.85, roughness: 0.2 });
 
-            // Left Sleeve & Torch/Multimeter
+            // Left Arm: Northants Security Hi-Vis Cuff + Fluke Digital Multimeter / Torch
             var lArm = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.11, 0.36), sleeveMat);
             lArm.position.set(0, -0.04, 0.1);
-            var lCuff = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.06), cuffMat);
+            var lCuff = new THREE.Mesh(new THREE.BoxGeometry(0.122, 0.122, 0.065), cuffMat);
             lCuff.position.set(0, -0.04, -0.08);
-            var lMeter = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.14, 0.06), toolYellowMat);
+            var lReflect = new THREE.Mesh(new THREE.BoxGeometry(0.125, 0.125, 0.018), stripMat);
+            lReflect.position.set(0, -0.04, -0.05);
+            var lMeter = new THREE.Mesh(new THREE.BoxGeometry(0.095, 0.145, 0.055), toolYellowMat);
             lMeter.position.set(0, 0.03, -0.14);
-            leftHandGroup.add(lArm, lCuff, lMeter);
+            var lScreen = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.055, 0.01), new THREE.MeshBasicMaterial({ color: 0x4ade80 }));
+            lScreen.position.set(0, 0.055, -0.11);
+            leftHandGroup.add(lArm, lCuff, lReflect, lMeter, lScreen);
             leftHandGroup.position.set(-0.27, -0.24, -0.42);
             camera.add(leftHandGroup);
 
-            // Right Sleeve & Insulated Screwdriver / Snips
+            // Right Arm: Northants Security Cuff + VDE 1000V Insulated Screwdriver
             var rArm = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.11, 0.36), sleeveMat);
             rArm.position.set(0, -0.04, 0.1);
-            var rCuff = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.06), cuffMat);
+            var rCuff = new THREE.Mesh(new THREE.BoxGeometry(0.122, 0.122, 0.065), cuffMat);
             rCuff.position.set(0, -0.04, -0.08);
-            var handle = new THREE.Mesh(new THREE.CylinderGeometry(0.026, 0.026, 0.15, 10), cuffMat);
+            var rReflect = new THREE.Mesh(new THREE.BoxGeometry(0.125, 0.125, 0.018), stripMat);
+            rReflect.position.set(0, -0.04, -0.05);
+            var handle = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.024, 0.15, 12), vdeRedMat);
             handle.rotation.x = Math.PI * 0.35;
             handle.position.set(0, 0.02, -0.14);
-            var shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.18, 8), steelMat);
+            var collar = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.035, 12), toolYellowMat);
+            collar.rotation.x = Math.PI * 0.35;
+            collar.position.set(0, 0.06, -0.19);
+            var shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.19, 8), steelMat);
             shaft.rotation.x = Math.PI * 0.35;
-            shaft.position.set(0, 0.11, -0.24);
-            rightHandGroup.add(rArm, rCuff, handle, shaft);
+            shaft.position.set(0, 0.12, -0.26);
+            rightHandGroup.add(rArm, rCuff, rReflect, handle, collar, shaft);
             rightHandGroup.position.set(0.27, -0.24, -0.42);
             camera.add(rightHandGroup);
         }
 
-        function addBoxMesh(parent, cx, cy, cz, w, h, d, mat, registerColl, doorRef) {
+        function addBoxMesh(parent, cx, cy, cz, w, h, d, mat, registerColl, doorRef, castShad, recvShad) {
             var mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
             mesh.position.set(cx, cy, cz);
+            if (castShad !== false) mesh.castShadow = true;
+            if (recvShad !== false) mesh.receiveShadow = true;
             parent.add(mesh);
             if (registerColl && (cy - h / 2) < 1.65 && (cy + h / 2) > 0.2) {
                 colliders.push({
@@ -1453,44 +1655,62 @@
 
             worldDoors.length = 0;
             colliders.length = 0;
+            bellboxStrobes.length = 0;
 
-            // 1. Central Tarmac Road (z = -3.4 to +3.4)
-            var roadMat = new THREE.MeshLambertMaterial({ map: TEX.road });
-            var roadMesh = new THREE.Mesh(new THREE.PlaneGeometry(76, 6.8), roadMat);
+            // 1. Central Speckled Tarmac Road (z = -3.4 to +3.4)
+            var roadMat = new THREE.MeshStandardMaterial({ map: TEX.road, roughness: 0.78, metalness: 0.08 });
+            var roadMesh = new THREE.Mesh(new THREE.PlaneGeometry(78, 6.8), roadMat);
             roadMesh.rotation.x = -Math.PI / 2;
             roadMesh.position.set(0, 0.01, 0);
+            roadMesh.receiveShadow = true;
             streetGroup.add(roadMesh);
 
+            // Raised Concrete Kerb Stones along Road Edges
+            var kerbMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.7 });
+            addBoxMesh(streetGroup, 0, 0.06, -3.45, 78, 0.12, 0.18, kerbMat, false, null, false, true);
+            addBoxMesh(streetGroup, 0, 0.06,  3.45, 78, 0.12, 0.18, kerbMat, false, null, false, true);
+
             // 2. North & South Pavements / Sidewalks
-            var paveMat = new THREE.MeshLambertMaterial({ map: TEX.pavement });
-            var nPave = new THREE.Mesh(new THREE.PlaneGeometry(76, 2.2), paveMat);
+            var paveMat = new THREE.MeshStandardMaterial({ map: TEX.pavement, bumpMap: TEX.pavement, bumpScale: 0.02, roughness: 0.85 });
+            var nPave = new THREE.Mesh(new THREE.PlaneGeometry(78, 2.2), paveMat);
             nPave.rotation.x = -Math.PI / 2;
             nPave.position.set(0, 0.03, -4.5);
+            nPave.receiveShadow = true;
             streetGroup.add(nPave);
 
-            var sPave = new THREE.Mesh(new THREE.PlaneGeometry(76, 2.2), paveMat);
+            var sPave = new THREE.Mesh(new THREE.PlaneGeometry(78, 2.2), paveMat);
             sPave.rotation.x = -Math.PI / 2;
             sPave.position.set(0, 0.03, 4.5);
+            sPave.receiveShadow = true;
             streetGroup.add(sPave);
 
-            // 3. Build All 8 Enterable Multi-Room Buildings (#10 to #17)
+            // 3. Build All 8 Detailed Enterable Multi-Room Buildings (#10 to #17)
             for (var i = 0; i < HOUSES.length; i++) {
                 buildSingle3DHouse(HOUSES[i]);
             }
 
-            // 4. Street Lamps along Both Sides of the Avenue
-            var poleMat = new THREE.MeshLambertMaterial({ color: 0x334155 });
+            // 4. Working Streetlamps Casting Warm Pools of Light onto the Road
+            var poleMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.6, roughness: 0.35 });
             var bulbMat = new THREE.MeshBasicMaterial({ color: 0xfef08a });
-            [-26, -12, 2, 16, 28].forEach(function(lx) {
-                addBoxMesh(streetGroup, lx, 2.2, -3.6, 0.18, 4.4, 0.18, poleMat, true);
-                addBoxMesh(streetGroup, lx, 4.45, -3.3, 0.55, 0.18, 0.55, bulbMat, false);
-                addBoxMesh(streetGroup, lx, 2.2, 3.6, 0.18, 4.4, 0.18, poleMat, true);
-                addBoxMesh(streetGroup, lx, 4.45, 3.3, 0.55, 0.18, 0.55, bulbMat, false);
+            [-24, -8, 8, 24].forEach(function(lx, idx) {
+                // North Lamp
+                addBoxMesh(streetGroup, lx, 2.35, -3.6, 0.16, 4.7, 0.16, poleMat, true);
+                addBoxMesh(streetGroup, lx, 4.65, -3.1, 0.22, 0.14, 1.1, poleMat, false);
+                addBoxMesh(streetGroup, lx, 4.56, -2.75, 0.45, 0.12, 0.45, bulbMat, false, null, false, false);
+                // South Lamp
+                addBoxMesh(streetGroup, lx, 2.35, 3.6, 0.16, 4.7, 0.16, poleMat, true);
+                addBoxMesh(streetGroup, lx, 4.65, 3.1, 0.22, 0.14, 1.1, poleMat, false);
+                addBoxMesh(streetGroup, lx, 4.56, 2.75, 0.45, 0.12, 0.45, bulbMat, false, null, false, false);
+
+                // Warm PointLight Pool on Tarmac
+                var lampLight = new THREE.PointLight(0xfde047, 0.95, 19, 1.6);
+                lampLight.position.set(lx, 4.2, (idx % 2 === 0) ? -2.2 : 2.2);
+                streetGroup.add(lampLight);
             });
 
-            // 5. Floating 3D Orange Target Cone & Active Wall Alarm Box
+            // 5. Floating 3D Orange Target Cone
             var coneMat = new THREE.MeshBasicMaterial({ color: 0xff6b00 });
-            targetConeMesh = new THREE.Mesh(new THREE.ConeGeometry(0.75, 1.4, 8), coneMat);
+            targetConeMesh = new THREE.Mesh(new THREE.ConeGeometry(0.78, 1.45, 8), coneMat);
             targetConeMesh.rotation.x = Math.PI;
             streetGroup.add(targetConeMesh);
 
@@ -1504,92 +1724,146 @@
             var leftX  = cx - 4.5, rightX = cx + 4.5;
             var midX   = cx - 0.2, midZ = cz;
 
-            var brickTex = makeBrickTexture(h.brickBase, h.brickMortar, 3, 2);
-            var brickMat = new THREE.MeshLambertMaterial({ map: brickTex });
-            var innerWallMat = new THREE.MeshLambertMaterial({ color: 0xe2e8f0 });
-            var loungeWallMat = new THREE.MeshLambertMaterial({ color: 0xbfdbfe });
+            var brickMat = makeBrickMaterial(h.brickBase, h.brickAlt, h.brickMortar, 3, 2);
+            var innerWallMat = new THREE.MeshStandardMaterial({ map: TEX.wallpaper, roughness: 0.9 });
+            var loungeWallMat = new THREE.MeshStandardMaterial({ color: 0xbfdbfe, roughness: 0.85 });
+            var upvcWhiteMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 });
 
             // 1. Lush Striped Front Lawn, Flagstone Garden Path & Gravel Driveway
             var lawnZ = cz + s * 6.8;
-            var lawnMesh = new THREE.Mesh(new THREE.PlaneGeometry(13.2, 5.6), new THREE.MeshLambertMaterial({ map: TEX.lawn }));
+            var lawnMesh = new THREE.Mesh(
+                new THREE.PlaneGeometry(13.2, 5.6),
+                new THREE.MeshStandardMaterial({ map: TEX.lawn, bumpMap: TEX.lawn, bumpScale: 0.03, roughness: 0.9 })
+            );
             lawnMesh.rotation.x = -Math.PI / 2;
             lawnMesh.position.set(cx, 0.02, lawnZ);
+            lawnMesh.receiveShadow = true;
             streetGroup.add(lawnMesh);
 
-            var pathMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 5.6), new THREE.MeshLambertMaterial({ map: TEX.path }));
+            var pathMesh = new THREE.Mesh(
+                new THREE.PlaneGeometry(1.5, 5.6),
+                new THREE.MeshStandardMaterial({ map: TEX.path, bumpMap: TEX.path, bumpScale: 0.025, roughness: 0.8 })
+            );
             pathMesh.rotation.x = -Math.PI / 2;
-            pathMesh.position.set(cx - 1.1, 0.035, lawnZ);
+            pathMesh.position.set(cx - 1.1, 0.036, lawnZ);
+            pathMesh.receiveShadow = true;
             streetGroup.add(pathMesh);
 
-            var driveMesh = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 5.6), new THREE.MeshLambertMaterial({ color: 0x475569 }));
+            var driveMesh = new THREE.Mesh(
+                new THREE.PlaneGeometry(2.4, 5.6),
+                new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.95 })
+            );
             driveMesh.rotation.x = -Math.PI / 2;
             driveMesh.position.set(cx - 4.5, 0.03, lawnZ);
+            driveMesh.receiveShadow = true;
             streetGroup.add(driveMesh);
 
-            // Front Garden Hedge & Gate Post with Number Sign
-            var hedgeMat = new THREE.MeshLambertMaterial({ color: 0x14532d });
-            addBoxMesh(streetGroup, cx + 2.2, 0.4, cz + s * 9.3, 4.2, 0.8, 0.35, hedgeMat, true);
-            addBoxMesh(streetGroup, cx - 2.3, 0.65, cz + s * 9.3, 0.42, 1.3, 0.42, brickMat, true);
+            // Front Garden Hedge & Brick Gate Pillar with Number Sign
+            var hedgeMat = new THREE.MeshStandardMaterial({ color: 0x14532d, bumpMap: TEX.lawn, bumpScale: 0.05, roughness: 0.9 });
+            addBoxMesh(streetGroup, cx + 2.2, 0.45, cz + s * 9.3, 4.2, 0.9, 0.38, hedgeMat, true);
+            addBoxMesh(streetGroup, cx - 2.3, 0.68, cz + s * 9.3, 0.46, 1.36, 0.46, brickMat, true);
+            addBoxMesh(streetGroup, cx - 2.3, 1.40, cz + s * 9.3, 0.54, 0.1, 0.54, upvcWhiteMat, false);
 
-            // Floating House Number Signboard on Front Wall
             var isTarget = (h.idx === JOBS[game.jobIdx].houseIdx);
             var plaqueTex = makeHouseNumberPlaqueTexture(h.num, isTarget);
             var plaqueMat = new THREE.MeshBasicMaterial({ map: plaqueTex });
-            addBoxMesh(streetGroup, cx - 2.3, 1.35, cz + s * 9.3, 0.72, 0.52, 0.12, plaqueMat, false);
+            addBoxMesh(streetGroup, cx - 2.3, 1.0, cz + s * 9.55, 0.68, 0.48, 0.06, plaqueMat, false, null, false, false);
 
             // Random Garden Trees, Flowerbeds & Wheelie Bins
             if (h.ornament.indexOf('tree') !== -1) {
-                addBoxMesh(streetGroup, cx + 2.8, 0.9, lawnZ, 0.34, 1.8, 0.34, new THREE.MeshLambertMaterial({ color: 0x78350f }), true);
-                addBoxMesh(streetGroup, cx + 2.8, 2.2, lawnZ, 1.5, 1.4, 1.5, new THREE.MeshLambertMaterial({ color: 0x15803d }), false);
+                addBoxMesh(streetGroup, cx + 2.8, 1.0, lawnZ, 0.34, 2.0, 0.34, new THREE.MeshStandardMaterial({ color: 0x5c2d16 }), true);
+                var canopy = new THREE.Mesh(new THREE.DodecahedronGeometry(1.15, 1), new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.85 }));
+                canopy.position.set(cx + 2.8, 2.55, lawnZ);
+                canopy.castShadow = true;
+                canopy.receiveShadow = true;
+                streetGroup.add(canopy);
             }
             if (h.ornament.indexOf('bins') !== -1) {
-                addBoxMesh(streetGroup, cx - 3.9, 0.52, frontZ + s * 0.7, 0.5, 1.05, 0.5, new THREE.MeshLambertMaterial({ color: 0x1e293b }), true);
-                addBoxMesh(streetGroup, cx - 3.25, 0.52, frontZ + s * 0.7, 0.5, 1.05, 0.5, new THREE.MeshLambertMaterial({ color: 0x15803d }), true);
+                addBoxMesh(streetGroup, cx - 3.9, 0.54, frontZ + s * 0.72, 0.52, 1.08, 0.52, new THREE.MeshStandardMaterial({ color: 0x1e293b }), true);
+                addBoxMesh(streetGroup, cx - 3.25, 0.54, frontZ + s * 0.72, 0.52, 1.08, 0.52, new THREE.MeshStandardMaterial({ color: 0x15803d }), true);
             }
 
-            // 2. Interior Room Floors (Hallway Wood, Lounge Carpet, Cupboard Concrete, Kitchen Chequered Tile)
-            var hallFloor = new THREE.Mesh(new THREE.PlaneGeometry(4.3, 4.0), new THREE.MeshLambertMaterial({ color: 0x92400e }));
+            // 2. Interior Room Floors (Hallway Wood, Lounge Carpet + Rug, Cupboard Concrete, Kitchen Chequered Tile)
+            var hallFloor = new THREE.Mesh(new THREE.PlaneGeometry(4.3, 4.0), new THREE.MeshStandardMaterial({ color: 0x92400e, roughness: 0.6 }));
             hallFloor.rotation.x = -Math.PI / 2;
             hallFloor.position.set(cx - 2.35, 0.03, cz + s * 2.0);
+            hallFloor.receiveShadow = true;
             streetGroup.add(hallFloor);
 
-            var loungeFloor = new THREE.Mesh(new THREE.PlaneGeometry(4.7, 4.0), new THREE.MeshLambertMaterial({ color: 0x1e3a8a }));
+            var loungeFloor = new THREE.Mesh(new THREE.PlaneGeometry(4.7, 4.0), new THREE.MeshStandardMaterial({ color: 0x1e3a8a, roughness: 0.9 }));
             loungeFloor.rotation.x = -Math.PI / 2;
             loungeFloor.position.set(cx + 2.15, 0.03, cz + s * 2.0);
+            loungeFloor.receiveShadow = true;
             streetGroup.add(loungeFloor);
 
-            var cupFloor = new THREE.Mesh(new THREE.PlaneGeometry(4.3, 4.0), new THREE.MeshLambertMaterial({ color: 0x334155 }));
+            var cupFloor = new THREE.Mesh(new THREE.PlaneGeometry(4.3, 4.0), new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.9 }));
             cupFloor.rotation.x = -Math.PI / 2;
             cupFloor.position.set(cx - 2.35, 0.03, cz - s * 2.0);
+            cupFloor.receiveShadow = true;
             streetGroup.add(cupFloor);
 
-            var kitFloor = new THREE.Mesh(new THREE.PlaneGeometry(4.7, 4.0), new THREE.MeshLambertMaterial({ map: TEX.kitchenTile }));
+            var kitFloor = new THREE.Mesh(new THREE.PlaneGeometry(4.7, 4.0), new THREE.MeshStandardMaterial({ map: TEX.kitchenTile, roughness: 0.35 }));
             kitFloor.rotation.x = -Math.PI / 2;
             kitFloor.position.set(cx + 2.15, 0.03, cz - s * 2.0);
+            kitFloor.receiveShadow = true;
             streetGroup.add(kitFloor);
 
-            // 3. Pitched Roof & External NS Bellbox
-            var roofMat = new THREE.MeshLambertMaterial({ color: h.roofHex });
-            var roofMesh = new THREE.Mesh(new THREE.ConeGeometry(6.8, 2.1, 4), roofMat);
-            roofMesh.position.set(cx, 3.95, cz);
+            // 3. Bump-Mapped Slate Roof, Brick Chimney Stack & Terracotta Chimney Pots
+            var roofMat = new THREE.MeshStandardMaterial({
+                color: h.roofHex,
+                bumpMap: TEX.roofBump,
+                bumpScale: 0.09,
+                roughness: 0.75
+            });
+            var roofMesh = new THREE.Mesh(new THREE.ConeGeometry(6.95, 2.35, 4), roofMat);
+            roofMesh.position.set(cx, 4.05, cz);
             roofMesh.rotation.y = Math.PI / 4;
+            roofMesh.castShadow = true;
+            roofMesh.receiveShadow = true;
             streetGroup.add(roofMesh);
 
-            // Northants Security External Orange & Blue Bellbox
-            addBoxMesh(streetGroup, cx - 3.1, 2.35, frontZ + s * 0.16, 0.46, 0.52, 0.14, new THREE.MeshBasicMaterial({ color: 0xff6b00 }), false);
+            // Brick Chimney Stack & Twin Terracotta Pots
+            addBoxMesh(streetGroup, cx + 2.4, 4.75, cz - s * 1.1, 0.85, 1.5, 0.85, brickMat, false);
+            var potMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.7 });
+            var pot1 = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.14, 0.42, 10), potMat);
+            pot1.position.set(cx + 2.22, 5.65, cz - s * 1.1);
+            var pot2 = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.14, 0.42, 10), potMat);
+            pot2.position.set(cx + 2.58, 5.65, cz - s * 1.1);
+            streetGroup.add(pot1, pot2);
 
-            // 4. Front Exterior Wall (with Front Doorway & Framed Lounge Window)
+            // Front Porch Canopy Over Front Doorway
+            addBoxMesh(streetGroup, cx - 1.1, 2.38, frontZ + s * 0.48, 1.65, 0.14, 0.9, upvcWhiteMat, false);
+            addBoxMesh(streetGroup, cx - 1.1, 2.50, frontZ + s * 0.45, 1.72, 0.12, 0.95, roofMat, false);
+
+            // External Northants Security Orange & Blue Bellbox with Flashing Strobe LED
+            addBoxMesh(streetGroup, cx - 3.1, 2.38, frontZ + s * 0.15, 0.48, 0.56, 0.14, new THREE.MeshStandardMaterial({ color: 0xff6b00, roughness: 0.3 }), false);
+            addBoxMesh(streetGroup, cx - 3.1, 2.22, frontZ + s * 0.19, 0.42, 0.18, 0.08, new THREE.MeshBasicMaterial({ color: 0x06101e }), false);
+            var strobeMesh = addBoxMesh(streetGroup, cx - 3.1, 2.16, frontZ + s * 0.22, 0.22, 0.08, 0.08, new THREE.MeshBasicMaterial({ color: 0x38bdf8 }), false, null, false, false);
+            bellboxStrobes.push(strobeMesh);
+
+            // 4. Front Exterior Wall + White UPVC Window Frame, Mullions & Sill
             addBoxMesh(streetGroup, cx - 3.1, 1.45, frontZ, 2.8, 2.9, 0.24, brickMat, true);
             addBoxMesh(streetGroup, cx - 1.1, 2.55, frontZ, 1.2, 0.7, 0.24, brickMat, false);
             addBoxMesh(streetGroup, cx + 0.25, 1.45, frontZ, 1.5, 2.9, 0.24, brickMat, true);
             addBoxMesh(streetGroup, cx + 2.1, 0.45, frontZ, 2.2, 0.9, 0.24, brickMat, true);
             addBoxMesh(streetGroup, cx + 2.1, 2.5, frontZ, 2.2, 0.8, 0.24, brickMat, false);
-            // See-Through Glass Window
-            var glassMat = new THREE.MeshBasicMaterial({ color: 0x7dd3fc, transparent: true, opacity: 0.32 });
-            addBoxMesh(streetGroup, cx + 2.1, 1.5, frontZ, 2.2, 1.2, 0.06, glassMat, false);
+            // UPVC Window Sill & Mullion Bars
+            addBoxMesh(streetGroup, cx + 2.1, 0.88, frontZ + s * 0.08, 2.34, 0.08, 0.34, upvcWhiteMat, false);
+            addBoxMesh(streetGroup, cx + 2.1, 2.10, frontZ + s * 0.04, 2.28, 0.07, 0.28, upvcWhiteMat, false);
+            addBoxMesh(streetGroup, cx + 2.1, 1.50, frontZ + s * 0.04, 0.07, 1.2, 0.28, upvcWhiteMat, false);
+            // Warm Glowing Window Glass
+            var glassMat = new THREE.MeshStandardMaterial({
+                color: 0xbae6fd,
+                emissive: 0xfde047,
+                emissiveIntensity: 0.22,
+                transparent: true,
+                opacity: 0.42,
+                roughness: 0.1
+            });
+            addBoxMesh(streetGroup, cx + 2.1, 1.5, frontZ, 2.2, 1.2, 0.06, glassMat, false, null, false, false);
             addBoxMesh(streetGroup, cx + 3.85, 1.45, frontZ, 1.3, 2.9, 0.24, brickMat, true);
 
-            // 5. Outer Left, Right & Back Walls
+            // 5. Outer Left, Right & Back Brick Walls
             addBoxMesh(streetGroup, leftX, 1.45, cz, 0.24, 2.9, 8.0, brickMat, true);
             addBoxMesh(streetGroup, rightX, 1.45, cz, 0.24, 2.9, 8.0, brickMat, true);
             addBoxMesh(streetGroup, cx, 1.45, backZ, 9.0, 2.9, 0.24, brickMat, true);
@@ -1615,12 +1889,19 @@
             createSwinging3DDoor(h, 'cupboard', '#' + h.num + ' Cupboard Door', cx - 2.2, midZ, 1.2, 0, s, 0x475569, false);
             createSwinging3DDoor(h, 'kitchen', '#' + h.num + ' Kitchen Door', cx + 1.0, midZ, 1.2, 0, s, 0x92400e, false);
 
-            // 9. Detailed 3D Interior Furniture (Sofa, 60" Glowing Telly, Kitchen Worktop)
-            var sofaMat = new THREE.MeshLambertMaterial({ color: 0x1d4ed8 });
-            addBoxMesh(streetGroup, cx + 1.8, 0.38, cz + s * 2.5, 1.8, 0.75, 0.8, sofaMat, true);
-            addBoxMesh(streetGroup, cx + 3.9, 0.35, cz + s * 1.4, 0.5, 0.7, 1.5, new THREE.MeshLambertMaterial({ color: 0x1e293b }), true);
-            addBoxMesh(streetGroup, cx + 3.82, 1.05, cz + s * 1.4, 0.08, 0.75, 1.35, new THREE.MeshBasicMaterial({ color: 0x38bdf8 }), false);
-            addBoxMesh(streetGroup, cx + 3.7, 0.45, cz - s * 2.2, 0.9, 0.9, 2.3, new THREE.MeshLambertMaterial({ color: 0x64748b }), true);
+            // 9. Multi-Room 3D Interior Furniture:
+            // Lounge Plush Sofa with Backrest, Armrests, Coffee Table, Rug & 60" Glowing Smart TV
+            var sofaMat = new THREE.MeshStandardMaterial({ color: 0x1d4ed8, roughness: 0.8 });
+            addBoxMesh(streetGroup, cx + 1.75, 0.28, cz + s * 2.55, 1.85, 0.45, 0.82, sofaMat, true);
+            addBoxMesh(streetGroup, cx + 1.75, 0.62, cz + s * 2.86, 1.85, 0.48, 0.22, sofaMat, false);
+            addBoxMesh(streetGroup, cx + 2.75, 0.22, cz + s * 1.45, 0.85, 0.38, 0.55, new THREE.MeshStandardMaterial({ color: 0x78350f }), true);
+            // TV Unit & 60" Glowing Screen
+            addBoxMesh(streetGroup, cx + 3.9, 0.35, cz + s * 1.4, 0.48, 0.68, 1.55, new THREE.MeshStandardMaterial({ color: 0x0f172a }), true);
+            addBoxMesh(streetGroup, cx + 3.82, 1.06, cz + s * 1.4, 0.07, 0.78, 1.42, new THREE.MeshBasicMaterial({ color: 0x38bdf8 }), false, null, false, false);
+            // Kitchen Countertop, Stainless Sink & Wall Cabinets
+            addBoxMesh(streetGroup, cx + 3.7, 0.45, cz - s * 2.2, 0.9, 0.9, 2.4, new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.5 }), true);
+            addBoxMesh(streetGroup, cx + 3.65, 0.92, cz - s * 2.2, 0.62, 0.04, 0.95, new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.8, roughness: 0.2 }), false);
+            addBoxMesh(streetGroup, cx + 4.02, 2.05, cz - s * 2.2, 0.42, 0.72, 2.2, upvcWhiteMat, false);
         }
 
         function createSwinging3DDoor(h, type, label, hingeX, hingeZ, width, closedRot, swingDir, colorHex, isFront) {
@@ -1628,9 +1909,17 @@
             pivot.position.set(hingeX, 0, hingeZ);
             pivot.rotation.y = closedRot;
 
-            var doorMat = new THREE.MeshLambertMaterial({ color: colorHex, map: TEX.doorWood });
+            var doorMat = new THREE.MeshStandardMaterial({
+                color: colorHex,
+                map: TEX.doorWood,
+                bumpMap: TEX.doorWood,
+                bumpScale: 0.03,
+                roughness: 0.45
+            });
             var panel = new THREE.Mesh(new THREE.BoxGeometry(width, 2.2, 0.09), doorMat);
             panel.position.set(width / 2, 1.1, 0);
+            panel.castShadow = true;
+            panel.receiveShadow = true;
             pivot.add(panel);
             streetGroup.add(pivot);
 
@@ -1668,47 +1957,74 @@
             var job = JOBS[game.jobIdx];
             var th = HOUSES[job.houseIdx];
             var vx = th.cx - 3.6;
-            var vz = th.side === 1 ? -1.9 : 1.9;
+            var vz = th.side === 1 ? -1.95 : 1.95;
             var tier = game.upgrades.van_sprinter ? 2 : (game.upgrades.van_custom ? 1 : 0);
 
-            var bodyMat = tier === 0
-                ? new THREE.MeshLambertMaterial({ color: 0xcbd5e1 })
-                : new THREE.MeshLambertMaterial({ map: TEX.vanLivery });
-            var cabMat = new THREE.MeshLambertMaterial({ color: tier === 0 ? 0x94a3b8 : 0x0f2537 });
-            var glassMat = new THREE.MeshBasicMaterial({ color: 0x7dd3fc });
-            var wheelMat = new THREE.MeshLambertMaterial({ color: 0x0f172a });
+            var bodyMat = new THREE.MeshStandardMaterial({
+                map: TEX.vanLivery,
+                roughness: 0.25,
+                metalness: 0.3
+            });
+            var cabMat = new THREE.MeshStandardMaterial({
+                color: tier === 2 ? 0xff6b00 : 0x06101e,
+                roughness: 0.28,
+                metalness: 0.35
+            });
+            var glassMat = new THREE.MeshStandardMaterial({ color: 0x7dd3fc, roughness: 0.1, metalness: 0.8 });
+            var wheelMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.8 });
+            var hubMat = new THREE.MeshStandardMaterial({ color: tier === 2 ? 0xfacc15 : 0xcbd5e1, metalness: 0.8, roughness: 0.2 });
 
-            // Main Cargo Box
-            var cargo = new THREE.Mesh(new THREE.BoxGeometry(3.4, 1.65, 1.75), bodyMat);
-            cargo.position.set(-0.35, 1.15, 0);
+            // Main Signwritten Cargo Box
+            var cargo = new THREE.Mesh(new THREE.BoxGeometry(3.5, 1.72, 1.82), bodyMat);
+            cargo.position.set(-0.35, 1.18, 0);
+            cargo.castShadow = true;
+            cargo.receiveShadow = true;
             vanGroup.add(cargo);
 
-            // Front Cab & Windscreen
-            var cab = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.25, 1.7), cabMat);
-            cab.position.set(1.75, 0.95, 0);
+            // Front Cab, Windscreen & Glowing Headlights
+            var cab = new THREE.Mesh(new THREE.BoxGeometry(1.15, 1.28, 1.76), cabMat);
+            cab.position.set(1.80, 0.96, 0);
+            cab.castShadow = true;
             vanGroup.add(cab);
 
-            var wind = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.55, 1.5), glassMat);
-            wind.position.set(2.31, 1.22, 0);
+            var wind = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.58, 1.56), glassMat);
+            wind.position.set(2.34, 1.26, 0);
             vanGroup.add(wind);
 
-            // 4 Wheels
-            [[-1.3, -0.88], [1.4, -0.88], [-1.3, 0.88], [1.4, 0.88]].forEach(function(w) {
-                var wh = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.65, 0.22), wheelMat);
-                wh.position.set(w[0], 0.34, w[1]);
-                vanGroup.add(wh);
+            var hlMat = new THREE.MeshBasicMaterial({ color: 0xfef08a });
+            var hl1 = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.2, 0.32), hlMat);
+            hl1.position.set(2.38, 0.72, -0.62);
+            var hl2 = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.2, 0.32), hlMat);
+            hl2.position.set(2.38, 0.72, 0.62);
+            vanGroup.add(hl1, hl2);
+
+            // 4 Wheels + Alloy Hubs
+            [[-1.3, -0.92], [1.45, -0.92], [-1.3, 0.92], [1.45, 0.92]].forEach(function(w) {
+                var wh = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.36, 0.24, 14), wheelMat);
+                wh.rotation.x = Math.PI / 2;
+                wh.position.set(w[0], 0.36, w[1]);
+                var hub = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.26, 10), hubMat);
+                hub.rotation.x = Math.PI / 2;
+                hub.position.set(w[0], 0.36, w[1]);
+                vanGroup.add(wh, hub);
             });
 
-            if (tier >= 1) {
-                var rack = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.12, 1.3), new THREE.MeshLambertMaterial({ color: 0xff6b00 }));
-                rack.position.set(-0.35, 2.04, 0);
-                vanGroup.add(rack);
-            }
-            if (tier === 2) {
-                var beacon = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.22, 0.9), new THREE.MeshBasicMaterial({ color: 0xfacc15 }));
-                beacon.position.set(0.9, 2.1, 0);
-                vanGroup.add(beacon);
-            }
+            // Roof Ladder Rack
+            var rack = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.1, 1.45), new THREE.MeshStandardMaterial({ color: 0xff6b00, metalness: 0.4 }));
+            rack.position.set(-0.35, 2.09, 0);
+            vanGroup.add(rack);
+
+            // Spinning Amber Roof Beacon Light + Dynamic PointLight
+            vanBeaconRotor = new THREE.Group();
+            vanBeaconRotor.position.set(0.85, 2.22, 0);
+            var dome = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.26, 0.24, 12), new THREE.MeshBasicMaterial({ color: 0xff9500 }));
+            var reflector = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.14, 0.14), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+            vanBeaconRotor.add(dome, reflector);
+            vanGroup.add(vanBeaconRotor);
+
+            vanBeaconLight = new THREE.PointLight(0xff8800, 2.2, 16, 1.5);
+            vanBeaconLight.position.set(0.85, 2.45, 0);
+            vanGroup.add(vanBeaconLight);
 
             vanGroup.position.set(vx, 0, vz);
             streetGroup.add(vanGroup);
@@ -1733,7 +2049,7 @@
             if (streetGroup && typeof THREE !== 'undefined') {
                 if (activePanelLED) streetGroup.remove(activePanelLED);
                 var boxGroup = new THREE.Group();
-                var casing = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.55, 0.16), new THREE.MeshLambertMaterial({ color: 0xf8fafc }));
+                var casing = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.55, 0.16), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 }));
                 var led = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.16, 0.2), new THREE.MeshBasicMaterial({ color: 0xff6b00 }));
                 led.position.y = 0.22;
                 boxGroup.add(casing, led);
@@ -1821,12 +2137,12 @@
             var job = JOBS[game.jobIdx];
             var inDarkRoom = loc.inside && (job.isDark || loc.room === 'Under-Stairs Cupboard');
             if (scene && scene.fog) {
-                scene.fog.density = inDarkRoom ? (game.torchOn ? 0.08 : 0.26) : 0.014;
+                scene.fog.density = inDarkRoom ? (game.torchOn ? 0.065 : 0.25) : 0.012;
             }
 
             // Nearest interactive door
             var closestDoor = null;
-            var minDist = 2.5;
+            var minDist = 2.55;
             for (var j = 0; j < worldDoors.length; j++) {
                 var dr = worldDoors[j];
                 var dist = Math.hypot(player.x - dr.centerX, player.z - dr.centerZ);
@@ -1852,7 +2168,7 @@
             var targetHouse = HOUSES[job.houseIdx];
             var pDist = Math.hypot(player.x - game.panelWorldPos.x, player.z - game.panelWorldPos.z);
             var inTargetHouse = loc.inside && loc.houseIdx === job.houseIdx;
-            game.canWirePanel = inTargetHouse && pDist < 2.8;
+            game.canWirePanel = inTargetHouse && pDist < 2.85;
 
             var wireBtn = document.getElementById('wireActionBtn');
             if (wireBtn) {
@@ -1959,8 +2275,8 @@
                         '<div style="font-weight:900;font-size:13.5px;margin-top:4px;color:#fff;">' + item.name + '</div>' +
                         '<div style="font-size:11px;color:#cbd5e1;margin-top:3px;line-height:1.3;">' + item.desc + '</div>' +
                     '</div>' +
-                    '<button type="button" style="width:100%;padding:9px;border-radius:9px;font-weight:900;font-size:12px;background:' + (owned ? '#065f46' : '#ff6b00') + ';color:' + (owned ? '#a7f3d0' : '#0f2537') + ';" ' +
-                        (owned ? 'disabled' : '') + ' onclick="window.buyShopUpgrade(\'' + item.id + '\')">' +
+                    '<button type="button" style="width:100%;padding:9px;border-radius:9px;font-weight:900;font-size:12px;background:' + (owned ? '#065f46' : '#ff6b00') + ';color:' + (owned ? '#a7f3d0' : '#06101e') + ';" ' +
+                        (owned ? 'disabled' : '') + ' onclick="window.buyShopUpgrade(\'' + item.id + '\'); return false;" ontouchend="window.buyShopUpgrade(\'' + item.id + '\'); return false;">' +
                         (owned ? 'EQUIPPED ✓' : 'BUY (£' + item.cost + ')') +
                     '</button>';
                 grid.appendChild(div);
@@ -1968,6 +2284,7 @@
         }
 
         window.buyShopUpgrade = function(itemId) {
+            if (!debounceTap()) return;
             var item = null;
             for (var i = 0; i < SHOP_ITEMS.length; i++) {
                 if (SHOP_ITEMS[i].id === itemId) item = SHOP_ITEMS[i];
@@ -1996,6 +2313,7 @@
         };
 
         window.resetAllProgress = function() {
+            if (!debounceTap()) return;
             try { localStorage.removeItem(SAVE_STORAGE_KEY); } catch (e) {}
             game.cash = 100;
             game.teaCount = 2;
@@ -2048,7 +2366,7 @@
             rightCol.innerHTML = '';
 
             if (lcd) {
-                lcd.textContent = 'NORTHANTS SEC V4.2 [' + game.connectedWires.length + '/' + job.wires.length + ']';
+                lcd.textContent = 'NORTHANTS SEC V4.0 [' + game.connectedWires.length + '/' + job.wires.length + ']';
             }
 
             job.wires.forEach(function(w) {
@@ -2123,7 +2441,7 @@
                 game.timeLeft = Math.max(1, game.timeLeft - 3.0);
                 var lcd = document.getElementById('lcdStatusDisplay');
                 if (lcd) {
-                    lcd.textContent = 'TAMPER FAULT! -3.0s';
+                    lcd.textContent = '⚡ SPARK FAULT! -3.0s';
                     lcd.style.background = '#ef4444';
                     lcd.style.color = '#ffffff';
                     setTimeout(function() {
@@ -2271,7 +2589,7 @@
                 '</div>';
 
             document.getElementById('resultDavidQuote').textContent =
-                '"Top class wiring at #' + h.num + ' mate! Sticky-Fingers Kev took one look at that Northants Security bellbox and legged it back to Wellingborough!"';
+                '"Top class wiring at #' + h.num + ' mate! Sticky-Fingers Kev took one look at that flashing Northants Security bellbox and legged it back to Wellingborough!"';
 
             document.getElementById('resultNextBtn').textContent = 'NEXT PROPERTY ON STREET →';
             document.getElementById('resultModal').style.display = 'flex';
@@ -2311,6 +2629,7 @@
         }
 
         window.nextOrRetryJob = function() {
+            if (!debounceTap()) return;
             document.getElementById('resultModal').style.display = 'none';
             if (game.lastOutcomeWin) {
                 loadJobLevel((game.jobIdx + 1) % JOBS.length);
@@ -2336,8 +2655,8 @@
                 if (e.code === 'KeyT') window.toggleTorch();
                 if (e.code === 'Space' || e.code === 'KeyF') {
                     if (game.phase !== 'street') return;
-                    if (game.canWirePanel) window.openPanelModal();
-                    else if (game.nearestDoor) window.interactNearestDoor();
+                    if (game.canWirePanel) window.openWiring();
+                    else if (game.nearestDoor) window.useDoor();
                 }
             });
             window.addEventListener('keyup', function(e) {
@@ -2389,8 +2708,8 @@
                 if (lookPointerId === e.pointerId) {
                     var dist = Math.hypot(e.clientX - startX, e.clientY - startY);
                     if (dist < 12 && game.phase === 'street') {
-                        if (game.canWirePanel) window.openPanelModal();
-                        else if (game.nearestDoor) window.interactNearestDoor();
+                        if (game.canWirePanel) window.openWiring();
+                        else if (game.nearestDoor) window.useDoor();
                     }
                     lookPointerId = null;
                 }
@@ -2451,16 +2770,28 @@
                 }
             }
 
-            // Render Three.js WebGL 3D World
+            // Render Three.js v4.0 ULTRA 3D World
             if (renderer && scene && camera) {
                 if (!game.active && game.phase === 'title') {
-                    camera.position.set(-28.0, 2.2, 0.0);
-                    camera.rotation.y = -Math.PI / 2 + Math.sin(now * 0.0005) * 0.28;
+                    camera.position.set(-27.0, 2.35, 0.0);
+                    camera.rotation.y = -Math.PI / 2 + Math.sin(now * 0.0005) * 0.32;
                     camera.rotation.x = -0.04;
                 } else {
                     camera.position.set(player.x, player.y + Math.sin(player.bob) * 0.045, player.z);
                     camera.rotation.y = player.yaw;
                     camera.rotation.x = player.pitch;
+                }
+
+                // Animate Spinning Amber Roof Beacon on Van
+                if (vanBeaconRotor && vanBeaconLight) {
+                    vanBeaconRotor.rotation.y = now * 0.012;
+                    vanBeaconLight.intensity = 1.6 + Math.sin(now * 0.024) * 1.4;
+                }
+
+                // Pulse External Northants Security Bellbox Strobe LEDs
+                var strobeOn = Math.sin(now * 0.01) > 0.2;
+                for (var sIdx = 0; sIdx < bellboxStrobes.length; sIdx++) {
+                    bellboxStrobes[sIdx].visible = strobeOn;
                 }
 
                 // Animate 3D Engineer Hands
@@ -2471,14 +2802,14 @@
                     if (game.toolSwing > 0) {
                         game.toolSwing = Math.max(0, game.toolSwing - dt * 4);
                     }
-                    rightHandGroup.position.set(0.27 - bx, -0.24 - by, -0.42 - game.toolSwing * 0.12);
-                    rightHandGroup.rotation.x = -game.toolSwing * 0.6;
+                    rightHandGroup.position.set(0.27 - bx, -0.24 - by, -0.42 - game.toolSwing * 0.14);
+                    rightHandGroup.rotation.x = -game.toolSwing * 0.65;
                 }
 
                 // Animate Floating Orange Target Marker Cone above Assigned Property
                 if (targetConeMesh && HOUSES.length > 0) {
                     var th = HOUSES[JOBS[game.jobIdx].houseIdx];
-                    targetConeMesh.position.set(th.cx - 1.1, 5.7 + Math.sin(now * 0.005) * 0.45, th.cz + th.side * 3.8);
+                    targetConeMesh.position.set(th.cx - 1.1, 6.0 + Math.sin(now * 0.005) * 0.45, th.cz + th.side * 3.8);
                     targetConeMesh.rotation.y = now * 0.0025;
                 }
 
@@ -2486,7 +2817,7 @@
             }
         }
 
-        // Start 3D Engine Immediately on Load
+        // Start v4.0 ULTRA 3D Engine Immediately on Load
         window.onload = function() {
             loadProgress();
             initWebGLEngine();
