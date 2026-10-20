@@ -7,11 +7,13 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="NS Rush">
-    <title>Northants Security Rush - 3D Alarm Engineer Game</title>
+    <title>Northants Security Rush - Max 3D WebGL Edition</title>
 
     <!-- Embedded Web App Manifest for Android APK / PWA Packaging -->
-    <link rel="manifest" href='data:application/manifest+json,{"name":"Northants Security Rush","short_name":"NS Rush","description":"First-Person 3D Alarm Engineer Game for Northants Security","start_url":"./index.html","display":"fullscreen","orientation":"any","background_color":"#071320","theme_color":"#ff6b00"}'>
+    <link rel="manifest" href='data:application/manifest+json,{"name":"Northants Security Rush","short_name":"NS Rush","description":"3D Alarm Engineer Game for Northants Security","start_url":"./index.html","display":"fullscreen","orientation":"any","background_color":"#071320","theme_color":"#ff6b00"}'>
+
+    <!-- Three.js r128 Hardware-Accelerated WebGL 3D Engine -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <style>
         :root {
@@ -34,21 +36,25 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: var(--ns-navy);
+            background: var(--ns-navy);
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             color: #ffffff;
         }
-        /* Main 3D Viewport Canvas */
-        #gameCanvas {
+        #webglContainer {
             position: fixed;
             inset: 0;
             width: 100%;
             height: 100%;
             z-index: 1;
-            display: block;
             touch-action: none;
         }
-        /* HUD Layer */
+        #webglContainer canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+        /* HUD Overlay */
         #uiLayer {
             position: fixed;
             inset: 0;
@@ -59,22 +65,17 @@
             justify-content: space-between;
             padding: max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
         }
-        .interactive {
-            pointer-events: auto;
-        }
+        .interactive { pointer-events: auto; }
         button {
             cursor: pointer;
             border: none;
             outline: none;
             font-family: inherit;
             touch-action: manipulation;
-            transition: transform 0.08s ease, filter 0.1s ease;
+            transition: transform 0.08s ease;
         }
-        button:active {
-            transform: scale(0.95);
-        }
+        button:active { transform: scale(0.95); }
 
-        /* Top HUD Bar */
         .hud-top {
             display: flex;
             flex-wrap: wrap;
@@ -84,14 +85,14 @@
             width: 100%;
         }
         .hud-card {
-            background: rgba(15, 37, 55, 0.93);
+            background: rgba(15, 37, 55, 0.92);
             border: 2px solid var(--ns-orange);
             border-radius: 14px;
             padding: 6px 10px;
             display: flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.55);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.6);
         }
         .ns-logo {
             width: 34px;
@@ -104,8 +105,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            border: 2px solid #ffffff;
             flex-shrink: 0;
-            border: 2px solid #fff;
         }
         .hud-btn {
             border-radius: 10px;
@@ -118,14 +119,12 @@
             color: #fff;
         }
 
-        /* Compass Bar */
-        #compassWrap {
-            align-self: center;
+        #compassBar {
             background: rgba(7, 19, 32, 0.92);
             border: 2px solid #38bdf8;
             border-radius: 999px;
             padding: 4px 14px;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 8px;
             font-size: 12px;
@@ -135,29 +134,21 @@
             margin-top: 4px;
         }
 
-        /* Walkie Talkie Radio */
+        /* Walkie-Talkie Radio */
         #davidRadio {
-            max-width: 370px;
+            max-width: 375px;
             background: rgba(15, 37, 55, 0.96);
             border: 2px solid var(--ns-orange);
             border-radius: 16px;
             padding: 10px 12px;
-            box-shadow: 0 12px 28px rgba(0,0,0,0.7);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.75);
             transition: transform 0.25s ease, opacity 0.25s ease;
             margin-top: 6px;
         }
-        .radio-hidden {
-            transform: translateX(-120%);
-            opacity: 0;
-            pointer-events: none;
-        }
-        .radio-visible {
-            transform: translateX(0);
-            opacity: 1;
-            pointer-events: auto;
-        }
+        .radio-hidden { transform: translateX(-125%); opacity: 0; pointer-events: none; }
+        .radio-visible { transform: translateX(0); opacity: 1; pointer-events: auto; }
 
-        /* Center Crosshair & Prompts */
+        /* Center Crosshair */
         #crosshair {
             position: fixed;
             top: 50%;
@@ -181,6 +172,7 @@
             border-radius: 50%;
         }
 
+        /* Action Prompts */
         #promptStack {
             position: fixed;
             bottom: 116px;
@@ -216,7 +208,7 @@
         }
         .pulse-orange { animation: pulse-orange 1.5s infinite; }
 
-        /* Bottom Controls */
+        /* Bottom D-Pad & Controls */
         .hud-bottom {
             display: flex;
             align-items: flex-end;
@@ -233,10 +225,7 @@
             flex-direction: column;
             gap: 5px;
         }
-        .dpad-row {
-            display: flex;
-            gap: 5px;
-        }
+        .dpad-row { display: flex; gap: 5px; }
         .dpad-btn {
             width: 46px;
             height: 42px;
@@ -261,7 +250,7 @@
             position: fixed;
             inset: 0;
             background: rgba(4, 12, 24, 0.82);
-            backdrop-filter: blur(3px);
+            backdrop-filter: blur(4px);
             z-index: 100;
             display: flex;
             align-items: center;
@@ -271,7 +260,7 @@
         }
         .modal-card {
             width: 100%;
-            max-width: 660px;
+            max-width: 670px;
             max-height: 92vh;
             background: var(--ns-blue);
             border: 4px solid var(--ns-orange);
@@ -283,19 +272,47 @@
             overflow-y: auto;
         }
 
-        /* Wiring Board */
+        /* Photorealistic Moulded PCB Board */
         #pcbBoard {
             position: relative;
-            background: radial-gradient(circle at 50% 50%, #065f46 0%, #064e3b 68%, #022c22 100%);
-            border: 4px solid #1e293b;
+            background:
+                radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.14) 0%, transparent 70%),
+                repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 18px),
+                repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 18px),
+                linear-gradient(135deg, #065f46 0%, #064e3b 55%, #022c22 100%);
+            border: 6px solid #334155;
             border-radius: 16px;
-            min-height: 315px;
-            padding: 12px;
+            min-height: 325px;
+            padding: 14px;
             display: flex;
             justify-content: space-between;
             align-items: stretch;
             overflow: hidden;
             touch-action: none;
+            box-shadow: inset 0 0 28px rgba(0,0,0,0.85);
+        }
+        /* Central Microchip IC Decoration */
+        #pcbChip {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 72px;
+            height: 96px;
+            background: #0f172a;
+            border: 2px solid #475569;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-family: monospace;
+            font-size: 9px;
+            text-align: center;
+            pointer-events: none;
+            z-index: 2;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.65);
         }
         .term-col {
             width: 41%;
@@ -303,7 +320,7 @@
             flex-direction: column;
             justify-content: space-around;
             gap: 8px;
-            z-index: 5;
+            z-index: 6;
         }
         .term-btn {
             background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
@@ -318,16 +335,16 @@
             justify-content: space-between;
             gap: 6px;
             text-align: left;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.45);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.55);
         }
         .term-btn.selected {
             border-color: var(--ns-orange);
-            box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.7);
+            box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.75);
             transform: scale(1.03);
         }
         .term-btn.fluke-hint {
             border-color: #4ade80;
-            box-shadow: 0 0 14px #22c55e;
+            box-shadow: 0 0 16px #22c55e;
             background: #064e3b;
         }
         .term-btn.connected {
@@ -343,6 +360,11 @@
             border: 2px solid #334155;
             flex-shrink: 0;
             position: relative;
+            transition: transform 0.25s ease;
+        }
+        .term-btn.connected .screw-head {
+            transform: rotate(75deg);
+            border-color: #22c55e;
         }
         .screw-head::after {
             content: '';
@@ -403,18 +425,18 @@
 </head>
 <body>
 
-    <!-- 100% SELF-CONTAINED Z-CLIPPED 3D ENGINE VIEWPORT -->
-    <canvas id="gameCanvas"></canvas>
+    <!-- HARDWARE-ACCELERATED WEBGL 3D CONTAINER -->
+    <div id="webglContainer"></div>
 
     <!-- CENTER CROSSHAIR -->
     <div id="crosshair"></div>
 
-    <!-- FLOATING ACTION PROMPTS -->
+    <!-- INTERACTIVE 3D DOOR & PANEL ACTION PROMPTS -->
     <div id="promptStack">
-        <button type="button" id="doorActionBtn" class="action-btn" style="display:none;background:#1d4ed8;color:#fff;border:2px solid #93c5fd;" onclick="window.handleDoorAction()">
+        <button type="button" id="doorActionBtn" class="action-btn" style="display:none;background:#1d4ed8;color:#fff;border:2px solid #93c5fd;" onclick="window.interactNearestDoor()">
             🚪 <span id="doorActionText">OPEN DOOR (E / TAP)</span>
         </button>
-        <button type="button" id="wireActionBtn" class="action-btn pulse-orange" style="display:none;background:#ff6b00;color:#0f2537;border:2px solid #ffffff;" onclick="window.openWireModal()">
+        <button type="button" id="wireActionBtn" class="action-btn pulse-orange" style="display:none;background:#ff6b00;color:#0f2537;border:2px solid #ffffff;" onclick="window.openPanelModal()">
             🪛 WIRE ALARM PANEL (SPACE / TAP)
         </button>
     </div>
@@ -431,14 +453,14 @@
                             <span id="hudJobBadge" style="background:#1e3a8a;padding:2px 6px;border-radius:5px;font-size:10px;font-weight:800;">JOB 1/5</span>
                         </div>
                         <div id="hudLocationText" style="font-size:11px;color:#bfdbfe;font-weight:700;">
-                            #12 Kettering Rd • <span id="hudRoomName" style="color:#fde047;">Cul-de-Sac Street</span>
+                            #12 Kettering Rd • <span id="hudRoomName" style="color:#fde047;">Avenue</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="hud-card">
                     <div>
-                        <div style="font-size:9px;color:#93c5fd;font-weight:800;text-transform:uppercase;">Assignment</div>
+                        <div style="font-size:9px;color:#93c5fd;font-weight:800;text-transform:uppercase;">Target Room</div>
                         <div id="hudObjectiveText" style="font-size:11.5px;color:#fbbf24;font-weight:800;">#12 Front Hallway</div>
                     </div>
                     <div style="width:2px;height:26px;background:#1e40af;"></div>
@@ -453,21 +475,21 @@
                         <div style="font-size:9px;color:#93c5fd;font-weight:800;text-transform:uppercase;">Wallet</div>
                         <div id="hudCashText" style="font-size:16px;font-weight:900;color:#4ade80;">£100</div>
                     </div>
-                    <button type="button" class="hud-btn" style="background:#10b981;color:#04121f;" onclick="window.openShopModal()">
+                    <button type="button" class="hud-btn" style="background:#10b981;color:#04121f;" onclick="window.openShop()">
                         🛒 <span class="hide-sm">Shop</span>
                     </button>
-                    <button type="button" class="hud-btn" style="background:#f59e0b;color:#04121f;" onclick="window.toggleHeadtorch()">
+                    <button type="button" class="hud-btn" style="background:#f59e0b;color:#04121f;" onclick="window.toggleTorch()">
                         🔦 <span id="hudTorchState">ON</span>
                     </button>
-                    <button type="button" class="hud-btn" style="background:#1d4ed8;" onclick="window.triggerDavidJoke()">
+                    <button type="button" class="hud-btn" style="background:#1d4ed8;" onclick="window.radioDavid()">
                         📻 <span class="hide-sm">David</span>
                     </button>
                 </div>
             </div>
 
-            <!-- Live Target Compass Indicator -->
+            <!-- Live Target Compass & Street Re-Roll -->
             <div style="display:flex;justify-content:center;gap:8px;align-items:center;flex-wrap:wrap;">
-                <div id="compassWrap">
+                <div id="compassBar">
                     <span id="compassArrow">⬆️</span>
                     <span id="compassLabel">Target: House #12 Front Door (12m)</span>
                 </div>
@@ -476,7 +498,7 @@
                 </button>
             </div>
 
-            <!-- Boss David Radio Popup -->
+            <!-- Boss David Radio Walkie-Talkie -->
             <div id="davidRadio" class="radio-hidden">
                 <div style="display:flex;align-items:flex-start;gap:10px;">
                     <div style="width:40px;height:40px;border-radius:10px;background:#ff6b00;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">
@@ -495,7 +517,7 @@
             </div>
         </div>
 
-        <!-- BOTTOM BAR: D-PAD & QUICK ACTIONS -->
+        <!-- BOTTOM BAR: D-PAD & QUICK ASSIST -->
         <div class="hud-bottom">
             <div class="dpad-card interactive">
                 <div class="dpad-row">
@@ -511,10 +533,10 @@
             </div>
 
             <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;" class="interactive">
-                <button type="button" id="quickWalkBtn" class="hud-btn" style="background:#1e3a8a;border:2px solid #60a5fa;padding:9px 13px;font-size:12px;" onclick="window.smartAssistStep()">
+                <button type="button" id="quickWalkBtn" class="hud-btn" style="background:#1e3a8a;border:2px solid #60a5fa;padding:9px 13px;font-size:12px;" onclick="window.sprintToTarget()">
                     ⚡ <span id="quickWalkText">SPRINT TO HOUSE #12</span>
                 </button>
-                <button type="button" class="hud-btn" style="background:#ff6b00;color:#0f2537;border:2px solid #fff;padding:9px 13px;font-size:12px;" onclick="window.drinkYorkshireTea()">
+                <button type="button" class="hud-btn" style="background:#ff6b00;color:#0f2537;border:2px solid #fff;padding:9px 13px;font-size:12px;" onclick="window.useTea()">
                     ☕ CUPPA TEA (<span id="hudTeaCount">2</span>)
                 </button>
             </div>
@@ -525,37 +547,37 @@
     <!-- TITLE / START SHIFT MODAL                                           -->
     <!-- =================================================================== -->
     <div id="titleModal" class="modal-backdrop">
-        <div class="modal-card" style="text-align:center;max-width:560px;">
+        <div class="modal-card" style="text-align:center;max-width:575px;">
             <div style="display:inline-flex;align-items:center;justify-content:center;gap:10px;margin:0 auto 8px;">
                 <div class="ns-logo" style="width:46px;height:46px;font-size:22px;">NS</div>
                 <div style="text-align:left;">
-                    <div style="font-size:11px;font-weight:900;color:#ff6b00;letter-spacing:0.08em;">NORTHAMPTONSHIRE'S FINEST</div>
+                    <div style="font-size:11px;font-weight:900;color:#ff6b00;letter-spacing:0.08em;">MAX WEBGL 3D EDITION</div>
                     <div style="font-size:24px;font-weight:900;line-height:1.1;">NORTHANTS <span style="color:#ff6b00;">SECURITY RUSH</span></div>
                 </div>
             </div>
 
             <p style="font-size:13px;color:#cbd5e1;line-height:1.45;margin:8px 0 14px;">
-                Look behind this menu—your live 3D Northamptonshire avenue is running with <strong>8 randomly generated houses (#10–#17)</strong> on both sides of the street! Walk along the road, pavements, garden paths, and green lawns, open swinging 3D doors, find the interior alarm box, and wire the PCB before Sticky-Fingers Kev strikes!
+                Explore a hardware-accelerated 3D Northamptonshire street with <strong>8 randomly generated houses (#10–#17)</strong>, brick & mortar textures, striped lawns, garden paths, 3D engineer tool hands, a real-time 3D SpotLight headtorch cone, and a realistic PCB alarm panel!
             </p>
 
             <div style="background:#061729;border:1px solid #1e40af;border-radius:14px;padding:10px 12px;text-align:left;font-size:12px;color:#93c5fd;margin-bottom:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                <div>🏘️ <strong>8 Random Buildings:</strong> #10, #12, #14, #16 (North) & #11, #13, #15, #17 (South)!</div>
-                <div>🌿 <strong>Roads, Paths & Lawns:</strong> Full street with gardens, trees, wheelie bins & drives!</div>
+                <div>🧱 <strong>Max WebGL 3D:</strong> Textured brick, slate roofs, striped grass & 3D SpotLight torch!</div>
+                <div>🏘️ <strong>8 Enterable Houses:</strong> #10, #12, #14, #16 (North) & #11, #13, #15, #17 (South)!</div>
                 <div>🚪 <strong>Draught Bonus:</strong> Shut front door inside for a +£25 tip!</div>
                 <div>🛒 <strong>£100 Starting Cash:</strong> Buy Knipex Snips, Fluke & Vans!</div>
             </div>
 
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
                 <button type="button" style="flex:0.8;min-width:120px;padding:14px;border-radius:14px;background:#3b82f6;color:#ffffff;font-weight:900;font-size:13px;"
-                    onclick="if(window.rerollStreet) window.rerollStreet();">
+                    onclick="window.rerollStreet()">
                     🎲 RE-ROLL STREET
                 </button>
-                <button type="button" id="openShopTitleBtn" style="flex:1;min-width:130px;padding:14px;border-radius:14px;background:#10b981;color:#04121f;font-weight:900;font-size:14px;"
-                    onclick="document.getElementById('shopModal').style.display='flex'; if(window.openShopModal) window.openShopModal();">
+                <button type="button" style="flex:1;min-width:130px;padding:14px;border-radius:14px;background:#10b981;color:#04121f;font-weight:900;font-size:14px;"
+                    onclick="window.openShop()">
                     🛒 SHOP (£<span id="titleCashLabel">100</span>)
                 </button>
-                <button type="button" id="startShiftBtn" class="pulse-orange" style="flex:1.6;min-width:190px;padding:15px;border-radius:14px;background:#ff6b00;color:#0f2537;font-weight:900;font-size:16px;"
-                    onclick="document.getElementById('titleModal').style.display='none'; if(window.startShift) window.startShift();">
+                <button type="button" class="pulse-orange" style="flex:1.6;min-width:190px;padding:15px;border-radius:14px;background:#ff6b00;color:#0f2537;font-weight:900;font-size:16px;"
+                    onclick="window.startShift()">
                     🚐 START SHIFT →
                 </button>
             </div>
@@ -577,7 +599,7 @@
                         £100
                     </div>
                     <button type="button" style="background:#1e293b;color:#fff;width:36px;height:36px;border-radius:10px;font-weight:900;font-size:16px;"
-                        onclick="document.getElementById('shopModal').style.display='none';">✕</button>
+                        onclick="window.closeShop()">✕</button>
                 </div>
             </div>
 
@@ -593,7 +615,7 @@
                     Reset Save
                 </button>
                 <button type="button" style="background:#ff6b00;color:#0f2537;padding:12px 24px;border-radius:12px;font-weight:900;font-size:14px;"
-                    onclick="document.getElementById('shopModal').style.display='none';">
+                    onclick="window.closeShop()">
                     DONE & BACK TO STREET →
                 </button>
             </div>
@@ -601,22 +623,22 @@
     </div>
 
     <!-- =================================================================== -->
-    <!-- WIRING MINIGAME MODAL                                               -->
+    <!-- REALISTIC PCB & LCD KEYPAD WIRING MINIGAME MODAL                    -->
     <!-- =================================================================== -->
     <div id="wireModal" class="modal-backdrop" style="display:none;">
-        <div class="modal-card" style="background:#cbd5e1;color:#0f172a;border-color:#94a3b8;padding:12px;">
+        <div class="modal-card" style="background:linear-gradient(180deg,#e2e8f0 0%,#cbd5e1 100%);color:#0f172a;border-color:#64748b;padding:14px;">
             <div style="background:#0f2537;color:#fff;padding:10px 12px;border-radius:14px;margin-bottom:10px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;border-bottom:3px solid #ff6b00;">
                 <div>
-                    <span style="background:#ff6b00;color:#0f2537;font-weight:900;padding:2px 6px;border-radius:4px;font-size:10px;">NS-EURO 46 PCB</span>
+                    <span style="background:#ff6b00;color:#0f2537;font-weight:900;padding:2px 6px;border-radius:4px;font-size:10px;">NS-EURO 46 PANEL</span>
                     <span id="wireModalTitle" style="font-weight:900;font-size:13px;margin-left:6px;">#12 HALLWAY PANEL</span>
                 </div>
-                <div id="lcdStatusDisplay" style="background:#84cc16;color:#1a2e05;font-family:monospace;font-weight:900;padding:5px 10px;border-radius:6px;font-size:12px;border:2px solid #365314;">
-                    NORTHANTS SEC v4.2 [0/3]
+                <div id="lcdStatusDisplay" style="background:#84cc16;color:#1a2e05;font-family:monospace;font-weight:900;padding:5px 10px;border-radius:6px;font-size:12px;border:2px solid #365314;box-shadow:inset 0 2px 6px rgba(0,0,0,0.35);">
+                    NORTHANTS SEC V4.2 [0/3]
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;">
                     <span id="wireModalTimer" style="font-weight:900;font-size:16px;color:#ff6b00;">60.0s</span>
                     <button type="button" style="background:#ef4444;color:#fff;padding:6px 10px;border-radius:8px;font-weight:900;font-size:12px;"
-                        onclick="window.closeWireModal()">✕</button>
+                        onclick="window.closePanelModal()">✕</button>
                 </div>
             </div>
 
@@ -626,6 +648,11 @@
             </div>
 
             <div id="pcbBoard">
+                <div id="pcbChip">
+                    <div style="color:#ff6b00;font-weight:900;">NS-ARM32</div>
+                    <div style="margin-top:4px;font-size:8px;">NORTHANTS<br>SEC LOGIC</div>
+                    <div style="margin-top:6px;width:8px;height:8px;border-radius:50%;background:#22c55e;"></div>
+                </div>
                 <div class="term-col" id="leftTermCol"></div>
                 <svg id="wireSvgLayer" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:8;"></svg>
                 <div class="term-col" id="rightTermCol"></div>
@@ -657,7 +684,7 @@
 
             <div style="display:flex;gap:10px;">
                 <button type="button" style="flex:1;padding:13px;border-radius:12px;background:#10b981;color:#04121f;font-weight:900;font-size:13.5px;"
-                    onclick="window.openShopModal()">
+                    onclick="window.openShop()">
                     🛒 TRADE SHOP
                 </button>
                 <button type="button" id="resultNextBtn" style="flex:1.4;padding:13px;border-radius:12px;background:#ff6b00;color:#0f2537;font-weight:900;font-size:14px;"
@@ -670,9 +697,171 @@
 
     <script>
         /********************************************************************
-         * 1. GAME DATA, SHOP CATALOG & 8 RANDOMLY GENERATED BUILDINGS
+         * 1. TOP-OF-SCRIPT GLOBAL HANDLERS (GUARANTEED BUTTON RESPONSE)
          ********************************************************************/
-        var SAVE_STORAGE_KEY = 'northants_security_rush_save_v6';
+        window.startShift = function() {
+            var tm = document.getElementById('titleModal');
+            if (tm) tm.style.display = 'none';
+            var sm = document.getElementById('shopModal');
+            if (sm) sm.style.display = 'none';
+            var rm = document.getElementById('resultModal');
+            if (rm) rm.style.display = 'none';
+            var wm = document.getElementById('wireModal');
+            if (wm) wm.style.display = 'none';
+
+            audio.init();
+            loadJobLevel(game.jobIdx);
+        };
+
+        window.openShop = function() {
+            audio.init();
+            renderShopItems();
+            var sm = document.getElementById('shopModal');
+            if (sm) sm.style.display = 'flex';
+        };
+
+        window.closeShop = function() {
+            var sm = document.getElementById('shopModal');
+            if (sm) sm.style.display = 'none';
+        };
+
+        window.rerollStreet = function() {
+            audio.coin();
+            generateRandomNeighborhood();
+            rebuild3DStreetWorld();
+            updateActiveAlarmPanelCoords();
+            var job = JOBS[game.jobIdx];
+            var h = HOUSES[job.houseIdx];
+            showDavidMessage("Street re-rolled! 8 fresh 3D Northants properties generated. Target #" + h.num + " is " + h.styleName + "!");
+        };
+
+        window.useTea = function() {
+            if (!game.active || game.teaCount <= 0) {
+                audio.buzz();
+                return;
+            }
+            game.teaCount--;
+            game.teaSlowTimer = game.upgrades.snack_mug ? 14.0 : 7.0;
+            saveProgress();
+            audio.coin();
+            showDavidMessage(game.upgrades.snack_mug
+                ? "Sports Direct Giant Mug deployed! SLA countdown slowed for 14 seconds!"
+                : "Proper Yorkshire Brew! SLA timer slowed down for 7 seconds!");
+        };
+
+        window.toggleTorch = function() {
+            game.torchOn = !game.torchOn;
+            audio.tone(game.torchOn ? 920 : 480, 'triangle', 0.06, 0.14);
+            var el = document.getElementById('hudTorchState');
+            if (el) el.textContent = game.torchOn ? 'ON' : 'OFF';
+            if (headtorchLight) headtorchLight.intensity = game.torchOn ? 2.6 : 0.0;
+        };
+
+        window.radioDavid = function() {
+            var joke = DAVID_JOKES[game.jokeCounter % DAVID_JOKES.length];
+            game.jokeCounter++;
+            showDavidMessage(joke);
+        };
+
+        window.interactNearestDoor = function() {
+            var d = game.nearestDoor;
+            if (!d) return;
+            d.isOpen = !d.isOpen;
+            audio.door(d.isOpen);
+            game.toolSwing = 1.0;
+
+            var loc = detectPlayerRoom(player.x, player.z);
+            if (d.isFront && !d.isOpen && loc.inside && !game.draughtClaimed) {
+                game.draughtClaimed = true;
+                game.cash += 25;
+                saveProgress();
+                audio.coin();
+                showDavidMessage("Proper polite engineer! Customer tipped you +£25 Draught Bonus for shutting the front door behind you!");
+            }
+        };
+
+        window.openPanelModal = function() {
+            if (!game.active) return;
+            game.phase = 'wiring';
+            game.toolSwing = 1.0;
+            var job = JOBS[game.jobIdx];
+            var h = HOUSES[job.houseIdx];
+
+            document.getElementById('wireModalTitle').textContent = '#' + h.num + ' ' + job.roomName.toUpperCase() + ' PANEL';
+            var badge = document.getElementById('wirePerksBadge');
+            if (badge) {
+                var perks = [];
+                if (game.upgrades.tool_fluke) perks.push('📟 Fluke Meter Active');
+                if (game.upgrades.tool_snips) perks.push('✂️ Knipex Snips Active');
+                badge.textContent = perks.join(' • ');
+            }
+
+            if (game.shuffledTargets.length !== job.wires.length) {
+                game.shuffledTargets = job.wires.slice().sort(function() { return Math.random() - 0.5; });
+            }
+
+            document.getElementById('wireModal').style.display = 'flex';
+            renderPCBBoard();
+            spawnPanelSpiders(job.spiders);
+        };
+
+        window.closePanelModal = function() {
+            game.phase = 'street';
+            game.selectedWireId = null;
+            game.draggingWireId = null;
+            document.getElementById('wireModal').style.display = 'none';
+        };
+
+        window.sprintToTarget = function() {
+            if (!game.active) {
+                window.startShift();
+                return;
+            }
+            var job = JOBS[game.jobIdx];
+            var h = HOUSES[job.houseIdx];
+            var s = h.side;
+            var loc = detectPlayerRoom(player.x, player.z);
+
+            if (!loc.inside || loc.houseIdx !== job.houseIdx) {
+                for (var i = 0; i < worldDoors.length; i++) {
+                    if (worldDoors[i].houseIdx === job.houseIdx && worldDoors[i].type === 'front') {
+                        worldDoors[i].isOpen = true;
+                    }
+                }
+                audio.door(true);
+                player.x = h.cx - 1.2;
+                player.z = h.cz + s * 2.5;
+                player.yaw = s === 1 ? 0 : Math.PI;
+                player.pitch = 0;
+                return;
+            }
+
+            for (var j = 0; j < worldDoors.length; j++) {
+                if (worldDoors[j].houseIdx === job.houseIdx && !worldDoors[j].isFront) {
+                    worldDoors[j].isOpen = true;
+                }
+            }
+
+            if (!game.canWirePanel) {
+                audio.door(true);
+                if (job.roomKey === 'hallway') {
+                    player.x = h.cx - 2.9; player.z = h.cz + s * 2.0; player.yaw = Math.PI / 2;
+                } else if (job.roomKey === 'lounge') {
+                    player.x = h.cx + 2.9; player.z = h.cz + s * 2.5; player.yaw = -Math.PI / 2;
+                } else if (job.roomKey === 'kitchen') {
+                    player.x = h.cx + 2.0; player.z = h.cz - s * 2.3; player.yaw = s === 1 ? 0 : Math.PI;
+                } else {
+                    player.x = h.cx - 2.4; player.z = h.cz - s * 2.3; player.yaw = s === 1 ? 0 : Math.PI;
+                }
+            } else {
+                window.openPanelModal();
+            }
+        };
+
+        /********************************************************************
+         * 2. GAME STATE, SHOP ITEMS & 8 RANDOMIZED BUILDINGS DATA
+         ********************************************************************/
+        var SAVE_STORAGE_KEY = 'northants_security_rush_webgl_v7';
 
         var SHOP_ITEMS = [
             { id: 'tool_snips', name: 'Knipex Pro Snips', icon: '✂️', cost: 80, desc: '+10s SLA timer on every shift & super-fast terminations.' },
@@ -685,37 +874,30 @@
             { id: 'snack_mug', name: 'Sports Direct Giant Mug', icon: '🍺', cost: 90, desc: 'Doubles your Cuppa Tea time-slow duration to 14 seconds!' }
         ];
 
-        // Palettes for random building generation across the 8 plots
         var WALL_FINISHES = [
-            { name: 'Northants Red Brick', brick: '#9a3412', brickDark: '#7c2d12' },
-            { name: 'Cotswold Yellow Stone', brick: '#ca8a04', brickDark: '#a16207' },
-            { name: 'White Cornish Render', brick: '#e2e8f0', brickDark: '#cbd5e1' },
-            { name: 'Cream Pebble-Dash', brick: '#fde68a', brickDark: '#fcd34d' },
-            { name: 'Warm Terracotta Brick', brick: '#b45309', brickDark: '#92400e' },
-            { name: 'Heritage Brown Brick', brick: '#78350f', brickDark: '#451a03' },
-            { name: 'Victorian Crimson Brick', brick: '#991b1b', brickDark: '#7f1d1d' },
-            { name: 'Limestone Grey Render', brick: '#94a3b8', brickDark: '#64748b' }
+            { name: 'Northants Red Brick', base: '#8c2d19', mortar: '#cbd5e1' },
+            { name: 'Cotswold Buff Stone', base: '#b47b26', mortar: '#e2e8f0' },
+            { name: 'White Cornish Render', base: '#dbeafe', mortar: '#94a3b8' },
+            { name: 'Warm Terracotta Brick', base: '#9a3412', mortar: '#d6d3d1' },
+            { name: 'Heritage Brown Brick', base: '#5c2d16', mortar: '#a8a29e' },
+            { name: 'Victorian Crimson Brick', base: '#7f1d1d', mortar: '#cbd5e1' }
         ];
-        var ROOF_STYLES = [
-            { top: '#1e293b', side: '#0f172a' }, // Welsh Dark Slate
-            { top: '#7c2d12', side: '#431407' }, // Clay Red Tile
-            { top: '#334155', side: '#1e293b' }, // Mossy Charcoal
-            { top: '#3f3f46', side: '#27272a' }  // Graphite Shingle
-        ];
-        var DOOR_COLORS = ['#ff6b00', '#0284c7', '#dc2626', '#059669', '#4f46e5', '#78350f', '#0f172a', '#d97706'];
-        var GARDEN_ORNAMENTS = ['tree', 'flowers', 'hedges', 'bins', 'tree_and_flowers', 'bins_and_flowers'];
+
+        var ROOF_COLORS = [0x1e293b, 0x7c2d12, 0x334155, 0x3f3f46];
+        var DOOR_COLORS = [0xff6b00, 0x0284c7, 0xdc2626, 0x059669, 0x4f46e5, 0xd97706];
+        var ORNAMENTS = ['tree_and_flowers', 'bins_and_flowers', 'tree', 'bins'];
 
         var HOUSES = [];
 
         function generateRandomNeighborhood() {
             HOUSES = [];
             var plots = [
-                // 4 North Side Buildings (z < 0, facing South toward the road)
+                // 4 North Side Buildings (z = -14.5, facing South toward road)
                 { idx: 0, num: '10', cx: -21, cz: -14.5, side: 1 },
                 { idx: 1, num: '12', cx: -7,  cz: -14.5, side: 1 },
                 { idx: 2, num: '14', cx: 7,   cz: -14.5, side: 1 },
                 { idx: 3, num: '16', cx: 21,  cz: -14.5, side: 1 },
-                // 4 South Side Buildings across the road (z > 0, facing North toward the road)
+                // 4 South Side Buildings across the road (z = +14.5, facing North toward road)
                 { idx: 4, num: '11', cx: -21, cz: 14.5,  side: -1 },
                 { idx: 5, num: '13', cx: -7,  cz: 14.5,  side: -1 },
                 { idx: 6, num: '15', cx: 7,   cz: 14.5,  side: -1 },
@@ -725,23 +907,21 @@
             for (var i = 0; i < plots.length; i++) {
                 var p = plots[i];
                 var wf = WALL_FINISHES[(i + Math.floor(Math.random() * WALL_FINISHES.length)) % WALL_FINISHES.length];
-                var rf = ROOF_STYLES[Math.floor(Math.random() * ROOF_STYLES.length)];
+                var rc = ROOF_COLORS[Math.floor(Math.random() * ROOF_COLORS.length)];
                 var dc = DOOR_COLORS[Math.floor(Math.random() * DOOR_COLORS.length)];
-                var orn = GARDEN_ORNAMENTS[Math.floor(Math.random() * GARDEN_ORNAMENTS.length)];
+                var orn = ORNAMENTS[i % ORNAMENTS.length];
                 HOUSES.push({
                     idx: p.idx,
                     num: p.num,
                     cx: p.cx,
                     cz: p.cz,
-                    side: p.side, // +1 = North side, -1 = South side
+                    side: p.side,
                     styleName: wf.name,
-                    brick: wf.brick,
-                    brickDark: wf.brickDark,
-                    roofTop: rf.top,
-                    roofSide: rf.side,
-                    doorCol: dc,
-                    ornament: orn,
-                    roofHeight: 4.35 + (Math.random() * 0.55)
+                    brickBase: wf.base,
+                    brickMortar: wf.mortar,
+                    roofHex: rc,
+                    doorHex: dc,
+                    ornament: orn
                 });
             }
         }
@@ -750,14 +930,14 @@
             {
                 jobNum: 1,
                 street: 'Kettering Road, Kingsley',
-                houseIdx: 1, // #12 (North side)
+                houseIdx: 1, // #12
                 roomKey: 'hallway',
                 roomName: 'Front Hallway',
                 isDark: false,
                 spiders: 0,
                 baseTime: 85,
                 basePay: 120,
-                briefing: 'Job 1 at #12 Kettering Rd! Walk up the garden path across the green lawn to #12, open the front door (shut it inside for +£25 Draught Bonus!) and wire the Hallway panel.',
+                briefing: 'Job 1 at #12 Kettering Rd! Walk up the garden path across the lawn to #12, open the front door (close it inside for +£25 Draught Bonus!) and wire the Hallway panel.',
                 wires: [
                     { id: '12v', label: '12V + POWER', target: '12V + AUX', color: '#ef4444' },
                     { id: '0v',  label: '0V - GROUND', target: '0V - NEG',  color: '#3b82f6' },
@@ -767,7 +947,7 @@
             {
                 jobNum: 2,
                 street: 'Kettering Road, Kingsley',
-                houseIdx: 5, // #13 (South side across the road!)
+                houseIdx: 5, // #13 across road
                 roomKey: 'lounge',
                 roomName: 'Living Room Lounge',
                 isDark: false,
@@ -785,14 +965,14 @@
             {
                 jobNum: 3,
                 street: 'Abington Avenue, Northampton',
-                houseIdx: 2, // #14 (North side)
+                houseIdx: 2, // #14
                 roomKey: 'kitchen',
                 roomName: 'Back Kitchen',
                 isDark: true,
                 spiders: 1,
                 baseTime: 80,
                 basePay: 185,
-                briefing: 'Tripped fuse at #14 Abington Ave! Your Headtorch 🔦 is on. Walk inside #14, head through the Lounge into the Back Kitchen, and wire the 5-zone panel!',
+                briefing: 'Tripped fuse at #14 Abington Ave! Your 3D SpotLight Headtorch 🔦 is on. Head through #14\'s Lounge into the Back Kitchen and wire the 5-zone panel!',
                 wires: [
                     { id: '12v', label: '12V + POWER', target: '12V + AUX', color: '#ef4444' },
                     { id: '0v',  label: '0V - GROUND', target: '0V - NEG',  color: '#3b82f6' },
@@ -804,14 +984,14 @@
             {
                 jobNum: 4,
                 street: 'Wellingborough Rd, Abington',
-                houseIdx: 6, // #15 (South side)
+                houseIdx: 6, // #15
                 roomKey: 'cupboard',
                 roomName: 'Under-Stairs Cupboard',
                 isDark: true,
                 spiders: 2,
                 baseTime: 78,
                 basePay: 225,
-                briefing: 'Pitch-black Under-Stairs Cupboard at #15 across the road! Open the cupboard door behind #15\'s hallway, and tap any spiders 3 times to shoo them!',
+                briefing: 'Dark Under-Stairs Cupboard at #15 across the road! Open the cupboard door behind #15\'s hallway, and tap any spiders 3 times to shoo them!',
                 wires: [
                     { id: '12v', label: '12V + POWER', target: '12V + AUX', color: '#ef4444' },
                     { id: '0v',  label: '0V - GROUND', target: '0V - NEG',  color: '#3b82f6' },
@@ -824,7 +1004,7 @@
             {
                 jobNum: 5,
                 street: 'Towcester Way, Delapre',
-                houseIdx: 7, // #17 (South-East end of street)
+                houseIdx: 7, // #17
                 roomKey: 'kitchen',
                 roomName: 'Back Kitchen',
                 isDark: true,
@@ -856,7 +1036,7 @@
 
         var game = {
             active: false,
-            phase: 'title', // 'title' | 'street' | 'wiring' | 'result'
+            phase: 'title',
             jobIdx: 0,
             cash: 100,
             teaCount: 2,
@@ -866,6 +1046,7 @@
             draughtClaimed: false,
             lastOutcomeWin: true,
             jokeCounter: 0,
+            toolSwing: 0,
             selectedWireId: null,
             draggingWireId: null,
             dragPos: { x: 0, y: 0 },
@@ -874,7 +1055,7 @@
             shuffledTargets: [],
             nearestDoor: null,
             canWirePanel: false,
-            panelWorldPos: { x: -25.3, y: 1.5, z: -12.0, houseIdx: 0 },
+            panelWorldPos: { x: -11.2, y: 1.5, z: -12.5, houseIdx: 1 },
             upgrades: {
                 tool_snips: false,
                 tool_fluke: false,
@@ -887,17 +1068,17 @@
         };
 
         var player = {
-            x: -29.5,
+            x: -26.0,
             y: 1.65,
             z: 0.0,
-            yaw: -Math.PI / 2, // Facing East straight down the central road so all 8 buildings & lawns are visible!
+            yaw: -Math.PI / 2, // Facing East straight down the central road
             pitch: -0.02,
             bob: 0,
-            radius: 0.34
+            radius: 0.36
         };
 
         /********************************************************************
-         * 2. WEB AUDIO SOUND SYNTHESIZER (Safe try/catch)
+         * 3. WEB AUDIO SYNTHESIZER
          ********************************************************************/
         var audio = {
             ctx: null,
@@ -930,7 +1111,7 @@
                 setTimeout(function() { self.tone(1750, 'square', 0.06, 0.07); }, 55);
             },
             door: function(open) {
-                this.tone(open ? 250 : 170, 'triangle', 0.15, 0.16);
+                this.tone(open ? 260 : 175, 'triangle', 0.15, 0.16);
             },
             snap: function() {
                 this.tone(590, 'triangle', 0.08, 0.18);
@@ -960,7 +1141,7 @@
         };
 
         /********************************************************************
-         * 3. SAVE / LOAD & UI REFRESH
+         * 4. SAVE / LOAD PROGRESS
          ********************************************************************/
         function loadProgress() {
             try {
@@ -1004,54 +1185,255 @@
         }
 
         /********************************************************************
-         * 4. SUTHERLAND-HODGMAN 3D NEAR-PLANE CLIPPED GEOMETRY ENGINE
-         * Subdivides walls/floors so perspective is rock-solid with zero stretching!
+         * 5. HIGH-RES PROCEDURAL CANVAS TEXTURES FOR THREE.JS WEBGL
          ********************************************************************/
-        var worldQuads = [];
+        var TEX = {};
+
+        function makeCanvasTexture(drawFn, repeatX, repeatY) {
+            var c = document.createElement('canvas');
+            c.width = 256;
+            c.height = 256;
+            var g = c.getContext('2d');
+            drawFn(g, 256, 256);
+            if (typeof THREE === 'undefined') return null;
+            var t = new THREE.CanvasTexture(c);
+            t.wrapS = THREE.RepeatWrapping;
+            t.wrapT = THREE.RepeatWrapping;
+            t.repeat.set(repeatX || 1, repeatY || 1);
+            return t;
+        }
+
+        function makeBrickTexture(baseCol, mortarCol, repX, repY) {
+            return makeCanvasTexture(function(g, w, h) {
+                g.fillStyle = mortarCol;
+                g.fillRect(0, 0, w, h);
+                var rows = 8, cols = 4;
+                var bh = h / rows, bw = w / cols;
+                for (var r = 0; r < rows; r++) {
+                    var offset = (r % 2 === 1) ? bw * 0.5 : 0;
+                    for (var c = -1; c <= cols; c++) {
+                        g.fillStyle = baseCol;
+                        g.fillRect(c * bw + offset + 3, r * bh + 3, bw - 6, bh - 6);
+                        g.fillStyle = 'rgba(0,0,0,0.12)';
+                        g.fillRect(c * bw + offset + 3, r * bh + bh - 8, bw - 6, 5);
+                    }
+                }
+            }, repX || 3, repY || 2);
+        }
+
+        function initProceduralTextures() {
+            if (typeof THREE === 'undefined') return;
+
+            // Striped Mowed Green Lawn Texture
+            TEX.lawn = makeCanvasTexture(function(g, w, h) {
+                for (var i = 0; i < 8; i++) {
+                    g.fillStyle = (i % 2 === 0) ? '#15803d' : '#16a34a';
+                    g.fillRect(i * (w / 8), 0, w / 8, h);
+                }
+                g.fillStyle = 'rgba(255,255,255,0.04)';
+                for (var j = 0; j < 220; j++) {
+                    g.fillRect(Math.random() * w, Math.random() * h, 2, 5);
+                }
+            }, 4, 4);
+
+            // Tarmac Road with White Center Line
+            TEX.road = makeCanvasTexture(function(g, w, h) {
+                g.fillStyle = '#1e293b';
+                g.fillRect(0, 0, w, h);
+                g.fillStyle = '#334155';
+                for (var i = 0; i < 400; i++) {
+                    g.fillRect(Math.random() * w, Math.random() * h, 2, 2);
+                }
+                g.fillStyle = '#f8fafc';
+                g.fillRect(40, h * 0.46, w - 80, h * 0.08);
+            }, 10, 1);
+
+            // Concrete Pavement Slabs
+            TEX.pavement = makeCanvasTexture(function(g, w, h) {
+                g.fillStyle = '#64748b';
+                g.fillRect(0, 0, w, h);
+                g.strokeStyle = '#334155';
+                g.lineWidth = 4;
+                for (var x = 0; x <= w; x += 64) {
+                    g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke();
+                }
+                for (var y = 0; y <= h; y += 64) {
+                    g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke();
+                }
+            }, 14, 2);
+
+            // Flagstone Garden Path
+            TEX.path = makeCanvasTexture(function(g, w, h) {
+                g.fillStyle = '#94a3b8';
+                g.fillRect(0, 0, w, h);
+                g.fillStyle = '#cbd5e1';
+                g.fillRect(8, 8, 110, 110);
+                g.fillRect(132, 8, 112, 110);
+                g.fillRect(8, 132, 110, 112);
+                g.fillRect(132, 132, 112, 112);
+            }, 1, 4);
+
+            // Kitchen Chequered Floor Tiles
+            TEX.kitchenTile = makeCanvasTexture(function(g, w, h) {
+                var s = 64;
+                for (var y = 0; y < h; y += s) {
+                    for (var x = 0; x < w; x += s) {
+                        g.fillStyle = ((x / s + y / s) % 2 === 0) ? '#e2e8f0' : '#94a3b8';
+                        g.fillRect(x, y, s, s);
+                    }
+                }
+            }, 2, 2);
+
+            // Wood Grain Door with Brass Handle
+            TEX.doorWood = makeCanvasTexture(function(g, w, h) {
+                g.fillStyle = '#ffffff';
+                g.fillRect(0, 0, w, h);
+                g.strokeStyle = 'rgba(0,0,0,0.28)';
+                g.lineWidth = 8;
+                g.strokeRect(24, 20, w - 48, h * 0.4 - 24);
+                g.strokeRect(24, h * 0.45, w - 48, h * 0.48);
+                // Brass Handle
+                g.fillStyle = '#facc15';
+                g.beginPath();
+                g.arc(w - 34, h * 0.52, 11, 0, Math.PI * 2);
+                g.fill();
+            }, 1, 1);
+
+            // Northants Security Van Livery Side Texture
+            TEX.vanLivery = makeCanvasTexture(function(g, w, h) {
+                g.fillStyle = '#0f2537';
+                g.fillRect(0, 0, w, h);
+                g.fillStyle = '#ff6b00';
+                g.fillRect(0, h * 0.56, w, h * 0.18);
+                g.fillStyle = '#ffffff';
+                g.font = '900 24px sans-serif';
+                g.textAlign = 'center';
+                g.fillText('NORTHANTS SECURITY', w * 0.5, h * 0.36);
+                g.fillStyle = '#0f2537';
+                g.font = '900 17px sans-serif';
+                g.fillText('24HR INTRUDER ALARMS', w * 0.5, h * 0.68);
+            }, 1, 1);
+        }
+
+        function makeHouseNumberPlaqueTexture(numStr, isTarget) {
+            return makeCanvasTexture(function(g, w, h) {
+                g.fillStyle = isTarget ? '#ff6b00' : '#0f2537';
+                g.fillRect(0, 0, w, h);
+                g.strokeStyle = '#ffffff';
+                g.lineWidth = 12;
+                g.strokeRect(8, 8, w - 16, h - 16);
+                g.fillStyle = isTarget ? '#0f2537' : '#ffffff';
+                g.font = '900 110px sans-serif';
+                g.textAlign = 'center';
+                g.textBaseline = 'middle';
+                g.fillText('#' + numStr, w * 0.5, h * 0.45);
+                g.font = '900 32px sans-serif';
+                g.fillText(isTarget ? 'TARGET JOB' : 'NORTHANTS', w * 0.5, h * 0.82);
+            }, 1, 1);
+        }
+
+        /********************************************************************
+         * 6. THREE.JS WEBGL SCENE, 3D SPOTLIGHT TORCH & 3D ENGINEER HANDS
+         ********************************************************************/
+        var scene = null;
+        var camera = null;
+        var renderer = null;
+        var streetGroup = null;
+        var vanGroup = null;
+        var targetConeMesh = null;
+        var activePanelLED = null;
+        var headtorchLight = null;
+        var headtorchTarget = null;
+        var leftHandGroup = null;
+        var rightHandGroup = null;
+
         var worldDoors = [];
         var colliders = [];
 
-        // Push a subdivided 3D quad so painters algorithm & lighting look crisp
-        function addSubdividedQuad(p0, p1, p2, p3, color, borderCol, subdivU, subdivV, tag) {
-            var su = subdivU || 1;
-            var sv = subdivV || 1;
-            for (var u = 0; u < su; u++) {
-                var u0 = u / su;
-                var u1 = (u + 1) / su;
-                for (var v = 0; v < sv; v++) {
-                    var v0 = v / sv;
-                    var v1 = (v + 1) / sv;
-                    var a = bilerp3D(p0, p1, p2, p3, u0, v0);
-                    var b = bilerp3D(p0, p1, p2, p3, u1, v0);
-                    var c = bilerp3D(p0, p1, p2, p3, u1, v1);
-                    var d = bilerp3D(p0, p1, p2, p3, u0, v1);
-                    worldQuads.push({
-                        pts: [a, b, c, d],
-                        color: color,
-                        border: borderCol || 'rgba(15,23,42,0.28)',
-                        tag: tag || null
-                    });
-                }
-            }
+        function initWebGLEngine() {
+            if (typeof THREE === 'undefined') return;
+            var container = document.getElementById('webglContainer');
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0b192c);
+            scene.fog = new THREE.FogExp2(0x0b192c, 0.015);
+
+            camera = new THREE.PerspectiveCamera(68, window.innerWidth / window.innerHeight, 0.15, 130);
+            camera.rotation.order = 'YXZ';
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+            container.innerHTML = '';
+            container.appendChild(renderer.domElement);
+
+            // Ambient & Directional Sunlight
+            var hemi = new THREE.HemisphereLight(0x93c5fd, 0x1e293b, 0.72);
+            scene.add(hemi);
+
+            var dirLight = new THREE.DirectionalLight(0xfffbeb, 0.85);
+            dirLight.position.set(-18, 28, 14);
+            scene.add(dirLight);
+
+            // Real-Time 3D SpotLight Headtorch attached to Camera
+            headtorchLight = new THREE.SpotLight(0xfffbeb, 2.6, 26, Math.PI / 4.2, 0.45, 1.2);
+            headtorchLight.position.set(0, 0, 0);
+            headtorchTarget = new THREE.Object3D();
+            headtorchTarget.position.set(0, 0, -5);
+            camera.add(headtorchLight);
+            camera.add(headtorchTarget);
+            headtorchLight.target = headtorchTarget;
+
+            // Build 3D First-Person Engineer Hands & Tools attached to Camera
+            build3DEngineerHands();
+            scene.add(camera);
+
+            initProceduralTextures();
+            generateRandomNeighborhood();
+            rebuild3DStreetWorld();
+            updateActiveAlarmPanelCoords();
         }
 
-        function bilerp3D(p0, p1, p2, p3, u, v) {
-            var topX = p0.x + (p1.x - p0.x) * u;
-            var topY = p0.y + (p1.y - p0.y) * u;
-            var topZ = p0.z + (p1.z - p0.z) * u;
-            var botX = p3.x + (p2.x - p3.x) * u;
-            var botY = p3.y + (p2.y - p3.y) * u;
-            var botZ = p3.z + (p2.z - p3.z) * u;
-            return {
-                x: topX + (botX - topX) * v,
-                y: topY + (botY - topY) * v,
-                z: topZ + (botZ - topZ) * v
-            };
+        function build3DEngineerHands() {
+            leftHandGroup = new THREE.Group();
+            rightHandGroup = new THREE.Group();
+
+            var sleeveMat = new THREE.MeshLambertMaterial({ color: 0x0f2537 });
+            var cuffMat = new THREE.MeshLambertMaterial({ color: 0xff6b00 });
+            var toolYellowMat = new THREE.MeshLambertMaterial({ color: 0xfacc15 });
+            var steelMat = new THREE.MeshLambertMaterial({ color: 0xcbd5e1 });
+
+            // Left Sleeve & Torch/Multimeter
+            var lArm = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.11, 0.36), sleeveMat);
+            lArm.position.set(0, -0.04, 0.1);
+            var lCuff = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.06), cuffMat);
+            lCuff.position.set(0, -0.04, -0.08);
+            var lMeter = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.14, 0.06), toolYellowMat);
+            lMeter.position.set(0, 0.03, -0.14);
+            leftHandGroup.add(lArm, lCuff, lMeter);
+            leftHandGroup.position.set(-0.27, -0.24, -0.42);
+            camera.add(leftHandGroup);
+
+            // Right Sleeve & Insulated Screwdriver / Snips
+            var rArm = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.11, 0.36), sleeveMat);
+            rArm.position.set(0, -0.04, 0.1);
+            var rCuff = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.06), cuffMat);
+            rCuff.position.set(0, -0.04, -0.08);
+            var handle = new THREE.Mesh(new THREE.CylinderGeometry(0.026, 0.026, 0.15, 10), cuffMat);
+            handle.rotation.x = Math.PI * 0.35;
+            handle.position.set(0, 0.02, -0.14);
+            var shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.18, 8), steelMat);
+            shaft.rotation.x = Math.PI * 0.35;
+            shaft.position.set(0, 0.11, -0.24);
+            rightHandGroup.add(rArm, rCuff, handle, shaft);
+            rightHandGroup.position.set(0.27, -0.24, -0.42);
+            camera.add(rightHandGroup);
         }
 
-        // Add a 3D Block (with optional subdivision & collision registration)
-        function add3DBox(cx, cy, cz, w, h, d, colFront, colSide, colTop, addCollider, doorRef, tag) {
-            if (addCollider && (cy - h / 2) < 1.65 && (cy + h / 2) > 0.2) {
+        function addBoxMesh(parent, cx, cy, cz, w, h, d, mat, registerColl, doorRef) {
+            var mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+            mesh.position.set(cx, cy, cz);
+            parent.add(mesh);
+            if (registerColl && (cy - h / 2) < 1.65 && (cy + h / 2) > 0.2) {
                 colliders.push({
                     minX: cx - w / 2,
                     maxX: cx + w / 2,
@@ -1060,205 +1442,276 @@
                     doorRef: doorRef || null
                 });
             }
-            var x1 = cx - w / 2, x2 = cx + w / 2;
-            var y1 = cy - h / 2, y2 = cy + h / 2;
-            var z1 = cz - d / 2, z2 = cz + d / 2;
-
-            var suX = Math.max(1, Math.round(w / 2.2));
-            var suZ = Math.max(1, Math.round(d / 2.2));
-            var svY = Math.max(1, Math.round(h / 1.6));
-
-            // Front (z2) & Back (z1)
-            addSubdividedQuad({x:x1,y:y2,z:z2},{x:x2,y:y2,z:z2},{x:x2,y:y1,z:z2},{x:x1,y:y1,z:z2}, colFront, null, suX, svY, tag);
-            addSubdividedQuad({x:x2,y:y2,z:z1},{x:x1,y:y2,z:z1},{x:x1,y:y1,z:z1},{x:x2,y:y1,z:z1}, colFront, null, suX, svY, tag);
-            // Left (x1) & Right (x2)
-            addSubdividedQuad({x:x1,y:y2,z:z1},{x:x1,y:y2,z:z2},{x:x1,y:y1,z:z2},{x:x1,y:y1,z:z1}, colSide || colFront, null, suZ, svY, tag);
-            addSubdividedQuad({x:x2,y:y2,z:z2},{x:x2,y:y2,z:z1},{x:x2,y:y1,z:z1},{x:x2,y:y1,z:z2}, colSide || colFront, null, suZ, svY, tag);
-            // Top (y2)
-            if (colTop) {
-                addSubdividedQuad({x:x1,y:y2,z:z1},{x:x2,y:y2,z:z1},{x:x2,y:y2,z:z2},{x:x1,y:y2,z:z2}, colTop, null, suX, suZ, tag);
-            }
+            return mesh;
         }
 
-        function buildEntireStreetScene() {
-            if (HOUSES.length === 0) {
-                generateRandomNeighborhood();
-            }
-            worldQuads.length = 0;
+        function rebuild3DStreetWorld() {
+            if (!scene) return;
+            if (streetGroup) scene.remove(streetGroup);
+            streetGroup = new THREE.Group();
+            scene.add(streetGroup);
+
             worldDoors.length = 0;
             colliders.length = 0;
 
-            // 1. Wide Central Tarmac Road (z = -3.4 to +3.4) & White Center Dashed Lines
-            addSubdividedQuad({x:-35,y:0,z:-3.4}, {x:35,y:0,z:-3.4}, {x:35,y:0,z:3.4}, {x:-35,y:0,z:3.4}, '#1e293b', '#334155', 16, 2);
-            for (var rx = -30; rx <= 28; rx += 5.5) {
-                addSubdividedQuad({x:rx,y:0.02,z:-0.15}, {x:rx+2.6,y:0.02,z:-0.15}, {x:rx+2.6,y:0.02,z:0.15}, {x:rx,y:0.02,z:0.15}, '#f8fafc', null, 1, 1);
-            }
+            // 1. Central Tarmac Road (z = -3.4 to +3.4)
+            var roadMat = new THREE.MeshLambertMaterial({ map: TEX.road });
+            var roadMesh = new THREE.Mesh(new THREE.PlaneGeometry(76, 6.8), roadMat);
+            roadMesh.rotation.x = -Math.PI / 2;
+            roadMesh.position.set(0, 0.01, 0);
+            streetGroup.add(roadMesh);
 
-            // 2. North & South Pavements / Sidewalks (Grey Paving Slabs)
-            addSubdividedQuad({x:-35,y:0.03,z:-5.4}, {x:35,y:0.03,z:-5.4}, {x:35,y:0.03,z:-3.4}, {x:-35,y:0.03,z:-3.4}, '#64748b', '#475569', 16, 1);
-            addSubdividedQuad({x:-35,y:0.03,z:3.4},  {x:35,y:0.03,z:3.4},  {x:35,y:0.03,z:5.4},  {x:-35,y:0.03,z:5.4},  '#64748b', '#475569', 16, 1);
+            // 2. North & South Pavements / Sidewalks
+            var paveMat = new THREE.MeshLambertMaterial({ map: TEX.pavement });
+            var nPave = new THREE.Mesh(new THREE.PlaneGeometry(76, 2.2), paveMat);
+            nPave.rotation.x = -Math.PI / 2;
+            nPave.position.set(0, 0.03, -4.5);
+            streetGroup.add(nPave);
 
-            // Road Kerb Edging Stones
-            addSubdividedQuad({x:-35,y:0.04,z:-3.5}, {x:35,y:0.04,z:-3.5}, {x:35,y:0.04,z:-3.35}, {x:-35,y:0.04,z:-3.35}, '#94a3b8', null, 14, 1);
-            addSubdividedQuad({x:-35,y:0.04,z:3.35}, {x:35,y:0.04,z:3.35}, {x:35,y:0.04,z:3.5},  {x:-35,y:0.04,z:3.5},  '#94a3b8', null, 14, 1);
+            var sPave = new THREE.Mesh(new THREE.PlaneGeometry(76, 2.2), paveMat);
+            sPave.rotation.x = -Math.PI / 2;
+            sPave.position.set(0, 0.03, 4.5);
+            streetGroup.add(sPave);
 
-            // 3. Build All 8 Enterable Multi-Room Buildings & Their Lawns/Paths (#10 to #17)
+            // 3. Build All 8 Enterable Multi-Room Buildings (#10 to #17)
             for (var i = 0; i < HOUSES.length; i++) {
-                buildSingleMultiRoomHouse(HOUSES[i]);
+                buildSingle3DHouse(HOUSES[i]);
             }
 
-            // 4. Street Lamps along Both Sides of the Road
-            [-27, -14, 0, 14, 27].forEach(function(lx) {
-                // North Pavement Lamp
-                add3DBox(lx, 2.1, -3.7, 0.2, 4.2, 0.2, '#334155', '#1e293b', '#facc15', true);
-                add3DBox(lx, 4.25, -3.4, 0.55, 0.2, 0.55, '#fef08a', '#facc15', '#fef08a', false);
-                // South Pavement Lamp
-                add3DBox(lx, 2.1, 3.7, 0.2, 4.2, 0.2, '#334155', '#1e293b', '#facc15', true);
-                add3DBox(lx, 4.25, 3.4, 0.55, 0.2, 0.55, '#fef08a', '#facc15', '#fef08a', false);
+            // 4. Street Lamps along Both Sides of the Avenue
+            var poleMat = new THREE.MeshLambertMaterial({ color: 0x334155 });
+            var bulbMat = new THREE.MeshBasicMaterial({ color: 0xfef08a });
+            [-26, -12, 2, 16, 28].forEach(function(lx) {
+                addBoxMesh(streetGroup, lx, 2.2, -3.6, 0.18, 4.4, 0.18, poleMat, true);
+                addBoxMesh(streetGroup, lx, 4.45, -3.3, 0.55, 0.18, 0.55, bulbMat, false);
+                addBoxMesh(streetGroup, lx, 2.2, 3.6, 0.18, 4.4, 0.18, poleMat, true);
+                addBoxMesh(streetGroup, lx, 4.45, 3.3, 0.55, 0.18, 0.55, bulbMat, false);
             });
+
+            // 5. Floating 3D Orange Target Cone & Active Wall Alarm Box
+            var coneMat = new THREE.MeshBasicMaterial({ color: 0xff6b00 });
+            targetConeMesh = new THREE.Mesh(new THREE.ConeGeometry(0.75, 1.4, 8), coneMat);
+            targetConeMesh.rotation.x = Math.PI;
+            streetGroup.add(targetConeMesh);
+
+            buildUpgradable3DVan();
         }
 
-        // Helper for ordered Z min/max so both North (s=1) and South (s=-1) houses render identically
-        function addFloorPatch(x1, x2, zA, zB, y, col, border, su, sv) {
-            var zMin = Math.min(zA, zB), zMax = Math.max(zA, zB);
-            addSubdividedQuad({x:x1,y:y,z:zMin}, {x:x2,y:y,z:zMin}, {x:x2,y:y,z:zMax}, {x:x1,y:y,z:zMax}, col, border, su, sv);
-        }
+        function buildSingle3DHouse(h) {
+            var cx = h.cx, cz = h.cz, s = h.side; // s=1 North, s=-1 South
+            var frontZ = cz + s * 4.0;
+            var backZ  = cz - s * 4.0;
+            var leftX  = cx - 4.5, rightX = cx + 4.5;
+            var midX   = cx - 0.2, midZ = cz;
 
-        function buildSingleMultiRoomHouse(h) {
-            var cx = h.cx;
-            var cz = h.cz;   // -14.5 (North) or +14.5 (South)
-            var s = h.side;  // +1 for North houses, -1 for South houses
-            var frontZ = cz + s * 4.0; // -10.5 or +10.5 (faces the road)
-            var backZ  = cz - s * 4.0; // -18.5 or +18.5
-            var paveZ  = cz + s * 9.1; // -5.4 or +5.4 (meets the pavement)
-            var leftX  = cx - 4.5;
-            var rightX = cx + 4.5;
-            var midX   = cx - 0.2;
-            var midZ   = cz;
+            var brickTex = makeBrickTexture(h.brickBase, h.brickMortar, 3, 2);
+            var brickMat = new THREE.MeshLambertMaterial({ map: brickTex });
+            var innerWallMat = new THREE.MeshLambertMaterial({ color: 0xe2e8f0 });
+            var loungeWallMat = new THREE.MeshLambertMaterial({ color: 0xbfdbfe });
 
-            // 1. LUSH GREEN FRONT LAWN OUTSIDE HOUSE + PAVED GARDEN PATH + GRAVEL DRIVEWAY
-            addFloorPatch(cx - 6.6, cx + 6.6, frontZ, paveZ, 0.015, '#15803d', '#166534', 4, 3);
-            // Striped Mowed Lawn Accent
-            addFloorPatch(cx - 4.2, cx + 4.2, frontZ + s * 0.8, paveZ - s * 0.8, 0.02, '#16a34a', '#15803d', 3, 2);
-            // Flagstone Front Garden Path from Pavement Gate to Front Doorstep
-            addFloorPatch(cx - 1.9, cx - 0.3, frontZ, paveZ, 0.04, '#cbd5e1', '#64748b', 1, 3);
-            // Side Gravel Driveway Strip
-            addFloorPatch(cx - 5.7, cx - 3.3, frontZ, paveZ, 0.03, '#475569', '#334155', 1, 2);
+            // 1. Lush Striped Front Lawn, Flagstone Garden Path & Gravel Driveway
+            var lawnZ = cz + s * 6.8;
+            var lawnMesh = new THREE.Mesh(new THREE.PlaneGeometry(13.2, 5.6), new THREE.MeshLambertMaterial({ map: TEX.lawn }));
+            lawnMesh.rotation.x = -Math.PI / 2;
+            lawnMesh.position.set(cx, 0.02, lawnZ);
+            streetGroup.add(lawnMesh);
 
-            // Low Front Garden Boundary Hedgerow & Gate Pillar with House Number Plaque
-            add3DBox(cx + 2.2, 0.38, paveZ - s * 0.2, 4.2, 0.75, 0.32, '#14532d', '#166534', '#15803d', true);
-            add3DBox(cx - 2.35, 0.65, paveZ - s * 0.25, 0.38, 1.3, 0.38, h.brick, h.brickDark, '#e2e8f0', true);
-            add3DBox(cx - 2.35, 1.05, paveZ - s * 0.05, 0.55, 0.42, 0.1, '#0f2537', '#ff6b00', '#ff6b00', false);
+            var pathMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 5.6), new THREE.MeshLambertMaterial({ map: TEX.path }));
+            pathMesh.rotation.x = -Math.PI / 2;
+            pathMesh.position.set(cx - 1.1, 0.035, lawnZ);
+            streetGroup.add(pathMesh);
 
-            // Random Garden Ornaments on the Lawn (Trees, Flowerbeds, Wheelie Bins)
-            var lawnMidZ = (frontZ + paveZ) * 0.5;
-            if (h.ornament === 'tree' || h.ornament === 'tree_and_flowers') {
-                add3DBox(cx + 2.8, 0.9, lawnMidZ, 0.32, 1.8, 0.32, '#78350f', '#451a03', '#78350f', true);
-                add3DBox(cx + 2.8, 2.2, lawnMidZ, 1.5, 1.4, 1.5, '#15803d', '#166534', '#22c55e', false);
+            var driveMesh = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 5.6), new THREE.MeshLambertMaterial({ color: 0x475569 }));
+            driveMesh.rotation.x = -Math.PI / 2;
+            driveMesh.position.set(cx - 4.5, 0.03, lawnZ);
+            streetGroup.add(driveMesh);
+
+            // Front Garden Hedge & Gate Post with Number Sign
+            var hedgeMat = new THREE.MeshLambertMaterial({ color: 0x14532d });
+            addBoxMesh(streetGroup, cx + 2.2, 0.4, cz + s * 9.3, 4.2, 0.8, 0.35, hedgeMat, true);
+            addBoxMesh(streetGroup, cx - 2.3, 0.65, cz + s * 9.3, 0.42, 1.3, 0.42, brickMat, true);
+
+            // Floating House Number Signboard on Front Wall
+            var isTarget = (h.idx === JOBS[game.jobIdx].houseIdx);
+            var plaqueTex = makeHouseNumberPlaqueTexture(h.num, isTarget);
+            var plaqueMat = new THREE.MeshBasicMaterial({ map: plaqueTex });
+            addBoxMesh(streetGroup, cx - 2.3, 1.35, cz + s * 9.3, 0.72, 0.52, 0.12, plaqueMat, false);
+
+            // Random Garden Trees, Flowerbeds & Wheelie Bins
+            if (h.ornament.indexOf('tree') !== -1) {
+                addBoxMesh(streetGroup, cx + 2.8, 0.9, lawnZ, 0.34, 1.8, 0.34, new THREE.MeshLambertMaterial({ color: 0x78350f }), true);
+                addBoxMesh(streetGroup, cx + 2.8, 2.2, lawnZ, 1.5, 1.4, 1.5, new THREE.MeshLambertMaterial({ color: 0x15803d }), false);
             }
-            if (h.ornament === 'flowers' || h.ornament === 'tree_and_flowers' || h.ornament === 'bins_and_flowers') {
-                add3DBox(cx + 1.1, 0.18, frontZ + s * 0.9, 1.8, 0.32, 0.7, '#78350f', '#451a03', '#f43f5e', false);
-            }
-            if (h.ornament === 'bins' || h.ornament === 'bins_and_flowers') {
-                add3DBox(cx - 4.1, 0.52, frontZ + s * 0.7, 0.52, 1.04, 0.52, '#1e293b', '#0f172a', '#2563eb', true);
-                add3DBox(cx - 3.45, 0.52, frontZ + s * 0.7, 0.52, 1.04, 0.52, '#14532d', '#064e3b', '#22c55e', true);
+            if (h.ornament.indexOf('bins') !== -1) {
+                addBoxMesh(streetGroup, cx - 3.9, 0.52, frontZ + s * 0.7, 0.5, 1.05, 0.5, new THREE.MeshLambertMaterial({ color: 0x1e293b }), true);
+                addBoxMesh(streetGroup, cx - 3.25, 0.52, frontZ + s * 0.7, 0.5, 1.05, 0.5, new THREE.MeshLambertMaterial({ color: 0x15803d }), true);
             }
 
-            // 2. INTERIOR ROOM FLOORS (Hallway, Lounge, Under-Stairs Cupboard, Back Kitchen)
-            addFloorPatch(leftX, midX, midZ, frontZ, 0.025, '#92400e', '#78350f', 2, 2);
-            addFloorPatch(midX, rightX, midZ, frontZ, 0.025, '#1e3a8a', '#172554', 2, 2);
-            addFloorPatch(leftX, midX, backZ, midZ, 0.025, '#334155', '#1e293b', 2, 2);
-            addFloorPatch(midX, rightX, backZ, midZ, 0.025, '#cbd5e1', '#94a3b8', 3, 3);
+            // 2. Interior Room Floors (Hallway Wood, Lounge Carpet, Cupboard Concrete, Kitchen Chequered Tile)
+            var hallFloor = new THREE.Mesh(new THREE.PlaneGeometry(4.3, 4.0), new THREE.MeshLambertMaterial({ color: 0x92400e }));
+            hallFloor.rotation.x = -Math.PI / 2;
+            hallFloor.position.set(cx - 2.35, 0.03, cz + s * 2.0);
+            streetGroup.add(hallFloor);
 
-            // 3. RANDOMIZED PITCHED ROOF (Both Front & Back Slopes)
-            var roofPeakY = h.roofHeight, roofBaseY = 2.9;
-            addSubdividedQuad(
-                {x:leftX-0.3,y:roofPeakY,z:cz},
-                {x:rightX+0.3,y:roofPeakY,z:cz},
-                {x:rightX+0.3,y:roofBaseY,z:frontZ + s * 0.35},
-                {x:leftX-0.3,y:roofBaseY,z:frontZ + s * 0.35},
-                h.roofTop, h.roofSide, 3, 2
-            );
-            addSubdividedQuad(
-                {x:rightX+0.3,y:roofPeakY,z:cz},
-                {x:leftX-0.3,y:roofPeakY,z:cz},
-                {x:leftX-0.3,y:roofBaseY,z:backZ - s * 0.35},
-                {x:rightX+0.3,y:roofBaseY,z:backZ - s * 0.35},
-                h.roofSide, h.roofTop, 3, 1
-            );
+            var loungeFloor = new THREE.Mesh(new THREE.PlaneGeometry(4.7, 4.0), new THREE.MeshLambertMaterial({ color: 0x1e3a8a }));
+            loungeFloor.rotation.x = -Math.PI / 2;
+            loungeFloor.position.set(cx + 2.15, 0.03, cz + s * 2.0);
+            streetGroup.add(loungeFloor);
 
-            // External NS Orange & Blue Bellbox on Front Facade
-            add3DBox(cx - 3.2, 2.35, frontZ + s * 0.15, 0.45, 0.52, 0.14, '#ff6b00', '#0f2537', '#ff6b00', false);
+            var cupFloor = new THREE.Mesh(new THREE.PlaneGeometry(4.3, 4.0), new THREE.MeshLambertMaterial({ color: 0x334155 }));
+            cupFloor.rotation.x = -Math.PI / 2;
+            cupFloor.position.set(cx - 2.35, 0.03, cz - s * 2.0);
+            streetGroup.add(cupFloor);
 
-            // 4. FRONT EXTERIOR WALL (With Front Doorway & Framed Lounge Window)
-            add3DBox(cx - 3.1, 1.45, frontZ, 2.8, 2.9, 0.24, h.brick, h.brickDark, null, true);
-            add3DBox(cx - 1.1, 2.55, frontZ, 1.2, 0.7, 0.24, h.brick, h.brickDark, null, false);
-            add3DBox(cx + 0.25, 1.45, frontZ, 1.5, 2.9, 0.24, h.brick, h.brickDark, null, true);
-            // Window Sill & Header
-            add3DBox(cx + 2.1, 0.45, frontZ, 2.2, 0.9, 0.24, h.brick, h.brickDark, '#e2e8f0', true);
-            add3DBox(cx + 2.1, 2.5, frontZ, 2.2, 0.8, 0.24, h.brick, h.brickDark, null, false);
-            // Translucent Window Glass
-            addSubdividedQuad({x:cx+1.0,y:2.1,z:frontZ}, {x:cx+3.2,y:2.1,z:frontZ}, {x:cx+3.2,y:0.9,z:frontZ}, {x:cx+1.0,y:0.9,z:frontZ}, 'rgba(125,211,252,0.34)', '#f8fafc', 2, 1);
-            add3DBox(cx + 3.85, 1.45, frontZ, 1.3, 2.9, 0.24, h.brick, h.brickDark, null, true);
+            var kitFloor = new THREE.Mesh(new THREE.PlaneGeometry(4.7, 4.0), new THREE.MeshLambertMaterial({ map: TEX.kitchenTile }));
+            kitFloor.rotation.x = -Math.PI / 2;
+            kitFloor.position.set(cx + 2.15, 0.03, cz - s * 2.0);
+            streetGroup.add(kitFloor);
 
-            // 5. OUTER LEFT, RIGHT & BACK WALLS
-            add3DBox(leftX, 1.45, cz, 0.24, 2.9, 8.0, h.brickDark, h.brick, null, true);
-            add3DBox(rightX, 1.45, cz, 0.24, 2.9, 8.0, h.brickDark, h.brick, null, true);
-            add3DBox(cx, 1.45, backZ, 9.0, 2.9, 0.24, h.brick, h.brickDark, null, true);
+            // 3. Pitched Roof & External NS Bellbox
+            var roofMat = new THREE.MeshLambertMaterial({ color: h.roofHex });
+            var roofMesh = new THREE.Mesh(new THREE.ConeGeometry(6.8, 2.1, 4), roofMat);
+            roofMesh.position.set(cx, 3.95, cz);
+            roofMesh.rotation.y = Math.PI / 4;
+            streetGroup.add(roofMesh);
 
-            // 6. CENTRAL PARTITION WALL (Hallway <-> Lounge Doorway)
-            add3DBox(midX, 1.45, cz + s * 2.8, 0.18, 2.9, 2.4, '#cbd5e1', '#94a3b8', null, true);
-            add3DBox(midX, 2.55, cz + s * 1.0, 0.18, 0.7, 1.2, '#cbd5e1', '#94a3b8', null, false);
-            add3DBox(midX, 1.45, cz - s * 1.8, 0.18, 2.9, 4.4, '#cbd5e1', '#94a3b8', null, true);
+            // Northants Security External Orange & Blue Bellbox
+            addBoxMesh(streetGroup, cx - 3.1, 2.35, frontZ + s * 0.16, 0.46, 0.52, 0.14, new THREE.MeshBasicMaterial({ color: 0xff6b00 }), false);
 
-            // 7. CROSS PARTITION WALL (Hallway <-> Cupboard & Lounge <-> Kitchen Doorways)
-            add3DBox(cx - 3.35, 1.45, midZ, 2.3, 2.9, 0.18, '#cbd5e1', '#94a3b8', null, true);
-            add3DBox(cx - 1.6, 2.55, midZ, 1.2, 0.7, 0.18, '#cbd5e1', '#94a3b8', null, false);
-            add3DBox(cx - 0.6, 1.45, midZ, 0.8, 2.9, 0.18, '#cbd5e1', '#94a3b8', null, true);
+            // 4. Front Exterior Wall (with Front Doorway & Framed Lounge Window)
+            addBoxMesh(streetGroup, cx - 3.1, 1.45, frontZ, 2.8, 2.9, 0.24, brickMat, true);
+            addBoxMesh(streetGroup, cx - 1.1, 2.55, frontZ, 1.2, 0.7, 0.24, brickMat, false);
+            addBoxMesh(streetGroup, cx + 0.25, 1.45, frontZ, 1.5, 2.9, 0.24, brickMat, true);
+            addBoxMesh(streetGroup, cx + 2.1, 0.45, frontZ, 2.2, 0.9, 0.24, brickMat, true);
+            addBoxMesh(streetGroup, cx + 2.1, 2.5, frontZ, 2.2, 0.8, 0.24, brickMat, false);
+            // See-Through Glass Window
+            var glassMat = new THREE.MeshBasicMaterial({ color: 0x7dd3fc, transparent: true, opacity: 0.32 });
+            addBoxMesh(streetGroup, cx + 2.1, 1.5, frontZ, 2.2, 1.2, 0.06, glassMat, false);
+            addBoxMesh(streetGroup, cx + 3.85, 1.45, frontZ, 1.3, 2.9, 0.24, brickMat, true);
 
-            add3DBox(cx + 0.4, 1.45, midZ, 1.2, 2.9, 0.18, '#bfdbfe', '#93c5fd', null, true);
-            add3DBox(cx + 1.6, 2.55, midZ, 1.2, 0.7, 0.18, '#bfdbfe', '#93c5fd', null, false);
-            add3DBox(cx + 3.35, 1.45, midZ, 2.3, 2.9, 0.18, '#bfdbfe', '#93c5fd', null, true);
+            // 5. Outer Left, Right & Back Walls
+            addBoxMesh(streetGroup, leftX, 1.45, cz, 0.24, 2.9, 8.0, brickMat, true);
+            addBoxMesh(streetGroup, rightX, 1.45, cz, 0.24, 2.9, 8.0, brickMat, true);
+            addBoxMesh(streetGroup, cx, 1.45, backZ, 9.0, 2.9, 0.24, brickMat, true);
 
-            // 8. SWINGING 3D DOORS ON HINGES (Works for both North & South side houses)
-            registerSwingingDoor(h, 'front', '#' + h.num + ' Front Door', cx - 1.7, frontZ, 1.2, 0, s, h.doorCol, true);
+            // 6. Central Partition Wall (Hallway <-> Lounge Doorway)
+            addBoxMesh(streetGroup, midX, 1.45, cz + s * 2.8, 0.18, 2.9, 2.4, innerWallMat, true);
+            addBoxMesh(streetGroup, midX, 2.55, cz + s * 1.0, 0.18, 0.7, 1.2, innerWallMat, false);
+            addBoxMesh(streetGroup, midX, 1.45, cz - s * 1.8, 0.18, 2.9, 4.4, innerWallMat, true);
+
+            // 7. Cross Partition Wall (Hallway <-> Cupboard & Lounge <-> Kitchen Doorways)
+            addBoxMesh(streetGroup, cx - 3.35, 1.45, midZ, 2.3, 2.9, 0.18, innerWallMat, true);
+            addBoxMesh(streetGroup, cx - 1.6, 2.55, midZ, 1.2, 0.7, 0.18, innerWallMat, false);
+            addBoxMesh(streetGroup, cx - 0.6, 1.45, midZ, 0.8, 2.9, 0.18, innerWallMat, true);
+
+            addBoxMesh(streetGroup, cx + 0.4, 1.45, midZ, 1.2, 2.9, 0.18, loungeWallMat, true);
+            addBoxMesh(streetGroup, cx + 1.6, 2.55, midZ, 1.2, 0.7, 0.18, loungeWallMat, false);
+            addBoxMesh(streetGroup, cx + 3.35, 1.45, midZ, 2.3, 2.9, 0.18, loungeWallMat, true);
+
+            // 8. Swinging 3D Doors on Hinges
+            createSwinging3DDoor(h, 'front', '#' + h.num + ' Front Door', cx - 1.7, frontZ, 1.2, 0, s, h.doorHex, true);
             var loungeHingeZ = s === 1 ? (cz + 1.6) : (cz - 0.4);
-            registerSwingingDoor(h, 'lounge', '#' + h.num + ' Lounge Door', midX, loungeHingeZ, 1.2, Math.PI / 2, 1, '#78350f', false);
-            registerSwingingDoor(h, 'cupboard', '#' + h.num + ' Cupboard Door', cx - 2.2, midZ, 1.2, 0, s, '#475569', false);
-            registerSwingingDoor(h, 'kitchen', '#' + h.num + ' Kitchen Door', cx + 1.0, midZ, 1.2, 0, s, '#78350f', false);
+            createSwinging3DDoor(h, 'lounge', '#' + h.num + ' Lounge Door', midX, loungeHingeZ, 1.2, Math.PI / 2, 1, 0x92400e, false);
+            createSwinging3DDoor(h, 'cupboard', '#' + h.num + ' Cupboard Door', cx - 2.2, midZ, 1.2, 0, s, 0x475569, false);
+            createSwinging3DDoor(h, 'kitchen', '#' + h.num + ' Kitchen Door', cx + 1.0, midZ, 1.2, 0, s, 0x92400e, false);
 
-            // 9. 3D INTERIOR FURNITURE (Sofa, 60" Telly & Stand, Kitchen Worktop)
-            add3DBox(cx + 1.8, 0.4, cz + s * 2.5, 1.8, 0.8, 0.8, '#1d4ed8', '#1e40af', '#2563eb', true);
-            add3DBox(cx + 3.9, 0.35, cz + s * 1.4, 0.5, 0.7, 1.5, '#1e293b', '#0f172a', '#334155', true);
-            add3DBox(cx + 3.85, 1.05, cz + s * 1.4, 0.1, 0.75, 1.35, '#090d16', '#38bdf8', '#1e293b', false);
-            add3DBox(cx + 3.7, 0.45, cz - s * 2.2, 0.9, 0.9, 2.3, '#475569', '#334155', '#e2e8f0', true);
+            // 9. Detailed 3D Interior Furniture (Sofa, 60" Glowing Telly, Kitchen Worktop)
+            var sofaMat = new THREE.MeshLambertMaterial({ color: 0x1d4ed8 });
+            addBoxMesh(streetGroup, cx + 1.8, 0.38, cz + s * 2.5, 1.8, 0.75, 0.8, sofaMat, true);
+            addBoxMesh(streetGroup, cx + 3.9, 0.35, cz + s * 1.4, 0.5, 0.7, 1.5, new THREE.MeshLambertMaterial({ color: 0x1e293b }), true);
+            addBoxMesh(streetGroup, cx + 3.82, 1.05, cz + s * 1.4, 0.08, 0.75, 1.35, new THREE.MeshBasicMaterial({ color: 0x38bdf8 }), false);
+            addBoxMesh(streetGroup, cx + 3.7, 0.45, cz - s * 2.2, 0.9, 0.9, 2.3, new THREE.MeshLambertMaterial({ color: 0x64748b }), true);
         }
 
-        function registerSwingingDoor(h, type, label, hingeX, hingeZ, width, closedRot, swingDir, color, isFront) {
-            var door = {
+        function createSwinging3DDoor(h, type, label, hingeX, hingeZ, width, closedRot, swingDir, colorHex, isFront) {
+            var pivot = new THREE.Group();
+            pivot.position.set(hingeX, 0, hingeZ);
+            pivot.rotation.y = closedRot;
+
+            var doorMat = new THREE.MeshLambertMaterial({ color: colorHex, map: TEX.doorWood });
+            var panel = new THREE.Mesh(new THREE.BoxGeometry(width, 2.2, 0.09), doorMat);
+            panel.position.set(width / 2, 1.1, 0);
+            pivot.add(panel);
+            streetGroup.add(pivot);
+
+            var doorObj = {
                 houseIdx: h.idx,
                 houseNum: h.num,
                 type: type,
                 name: label,
+                pivot: pivot,
                 hingeX: hingeX,
                 hingeZ: hingeZ,
                 width: width,
                 closedRot: closedRot,
                 openRot: closedRot - (1.42 * (swingDir || 1)),
                 currentRot: closedRot,
-                color: color,
                 isOpen: false,
                 isFront: isFront,
                 centerX: closedRot === 0 ? hingeX + width / 2 : hingeX,
                 centerZ: closedRot === 0 ? hingeZ : hingeZ - width / 2
             };
-            worldDoors.push(door);
+            worldDoors.push(doorObj);
 
             var minX = closedRot === 0 ? hingeX : hingeX - 0.24;
             var maxX = closedRot === 0 ? hingeX + width : hingeX + 0.24;
             var minZ = closedRot === 0 ? hingeZ - 0.24 : hingeZ - width;
             var maxZ = closedRot === 0 ? hingeZ + 0.24 : hingeZ;
-            colliders.push({ minX: minX, maxX: maxX, minZ: minZ, maxZ: maxZ, doorRef: door });
+            colliders.push({ minX: minX, maxX: maxX, minZ: minZ, maxZ: maxZ, doorRef: doorObj });
+        }
+
+        function buildUpgradable3DVan() {
+            if (!streetGroup) return;
+            if (vanGroup) streetGroup.remove(vanGroup);
+            vanGroup = new THREE.Group();
+
+            var job = JOBS[game.jobIdx];
+            var th = HOUSES[job.houseIdx];
+            var vx = th.cx - 3.6;
+            var vz = th.side === 1 ? -1.9 : 1.9;
+            var tier = game.upgrades.van_sprinter ? 2 : (game.upgrades.van_custom ? 1 : 0);
+
+            var bodyMat = tier === 0
+                ? new THREE.MeshLambertMaterial({ color: 0xcbd5e1 })
+                : new THREE.MeshLambertMaterial({ map: TEX.vanLivery });
+            var cabMat = new THREE.MeshLambertMaterial({ color: tier === 0 ? 0x94a3b8 : 0x0f2537 });
+            var glassMat = new THREE.MeshBasicMaterial({ color: 0x7dd3fc });
+            var wheelMat = new THREE.MeshLambertMaterial({ color: 0x0f172a });
+
+            // Main Cargo Box
+            var cargo = new THREE.Mesh(new THREE.BoxGeometry(3.4, 1.65, 1.75), bodyMat);
+            cargo.position.set(-0.35, 1.15, 0);
+            vanGroup.add(cargo);
+
+            // Front Cab & Windscreen
+            var cab = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.25, 1.7), cabMat);
+            cab.position.set(1.75, 0.95, 0);
+            vanGroup.add(cab);
+
+            var wind = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.55, 1.5), glassMat);
+            wind.position.set(2.31, 1.22, 0);
+            vanGroup.add(wind);
+
+            // 4 Wheels
+            [[-1.3, -0.88], [1.4, -0.88], [-1.3, 0.88], [1.4, 0.88]].forEach(function(w) {
+                var wh = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.65, 0.22), wheelMat);
+                wh.position.set(w[0], 0.34, w[1]);
+                vanGroup.add(wh);
+            });
+
+            if (tier >= 1) {
+                var rack = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.12, 1.3), new THREE.MeshLambertMaterial({ color: 0xff6b00 }));
+                rack.position.set(-0.35, 2.04, 0);
+                vanGroup.add(rack);
+            }
+            if (tier === 2) {
+                var beacon = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.22, 0.9), new THREE.MeshBasicMaterial({ color: 0xfacc15 }));
+                beacon.position.set(0.9, 2.1, 0);
+                vanGroup.add(beacon);
+            }
+
+            vanGroup.position.set(vx, 0, vz);
+            streetGroup.add(vanGroup);
         }
 
         function updateActiveAlarmPanelCoords() {
@@ -1276,405 +1729,18 @@
             } else {
                 game.panelWorldPos.x = cx - 2.4;  game.panelWorldPos.y = 1.48; game.panelWorldPos.z = cz - s * 3.78;
             }
-        }
 
-        // Re-Roll all 8 buildings with brand new colors, roofs & garden layouts anytime!
-        window.rerollStreet = function() {
-            audio.coin();
-            generateRandomNeighborhood();
-            buildEntireStreetScene();
-            updateActiveAlarmPanelCoords();
-            var job = JOBS[game.jobIdx];
-            var h = HOUSES[job.houseIdx];
-            showDavidMessage("Street re-rolled! 8 fresh Northants properties generated. Target #" + h.num + " is now " + h.styleName + "!");
-        };
-
-        /********************************************************************
-         * 5. DYNAMIC 3D ENTITIES (SWINGING DOORS, UPGRADABLE VAN, ALARM BOX)
-         ********************************************************************/
-        function gatherDynamicQuads(now) {
-            var dyn = [];
-
-            // 1. Swinging 3D Doors
-            for (var i = 0; i < worldDoors.length; i++) {
-                var d = worldDoors[i];
-                var ex = d.hingeX + Math.cos(d.currentRot) * d.width;
-                var ez = d.hingeZ - Math.sin(d.currentRot) * d.width;
-                dyn.push({
-                    pts: [
-                        { x: d.hingeX, y: 2.2, z: d.hingeZ },
-                        { x: ex,       y: 2.2, z: ez },
-                        { x: ex,       y: 0.0, z: ez },
-                        { x: d.hingeX, y: 0.0, z: d.hingeZ }
-                    ],
-                    color: d.color,
-                    border: '#facc15'
-                });
+            if (streetGroup && typeof THREE !== 'undefined') {
+                if (activePanelLED) streetGroup.remove(activePanelLED);
+                var boxGroup = new THREE.Group();
+                var casing = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.55, 0.16), new THREE.MeshLambertMaterial({ color: 0xf8fafc }));
+                var led = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.16, 0.2), new THREE.MeshBasicMaterial({ color: 0xff6b00 }));
+                led.position.y = 0.22;
+                boxGroup.add(casing, led);
+                boxGroup.position.set(game.panelWorldPos.x, game.panelWorldPos.y, game.panelWorldPos.z);
+                activePanelLED = boxGroup;
+                streetGroup.add(activePanelLED);
             }
-
-            // 2. Active Wall Alarm Panel Box + Blinking Status LED
-            var p = game.panelWorldPos;
-            var blinkCol = (Math.floor(now / 260) % 2 === 0) ? '#ff6b00' : '#22c55e';
-            var pw = 0.34, ph = 0.32;
-            dyn.push({
-                pts: [
-                    { x: p.x - pw, y: p.y + ph, z: p.z + 0.08 },
-                    { x: p.x + pw, y: p.y + ph, z: p.z + 0.08 },
-                    { x: p.x + pw, y: p.y - ph, z: p.z + 0.08 },
-                    { x: p.x - pw, y: p.y - ph, z: p.z + 0.08 }
-                ],
-                color: '#f8fafc',
-                border: blinkCol
-            });
-            dyn.push({
-                pts: [
-                    { x: p.x - pw, y: p.y + ph, z: p.z - 0.08 },
-                    { x: p.x - pw, y: p.y + ph, z: p.z + 0.08 },
-                    { x: p.x - pw, y: p.y - ph, z: p.z + 0.08 },
-                    { x: p.x - pw, y: p.y - ph, z: p.z - 0.08 }
-                ],
-                color: '#f8fafc',
-                border: blinkCol
-            });
-            dyn.push({
-                pts: [
-                    { x: p.x + pw, y: p.y + ph, z: p.z - 0.08 },
-                    { x: p.x + pw, y: p.y + ph, z: p.z + 0.08 },
-                    { x: p.x + pw, y: p.y - ph, z: p.z + 0.08 },
-                    { x: p.x + pw, y: p.y - ph, z: p.z - 0.08 }
-                ],
-                color: '#f8fafc',
-                border: blinkCol
-            });
-
-            // 3. Floating 3D Orange Target House Arrow above Assigned Property
-            var job = JOBS[game.jobIdx];
-            var th = HOUSES[job.houseIdx];
-            var bounceY = 5.6 + Math.sin(now * 0.0045) * 0.45;
-            var ax = th.cx - 1.1, az = th.cz + th.side * 3.8;
-            dyn.push({
-                pts: [
-                    { x: ax - 0.75, y: bounceY + 1.1, z: az },
-                    { x: ax + 0.75, y: bounceY + 1.1, z: az },
-                    { x: ax,        y: bounceY,       z: az },
-                    { x: ax,        y: bounceY,       z: az }
-                ],
-                color: '#ff6b00',
-                border: '#ffffff'
-            });
-
-            // 4. Upgradable 3D Northants Security Van Parked by Roadside Kerb
-            var vx = th.cx - 3.6, vz = th.side === 1 ? -2.1 : 2.1;
-            var tier = game.upgrades.van_sprinter ? 2 : (game.upgrades.van_custom ? 1 : 0);
-            var bodyCol = tier === 0 ? '#cbd5e1' : '#0f2537';
-            var stripeCol = tier === 0 ? '#78350f' : '#ff6b00';
-            // Van Side Body
-            dyn.push({
-                pts: [
-                    { x: vx - 2.0, y: 2.0, z: vz - 0.9 },
-                    { x: vx + 2.0, y: 2.0, z: vz - 0.9 },
-                    { x: vx + 2.0, y: 0.35, z: vz - 0.9 },
-                    { x: vx - 2.0, y: 0.35, z: vz - 0.9 }
-                ],
-                color: bodyCol,
-                border: stripeCol
-            });
-            dyn.push({
-                pts: [
-                    { x: vx - 2.0, y: 2.0, z: vz + 0.9 },
-                    { x: vx + 2.0, y: 2.0, z: vz + 0.9 },
-                    { x: vx + 2.0, y: 0.35, z: vz + 0.9 },
-                    { x: vx - 2.0, y: 0.35, z: vz + 0.9 }
-                ],
-                color: bodyCol,
-                border: stripeCol
-            });
-            // Van Orange Livery Stripe
-            dyn.push({
-                pts: [
-                    { x: vx - 1.95, y: 1.25, z: vz - 0.92 },
-                    { x: vx + 1.95, y: 1.25, z: vz - 0.92 },
-                    { x: vx + 1.95, y: 0.85, z: vz - 0.92 },
-                    { x: vx - 1.95, y: 0.85, z: vz - 0.92 }
-                ],
-                color: stripeCol,
-                border: '#ffffff'
-            });
-            // Van Front Cab & Windscreen
-            dyn.push({
-                pts: [
-                    { x: vx + 2.0, y: 1.9, z: vz + 0.9 },
-                    { x: vx + 2.0, y: 1.9, z: vz - 0.9 },
-                    { x: vx + 2.0, y: 0.35, z: vz - 0.9 },
-                    { x: vx + 2.0, y: 0.35, z: vz + 0.9 }
-                ],
-                color: '#38bdf8',
-                border: bodyCol
-            });
-            if (tier === 2) {
-                var beaconCol = (Math.floor(now / 180) % 2 === 0) ? '#facc15' : '#ff6b00';
-                dyn.push({
-                    pts: [
-                        { x: vx - 0.5, y: 2.35, z: vz },
-                        { x: vx + 0.5, y: 2.35, z: vz },
-                        { x: vx + 0.5, y: 2.02, z: vz },
-                        { x: vx - 0.5, y: 2.02, z: vz }
-                    ],
-                    color: beaconCol,
-                    border: '#ffffff'
-                });
-            }
-
-            return dyn;
-        }
-
-        /********************************************************************
-         * 6. 3D RENDERER WITH SUTHERLAND-HODGMAN NEAR-PLANE CLIPPING (z >= 0.25)
-         ********************************************************************/
-        var canvas = document.getElementById('gameCanvas');
-        var ctx = canvas.getContext('2d');
-
-        function clipPolygonNearPlane(pts, nearZ) {
-            var out = [];
-            var n = pts.length;
-            for (var i = 0; i < n; i++) {
-                var a = pts[i];
-                var b = pts[(i + 1) % n];
-                var aIn = a.z >= nearZ;
-                var bIn = b.z >= nearZ;
-                if (aIn && bIn) {
-                    out.push(b);
-                } else if (aIn && !bIn) {
-                    var t1 = (nearZ - a.z) / (b.z - a.z);
-                    out.push({
-                        x: a.x + t1 * (b.x - a.x),
-                        y: a.y + t1 * (b.y - a.y),
-                        z: nearZ
-                    });
-                } else if (!aIn && bIn) {
-                    var t2 = (nearZ - a.z) / (b.z - a.z);
-                    out.push({
-                        x: a.x + t2 * (b.x - a.x),
-                        y: a.y + t2 * (b.y - a.y),
-                        z: nearZ
-                    });
-                    out.push(b);
-                }
-            }
-            return out;
-        }
-
-        function render3DWorld(now) {
-            var w = canvas.width;
-            var h = canvas.height;
-
-            // Gentle idle camera pan looking down the central avenue so all 8 buildings & lawns are on screen!
-            var camX = player.x;
-            var camY = player.y + Math.sin(player.bob) * 0.04;
-            var camZ = player.z;
-            var camYaw = player.yaw;
-            var camPitch = player.pitch;
-
-            if (!game.active && game.phase === 'title') {
-                camX = -29.5;
-                camZ = 0.0;
-                camYaw = -Math.PI / 2 + Math.sin(now * 0.0005) * 0.32;
-                camPitch = -0.03;
-            }
-
-            var horizonY = h * 0.5 + Math.tan(camPitch) * (h * 0.72);
-
-            // Sky Gradient
-            var skyGrad = ctx.createLinearGradient(0, 0, 0, Math.max(10, horizonY));
-            skyGrad.addColorStop(0, '#071324');
-            skyGrad.addColorStop(1, '#1e3a8a');
-            ctx.fillStyle = skyGrad;
-            ctx.fillRect(0, 0, w, Math.max(0, horizonY));
-
-            // Ground Base
-            var gndGrad = ctx.createLinearGradient(0, Math.max(0, horizonY), 0, h);
-            gndGrad.addColorStop(0, '#143322');
-            gndGrad.addColorStop(1, '#0f172a');
-            ctx.fillStyle = gndGrad;
-            ctx.fillRect(0, Math.max(0, horizonY), w, h - Math.max(0, horizonY));
-
-            var fov = Math.min(w, h) * 0.85;
-            var cosY = Math.cos(camYaw), sinY = Math.sin(camYaw);
-            var cosP = Math.cos(camPitch), sinP = Math.sin(camPitch);
-
-            var allQuads = worldQuads.concat(gatherDynamicQuads(now));
-            var renderList = [];
-
-            for (var i = 0; i < allQuads.length; i++) {
-                var q = allQuads[i];
-                var p = q.pts;
-
-                // Distance cull generous enough to show the entire 8-house avenue
-                var mX = (p[0].x + p[2].x) * 0.5 - camX;
-                var mZ = (p[0].z + p[2].z) * 0.5 - camZ;
-                if (mX * mX + mZ * mZ > 4800) continue;
-
-                // Transform vertices into 3D Camera Space
-                var camPts = [];
-                for (var j = 0; j < p.length; j++) {
-                    var dx = p[j].x - camX;
-                    var dy = p[j].y - camY;
-                    var dz = p[j].z - camZ;
-
-                    var rx = dx * cosY - dz * sinY;
-                    var rz1 = -dx * sinY - dz * cosY;
-                    var ry = dy * cosP - rz1 * sinP;
-                    var rz = dy * sinP + rz1 * cosP;
-                    camPts.push({ x: rx, y: ry, z: rz });
-                }
-
-                // Sutherland-Hodgman 3D Near-Plane Clip at z = 0.25
-                var clipped = clipPolygonNearPlane(camPts, 0.25);
-                if (clipped.length < 3) continue;
-
-                var sumZ = 0, sumX = 0, sumY = 0;
-                for (var k = 0; k < clipped.length; k++) {
-                    sumZ += clipped[k].z;
-                    sumX += clipped[k].x;
-                    sumY += clipped[k].y;
-                }
-                var nPts = clipped.length;
-                var depth = Math.hypot(sumX / nPts, (sumY / nPts) * 0.4, sumZ / nPts);
-
-                renderList.push({
-                    clipped: clipped,
-                    color: q.color,
-                    border: q.border,
-                    depth: depth
-                });
-            }
-
-            // Painter's Algorithm Back-to-Front Sort
-            renderList.sort(function(a, b) { return b.depth - a.depth; });
-
-            for (var r = 0; r < renderList.length; r++) {
-                var item = renderList[r];
-                ctx.beginPath();
-                for (var v = 0; v < item.clipped.length; v++) {
-                    var pt = item.clipped[v];
-                    var sx = w * 0.5 + (pt.x / pt.z) * fov;
-                    var sy = h * 0.5 - (pt.y / pt.z) * fov;
-                    if (v === 0) ctx.moveTo(sx, sy);
-                    else ctx.lineTo(sx, sy);
-                }
-                ctx.closePath();
-                ctx.fillStyle = item.color;
-                ctx.fill();
-                if (item.border) {
-                    ctx.strokeStyle = item.border;
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-                }
-            }
-
-            // Draw Target House Floating Label in 3D Screen Space
-            draw3DTargetHouseBadge(w, h, fov, camX, camY, camZ, cosY, sinY, cosP, sinP);
-
-            // Draw Headtorch Darkness Cone & First-Person Engineer Hands
-            drawTorchAndEngineerHands(w, h);
-        }
-
-        function draw3DTargetHouseBadge(w, h, fov, camX, camY, camZ, cosY, sinY, cosP, sinP) {
-            // Draw House Number Badges above all 8 buildings + highlight the active Target House!
-            var job = JOBS[game.jobIdx];
-            for (var i = 0; i < HOUSES.length; i++) {
-                var house = HOUSES[i];
-                var isTarget = (i === job.houseIdx);
-                var tx = house.cx - 1.1;
-                var ty = isTarget ? 4.8 : 3.5;
-                var tz = house.cz + house.side * 4.1;
-
-                var dx = tx - camX, dy = ty - camY, dz = tz - camZ;
-                var rx = dx * cosY - dz * sinY;
-                var rz1 = -dx * sinY - dz * cosY;
-                var ry = dy * cosP - rz1 * sinP;
-                var rz = dy * sinP + rz1 * cosP;
-
-                if (rz > 0.6 && rz < 58) {
-                    var sx = w * 0.5 + (rx / rz) * fov;
-                    var sy = h * 0.5 - (ry / rz) * fov;
-                    if (sx > 20 && sx < w - 20 && sy > 20 && sy < h - 20) {
-                        ctx.save();
-                        ctx.fillStyle = isTarget ? 'rgba(255, 107, 0, 0.95)' : 'rgba(15, 37, 55, 0.82)';
-                        ctx.strokeStyle = isTarget ? '#ffffff' : '#38bdf8';
-                        ctx.lineWidth = isTarget ? 2.5 : 1.5;
-                        var bw = isTarget ? 116 : 52;
-                        var bh = isTarget ? 28 : 22;
-                        ctx.beginPath();
-                        ctx.roundRect(sx - bw * 0.5, sy - bh * 0.5, bw, bh, 7);
-                        ctx.fill();
-                        ctx.stroke();
-                        ctx.fillStyle = isTarget ? '#0f2537' : '#f8fafc';
-                        ctx.font = (isTarget ? '900 12px ' : '800 11px ') + 'sans-serif';
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        ctx.fillText(isTarget ? ('🎯 TARGET #' + house.num) : ('#' + house.num), sx, sy);
-                        ctx.restore();
-                    }
-                }
-            }
-        }
-
-        function drawTorchAndEngineerHands(w, h) {
-            var job = JOBS[game.jobIdx];
-            var loc = detectPlayerRoom(player.x, player.z);
-            var isDarkInterior = loc.inside && (job.isDark || loc.room === 'Under-Stairs Cupboard');
-
-            if (isDarkInterior) {
-                if (game.torchOn) {
-                    var rad = Math.min(w, h) * 0.46;
-                    var grad = ctx.createRadialGradient(w * 0.5, h * 0.5, rad * 0.2, w * 0.5, h * 0.5, rad);
-                    grad.addColorStop(0, 'rgba(255, 251, 235, 0.03)');
-                    grad.addColorStop(0.65, 'rgba(4, 10, 22, 0.65)');
-                    grad.addColorStop(1, 'rgba(2, 6, 14, 0.95)');
-                    ctx.fillStyle = grad;
-                    ctx.fillRect(0, 0, w, h);
-                } else {
-                    ctx.fillStyle = 'rgba(2, 6, 14, 0.94)';
-                    ctx.fillRect(0, 0, w, h);
-                }
-            }
-
-            if (game.teaSlowTimer > 0) {
-                ctx.strokeStyle = 'rgba(255, 149, 0, 0.75)';
-                ctx.lineWidth = 10;
-                ctx.strokeRect(0, 0, w, h);
-            }
-
-            // 2.5D First-Person Engineer Hands (Left: Torch/Fluke Meter, Right: Insulated Screwdriver)
-            var bobX = Math.cos(player.bob * 0.5) * 7;
-            var bobY = Math.abs(Math.sin(player.bob)) * 9;
-
-            // Left Hand
-            ctx.save();
-            ctx.translate(w * 0.18 + bobX, h - 78 + bobY);
-            ctx.fillStyle = game.upgrades.gear_hivis ? '#eab308' : '#0f2537';
-            ctx.fillRect(-26, 22, 52, 70);
-            ctx.fillStyle = '#ff6b00';
-            ctx.fillRect(-26, 12, 52, 14);
-            ctx.fillStyle = game.upgrades.tool_fluke ? '#facc15' : '#334155';
-            ctx.fillRect(-15, -28, 32, 42);
-            ctx.fillStyle = game.torchOn ? '#fef08a' : '#475569';
-            ctx.fillRect(-9, -35, 20, 7);
-            ctx.restore();
-
-            // Right Hand
-            ctx.save();
-            ctx.translate(w * 0.82 - bobX, h - 78 + bobY);
-            ctx.fillStyle = game.upgrades.gear_hivis ? '#eab308' : '#0f2537';
-            ctx.fillRect(-26, 22, 52, 70);
-            ctx.fillStyle = '#ff6b00';
-            ctx.fillRect(-26, 12, 52, 14);
-            ctx.fillStyle = game.upgrades.tool_snips ? '#ef4444' : '#ff6b00';
-            ctx.fillRect(-11, -18, 22, 32);
-            ctx.fillStyle = '#cbd5e1';
-            ctx.fillRect(-4, -52, 8, 34);
-            ctx.restore();
         }
 
         /********************************************************************
@@ -1698,7 +1764,7 @@
         }
 
         function isBlockedByWall(nx, nz) {
-            if (nx < -34 || nx > 34 || nz < -21 || nz > 21) return true;
+            if (nx < -35 || nx > 35 || nz < -21 || nz > 21) return true;
             var r = player.radius;
             for (var i = 0; i < colliders.length; i++) {
                 var c = colliders[i];
@@ -1715,7 +1781,7 @@
 
         function updateMovementAndPrompts(dt) {
             var speedMult = game.upgrades.snack_greggs ? 1.38 : 1.0;
-            var moveSpeed = 4.6 * speedMult;
+            var moveSpeed = 4.8 * speedMult;
             var turnSpeed = 2.15;
 
             if (keysDown['ArrowLeft'] || keysDown['KeyQ'] || dpadState.turnL) player.yaw += turnSpeed * dt;
@@ -1739,20 +1805,28 @@
                 player.bob += dt * 11;
             }
 
-            // Smoothly animate swinging doors
+            // Smoothly swing 3D door pivots
             for (var i = 0; i < worldDoors.length; i++) {
                 var d = worldDoors[i];
                 var target = d.isOpen ? d.openRot : d.closedRot;
                 d.currentRot += (target - d.currentRot) * Math.min(1, dt * 10);
+                if (d.pivot) d.pivot.rotation.y = d.currentRot;
             }
 
             var loc = detectPlayerRoom(player.x, player.z);
             var roomEl = document.getElementById('hudRoomName');
             if (roomEl) roomEl.textContent = loc.label;
 
-            // Find closest interactive door
+            // Adjust scene ambient darkness when inside a dark house or cupboard
+            var job = JOBS[game.jobIdx];
+            var inDarkRoom = loc.inside && (job.isDark || loc.room === 'Under-Stairs Cupboard');
+            if (scene && scene.fog) {
+                scene.fog.density = inDarkRoom ? (game.torchOn ? 0.08 : 0.26) : 0.014;
+            }
+
+            // Nearest interactive door
             var closestDoor = null;
-            var minDist = 2.45;
+            var minDist = 2.5;
             for (var j = 0; j < worldDoors.length; j++) {
                 var dr = worldDoors[j];
                 var dist = Math.hypot(player.x - dr.centerX, player.z - dr.centerZ);
@@ -1774,19 +1848,18 @@
                 }
             }
 
-            // Check distance to active alarm panel
-            var job = JOBS[game.jobIdx];
+            // Distance to active alarm panel
             var targetHouse = HOUSES[job.houseIdx];
             var pDist = Math.hypot(player.x - game.panelWorldPos.x, player.z - game.panelWorldPos.z);
             var inTargetHouse = loc.inside && loc.houseIdx === job.houseIdx;
-            game.canWirePanel = inTargetHouse && pDist < 2.75;
+            game.canWirePanel = inTargetHouse && pDist < 2.8;
 
             var wireBtn = document.getElementById('wireActionBtn');
             if (wireBtn) {
                 wireBtn.style.display = (game.canWirePanel && game.phase === 'street') ? 'flex' : 'none';
             }
 
-            // Update Compass Bar & Quick Assist Button
+            // Update Compass & Quick Assist Button
             var goalX = inTargetHouse ? game.panelWorldPos.x : (targetHouse.cx - 1.1);
             var goalZ = inTargetHouse ? game.panelWorldPos.z : (targetHouse.cz + targetHouse.side * 4.0);
             var goalDist = Math.round(Math.hypot(goalX - player.x, goalZ - player.z));
@@ -1817,33 +1890,20 @@
         }
 
         /********************************************************************
-         * 8. GLOBAL BUTTON ACTIONS (START SHIFT, DOORS, TEA, SHOP, WIRING)
+         * 8. LEVEL LOADER, RADIO & SHOP LOGIC
          ********************************************************************/
-        window.startShift = function() {
-            document.getElementById('titleModal').style.display = 'none';
-            document.getElementById('shopModal').style.display = 'none';
-            document.getElementById('resultModal').style.display = 'none';
-            document.getElementById('wireModal').style.display = 'none';
-
-            audio.init();
-            loadJobLevel(game.jobIdx);
-        };
-
         function loadJobLevel(idx) {
             game.jobIdx = idx % JOBS.length;
             var job = JOBS[game.jobIdx];
 
-            // Randomize the 8 houses each time a new shift starts!
             generateRandomNeighborhood();
-            buildEntireStreetScene();
-
-            var h = HOUSES[job.houseIdx];
+            rebuild3DStreetWorld();
             updateActiveAlarmPanelCoords();
 
-            // Spawn player on the central road looking down the avenue so multiple buildings on both sides are visible!
-            player.x = Math.max(-29, h.cx - 11.5);
+            var h = HOUSES[job.houseIdx];
+            player.x = Math.max(-28, h.cx - 10.5);
             player.z = 0.0;
-            player.yaw = Math.atan2(-(h.cx - 1.1 - player.x), -( (h.cz + h.side * 4.0) - player.z ));
+            player.yaw = Math.atan2(-(h.cx - 1.1 - player.x), -((h.cz + h.side * 4.0) - player.z));
             player.pitch = -0.02;
 
             game.timeLeft = job.baseTime + (game.upgrades.tool_snips ? 10 : 0);
@@ -1862,89 +1922,6 @@
             showDavidMessage(job.briefing);
         }
 
-        window.handleDoorAction = function() {
-            var d = game.nearestDoor;
-            if (!d) return;
-            d.isOpen = !d.isOpen;
-            audio.door(d.isOpen);
-
-            var loc = detectPlayerRoom(player.x, player.z);
-            if (d.isFront && !d.isOpen && loc.inside && !game.draughtClaimed) {
-                game.draughtClaimed = true;
-                game.cash += 25;
-                saveProgress();
-                audio.coin();
-                showDavidMessage("Proper polite engineer! Customer tipped you +£25 Draught Bonus for shutting the front door behind you!");
-            }
-        };
-
-        window.smartAssistStep = function() {
-            if (!game.active) {
-                window.startShift();
-                return;
-            }
-            var job = JOBS[game.jobIdx];
-            var h = HOUSES[job.houseIdx];
-            var s = h.side;
-            var loc = detectPlayerRoom(player.x, player.z);
-
-            if (!loc.inside || loc.houseIdx !== job.houseIdx) {
-                for (var i = 0; i < worldDoors.length; i++) {
-                    if (worldDoors[i].houseIdx === job.houseIdx && worldDoors[i].type === 'front') {
-                        worldDoors[i].isOpen = true;
-                    }
-                }
-                audio.door(true);
-                player.x = h.cx - 1.2;
-                player.z = h.cz + s * 2.5;
-                player.yaw = s === 1 ? 0 : Math.PI;
-                player.pitch = 0;
-                return;
-            }
-
-            for (var j = 0; j < worldDoors.length; j++) {
-                if (worldDoors[j].houseIdx === job.houseIdx && !worldDoors[j].isFront) {
-                    worldDoors[j].isOpen = true;
-                }
-            }
-
-            if (!game.canWirePanel) {
-                audio.door(true);
-                if (job.roomKey === 'hallway') {
-                    player.x = h.cx - 2.9; player.z = h.cz + s * 2.0; player.yaw = Math.PI / 2;
-                } else if (job.roomKey === 'lounge') {
-                    player.x = h.cx + 2.9; player.z = h.cz + s * 2.5; player.yaw = -Math.PI / 2;
-                } else if (job.roomKey === 'kitchen') {
-                    player.x = h.cx + 2.0; player.z = h.cz - s * 2.3; player.yaw = s === 1 ? 0 : Math.PI;
-                } else {
-                    player.x = h.cx - 2.4; player.z = h.cz - s * 2.3; player.yaw = s === 1 ? 0 : Math.PI;
-                }
-            } else {
-                window.openWireModal();
-            }
-        };
-
-        window.toggleHeadtorch = function() {
-            game.torchOn = !game.torchOn;
-            audio.tone(game.torchOn ? 920 : 480, 'triangle', 0.06, 0.14);
-            var el = document.getElementById('hudTorchState');
-            if (el) el.textContent = game.torchOn ? 'ON' : 'OFF';
-        };
-
-        window.drinkYorkshireTea = function() {
-            if (!game.active || game.teaCount <= 0) {
-                audio.buzz();
-                return;
-            }
-            game.teaCount--;
-            game.teaSlowTimer = game.upgrades.snack_mug ? 14.0 : 7.0;
-            saveProgress();
-            audio.coin();
-            showDavidMessage(game.upgrades.snack_mug
-                ? "Sports Direct Giant Mug deployed! SLA countdown slowed for 14 seconds!"
-                : "Proper Yorkshire Brew! SLA timer slowed down for 7 seconds!");
-        };
-
         var radioTimeout = null;
         function showDavidMessage(msg) {
             audio.chirp();
@@ -1960,21 +1937,6 @@
                 box.classList.add('radio-hidden');
             }, 6800);
         }
-
-        window.triggerDavidJoke = function() {
-            var joke = DAVID_JOKES[game.jokeCounter % DAVID_JOKES.length];
-            game.jokeCounter++;
-            showDavidMessage(joke);
-        };
-
-        /********************************************************************
-         * 9. TRADE COUNTER SHOP MODAL
-         ********************************************************************/
-        window.openShopModal = function() {
-            audio.init();
-            renderShopItems();
-            document.getElementById('shopModal').style.display = 'flex';
-        };
 
         function renderShopItems() {
             updateHudWallet();
@@ -2027,6 +1989,7 @@
                 game.upgrades[item.id] = true;
             }
             saveProgress();
+            buildUpgradable3DVan();
             audio.coin();
             if (fb) fb.textContent = 'Purchased ' + item.name + '! Your kit and 3D Van on the street are upgraded!';
             renderShopItems();
@@ -2038,43 +2001,13 @@
             game.teaCount = 2;
             for (var k in game.upgrades) game.upgrades[k] = false;
             saveProgress();
+            buildUpgradable3DVan();
             renderShopItems();
         };
 
         /********************************************************************
-         * 10. WIRING MINIGAME (DRAG + TAP-TO-CONNECT + 3-TAP SPIDER HAZARD)
+         * 9. REALISTIC PCB & LCD KEYPAD WIRING MINIGAME
          ********************************************************************/
-        window.openWireModal = function() {
-            if (!game.active) return;
-            game.phase = 'wiring';
-            var job = JOBS[game.jobIdx];
-            var h = HOUSES[job.houseIdx];
-
-            document.getElementById('wireModalTitle').textContent = '#' + h.num + ' ' + job.roomName.toUpperCase() + ' PANEL';
-            var badge = document.getElementById('wirePerksBadge');
-            if (badge) {
-                var perks = [];
-                if (game.upgrades.tool_fluke) perks.push('📟 Fluke Meter Active');
-                if (game.upgrades.tool_snips) perks.push('✂️ Knipex Snips Active');
-                badge.textContent = perks.join(' • ');
-            }
-
-            if (game.shuffledTargets.length !== job.wires.length) {
-                game.shuffledTargets = job.wires.slice().sort(function() { return Math.random() - 0.5; });
-            }
-
-            document.getElementById('wireModal').style.display = 'flex';
-            renderPCBBoard();
-            spawnPanelSpiders(job.spiders);
-        };
-
-        window.closeWireModal = function() {
-            game.phase = 'street';
-            game.selectedWireId = null;
-            game.draggingWireId = null;
-            document.getElementById('wireModal').style.display = 'none';
-        };
-
         function spawnPanelSpiders(count) {
             var container = document.getElementById('spiderContainer');
             if (!container) return;
@@ -2115,7 +2048,7 @@
             rightCol.innerHTML = '';
 
             if (lcd) {
-                lcd.textContent = 'NORTHANTS SEC v4.2 [' + game.connectedWires.length + '/' + job.wires.length + ']';
+                lcd.textContent = 'NORTHANTS SEC V4.2 [' + game.connectedWires.length + '/' + job.wires.length + ']';
             }
 
             job.wires.forEach(function(w) {
@@ -2188,6 +2121,17 @@
             } else {
                 audio.buzz();
                 game.timeLeft = Math.max(1, game.timeLeft - 3.0);
+                var lcd = document.getElementById('lcdStatusDisplay');
+                if (lcd) {
+                    lcd.textContent = 'TAMPER FAULT! -3.0s';
+                    lcd.style.background = '#ef4444';
+                    lcd.style.color = '#ffffff';
+                    setTimeout(function() {
+                        lcd.style.background = '#84cc16';
+                        lcd.style.color = '#1a2e05';
+                        renderPCBBoard();
+                    }, 450);
+                }
                 game.selectedWireId = null;
                 game.draggingWireId = null;
                 renderPCBBoard();
@@ -2234,7 +2178,7 @@
                 var cx2 = x1 + (x2 - x1) * 0.55;
                 path.setAttribute('d', 'M ' + x1 + ' ' + y1 + ' C ' + cx1 + ' ' + y1 + ', ' + cx2 + ' ' + y2 + ', ' + x2 + ' ' + y2);
                 path.setAttribute('stroke', w.color);
-                path.setAttribute('stroke-width', '6');
+                path.setAttribute('stroke-width', '7');
                 path.setAttribute('fill', 'none');
                 path.setAttribute('stroke-linecap', 'round');
                 svg.appendChild(path);
@@ -2256,7 +2200,7 @@
                     var dPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
                     dPath.setAttribute('d', 'M ' + sx1 + ' ' + sy1 + ' Q ' + ((sx1 + sx2) * 0.5) + ' ' + sy1 + ', ' + sx2 + ' ' + sy2);
                     dPath.setAttribute('stroke', dw.color);
-                    dPath.setAttribute('stroke-width', '5');
+                    dPath.setAttribute('stroke-width', '6');
                     dPath.setAttribute('stroke-dasharray', '6 4');
                     dPath.setAttribute('fill', 'none');
                     svg.appendChild(dPath);
@@ -2295,7 +2239,7 @@
         }
 
         /********************************************************************
-         * 11. WIN & STICKY-FINGERS KEV ROBBERY OUTCOMES
+         * 10. WIN & STICKY-FINGERS KEV ROBBERY OUTCOMES
          ********************************************************************/
         function finishJobSuccess() {
             game.active = false;
@@ -2376,31 +2320,31 @@
         };
 
         /********************************************************************
-         * 12. NON-BLOCKING INPUT CONTROLS & 60FPS MAIN LOOP
-         * Never calls preventDefault on window/document so buttons ALWAYS work!
+         * 11. INPUT CONTROLS & 60FPS WEBGL RENDER LOOP
          ********************************************************************/
         function setupControls() {
-            function resizeViewport() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            }
-            window.addEventListener('resize', resizeViewport);
-            resizeViewport();
+            window.addEventListener('resize', function() {
+                if (camera && renderer) {
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                }
+            });
 
             window.addEventListener('keydown', function(e) {
                 keysDown[e.code] = true;
-                if (e.code === 'KeyT') window.toggleHeadtorch();
+                if (e.code === 'KeyT') window.toggleTorch();
                 if (e.code === 'Space' || e.code === 'KeyF') {
                     if (game.phase !== 'street') return;
-                    if (game.canWirePanel) window.openWireModal();
-                    else if (game.nearestDoor) window.handleDoorAction();
+                    if (game.canWirePanel) window.openPanelModal();
+                    else if (game.nearestDoor) window.interactNearestDoor();
                 }
             });
             window.addEventListener('keyup', function(e) {
                 keysDown[e.code] = false;
             });
 
-            // D-Pad Buttons
+            // D-Pad Touch Controls
             var dpadBtns = document.querySelectorAll('.dpad-btn');
             for (var i = 0; i < dpadBtns.length; i++) {
                 (function(btn) {
@@ -2421,38 +2365,39 @@
                 })(dpadBtns[i]);
             }
 
-            // Touch / Mouse Look ONLY on #gameCanvas (Never blocks UI buttons!)
+            // Touch / Mouse Look bound strictly to #webglContainer
+            var vp = document.getElementById('webglContainer');
             var lookPointerId = null;
             var lastX = 0, lastY = 0;
             var startX = 0, startY = 0;
 
-            canvas.addEventListener('pointerdown', function(e) {
+            vp.addEventListener('pointerdown', function(e) {
                 lookPointerId = e.pointerId;
                 lastX = startX = e.clientX;
                 lastY = startY = e.clientY;
             });
-            canvas.addEventListener('pointermove', function(e) {
+            vp.addEventListener('pointermove', function(e) {
                 if (lookPointerId !== e.pointerId) return;
                 var dx = e.clientX - lastX;
                 var dy = e.clientY - lastY;
                 lastX = e.clientX;
                 lastY = e.clientY;
                 player.yaw -= dx * 0.0052;
-                player.pitch = Math.max(-0.55, Math.min(0.55, player.pitch - dy * 0.0042));
+                player.pitch = Math.max(-0.62, Math.min(0.62, player.pitch - dy * 0.0042));
             });
-            canvas.addEventListener('pointerup', function(e) {
+            vp.addEventListener('pointerup', function(e) {
                 if (lookPointerId === e.pointerId) {
                     var dist = Math.hypot(e.clientX - startX, e.clientY - startY);
                     if (dist < 12 && game.phase === 'street') {
-                        if (game.canWirePanel) window.openWireModal();
-                        else if (game.nearestDoor) window.handleDoorAction();
+                        if (game.canWirePanel) window.openPanelModal();
+                        else if (game.nearestDoor) window.interactNearestDoor();
                     }
                     lookPointerId = null;
                 }
             });
-            canvas.addEventListener('pointercancel', function() { lookPointerId = null; });
+            vp.addEventListener('pointercancel', function() { lookPointerId = null; });
 
-            // Wiring Board Drag-and-Drop
+            // PCB Drag-and-Drop Wiring
             var board = document.getElementById('pcbBoard');
             if (board) {
                 board.addEventListener('pointermove', function(e) {
@@ -2506,15 +2451,48 @@
                 }
             }
 
-            render3DWorld(now);
+            // Render Three.js WebGL 3D World
+            if (renderer && scene && camera) {
+                if (!game.active && game.phase === 'title') {
+                    camera.position.set(-28.0, 2.2, 0.0);
+                    camera.rotation.y = -Math.PI / 2 + Math.sin(now * 0.0005) * 0.28;
+                    camera.rotation.x = -0.04;
+                } else {
+                    camera.position.set(player.x, player.y + Math.sin(player.bob) * 0.045, player.z);
+                    camera.rotation.y = player.yaw;
+                    camera.rotation.x = player.pitch;
+                }
+
+                // Animate 3D Engineer Hands
+                if (leftHandGroup && rightHandGroup) {
+                    var bx = Math.cos(player.bob * 0.5) * 0.015;
+                    var by = Math.abs(Math.sin(player.bob)) * 0.022;
+                    leftHandGroup.position.set(-0.27 + bx, -0.24 - by, -0.42);
+                    if (game.toolSwing > 0) {
+                        game.toolSwing = Math.max(0, game.toolSwing - dt * 4);
+                    }
+                    rightHandGroup.position.set(0.27 - bx, -0.24 - by, -0.42 - game.toolSwing * 0.12);
+                    rightHandGroup.rotation.x = -game.toolSwing * 0.6;
+                }
+
+                // Animate Floating Orange Target Marker Cone above Assigned Property
+                if (targetConeMesh && HOUSES.length > 0) {
+                    var th = HOUSES[JOBS[game.jobIdx].houseIdx];
+                    targetConeMesh.position.set(th.cx - 1.1, 5.7 + Math.sin(now * 0.005) * 0.45, th.cz + th.side * 3.8);
+                    targetConeMesh.rotation.y = now * 0.0025;
+                }
+
+                renderer.render(scene, camera);
+            }
         }
 
-        // Start 3D Engine Immediately on Page Load
-        loadProgress();
-        buildEntireStreetScene();
-        updateActiveAlarmPanelCoords();
-        setupControls();
-        requestAnimationFrame(animateLoop);
+        // Start 3D Engine Immediately on Load
+        window.onload = function() {
+            loadProgress();
+            initWebGLEngine();
+            setupControls();
+            requestAnimationFrame(animateLoop);
+        };
     </script>
 </body>
 </html>
