@@ -466,11 +466,14 @@
             </div>
 
             <!-- Live Target Compass Indicator -->
-            <div style="display:flex;justify-content:center;">
+            <div style="display:flex;justify-content:center;gap:8px;align-items:center;flex-wrap:wrap;">
                 <div id="compassWrap">
                     <span id="compassArrow">⬆️</span>
                     <span id="compassLabel">Target: House #12 Front Door (12m)</span>
                 </div>
+                <button type="button" class="hud-btn interactive" style="background:#334155;border:1px solid #94a3b8;padding:4px 10px;font-size:11px;margin-top:4px;border-radius:999px;" onclick="window.rerollStreet()">
+                    🎲 Re-Roll 8 Houses
+                </button>
             </div>
 
             <!-- Boss David Radio Popup -->
@@ -532,24 +535,28 @@
             </div>
 
             <p style="font-size:13px;color:#cbd5e1;line-height:1.45;margin:8px 0 14px;">
-                Look behind this menu—your live 3D Northamptonshire cul-de-sac street is already running! Walk between <strong>Houses #12, #14, #16 & #18</strong>, open swinging 3D doors, locate the interior alarm box in the Hallway, Lounge, Kitchen, or dark Under-Stairs Cupboard, and wire the PCB before Sticky-Fingers Kev strikes!
+                Look behind this menu—your live 3D Northamptonshire avenue is running with <strong>8 randomly generated houses (#10–#17)</strong> on both sides of the street! Walk along the road, pavements, garden paths, and green lawns, open swinging 3D doors, find the interior alarm box, and wire the PCB before Sticky-Fingers Kev strikes!
             </p>
 
             <div style="background:#061729;border:1px solid #1e40af;border-radius:14px;padding:10px 12px;text-align:left;font-size:12px;color:#93c5fd;margin-bottom:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                <div>🏘️ <strong>4 Enterable Houses:</strong> #12, #14, #16 & #18 with multi-room interiors!</div>
+                <div>🏘️ <strong>8 Random Buildings:</strong> #10, #12, #14, #16 (North) & #11, #13, #15, #17 (South)!</div>
+                <div>🌿 <strong>Roads, Paths & Lawns:</strong> Full street with gardens, trees, wheelie bins & drives!</div>
                 <div>🚪 <strong>Draught Bonus:</strong> Shut front door inside for a +£25 tip!</div>
-                <div>🔦 <strong>Headtorch Mode:</strong> Spotlight cone in dark cupboards & kitchens.</div>
                 <div>🛒 <strong>£100 Starting Cash:</strong> Buy Knipex Snips, Fluke & Vans!</div>
             </div>
 
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                <button type="button" id="openShopTitleBtn" style="flex:1;min-width:140px;padding:14px;border-radius:14px;background:#10b981;color:#04121f;font-weight:900;font-size:14px;"
-                    onclick="document.getElementById('shopModal').style.display='flex'; if(window.openShopModal) window.openShopModal();">
-                    🛒 TRADE SHOP (£<span id="titleCashLabel">100</span>)
+                <button type="button" style="flex:0.8;min-width:120px;padding:14px;border-radius:14px;background:#3b82f6;color:#ffffff;font-weight:900;font-size:13px;"
+                    onclick="if(window.rerollStreet) window.rerollStreet();">
+                    🎲 RE-ROLL STREET
                 </button>
-                <button type="button" id="startShiftBtn" class="pulse-orange" style="flex:1.8;min-width:200px;padding:15px;border-radius:14px;background:#ff6b00;color:#0f2537;font-weight:900;font-size:16px;"
+                <button type="button" id="openShopTitleBtn" style="flex:1;min-width:130px;padding:14px;border-radius:14px;background:#10b981;color:#04121f;font-weight:900;font-size:14px;"
+                    onclick="document.getElementById('shopModal').style.display='flex'; if(window.openShopModal) window.openShopModal();">
+                    🛒 SHOP (£<span id="titleCashLabel">100</span>)
+                </button>
+                <button type="button" id="startShiftBtn" class="pulse-orange" style="flex:1.6;min-width:190px;padding:15px;border-radius:14px;background:#ff6b00;color:#0f2537;font-weight:900;font-size:16px;"
                     onclick="document.getElementById('titleModal').style.display='none'; if(window.startShift) window.startShift();">
-                    🚐 START SHIFT ON STREET →
+                    🚐 START SHIFT →
                 </button>
             </div>
         </div>
@@ -663,7 +670,7 @@
 
     <script>
         /********************************************************************
-         * 1. GAME DATA, SHOP CATALOG & 4-HOUSE STREET DEFINITIONS
+         * 1. GAME DATA, SHOP CATALOG & 8 RANDOMLY GENERATED BUILDINGS
          ********************************************************************/
         var SAVE_STORAGE_KEY = 'northants_security_rush_save_v6';
 
@@ -678,26 +685,79 @@
             { id: 'snack_mug', name: 'Sports Direct Giant Mug', icon: '🍺', cost: 90, desc: 'Doubles your Cuppa Tea time-slow duration to 14 seconds!' }
         ];
 
-        // 4 Houses along the Northamptonshire Cul-de-Sac Street (#12, #14, #16, #18)
-        var HOUSES = [
-            { idx: 0, num: '12', cx: -21, cz: -14, brick: '#9a3412', brickDark: '#7c2d12', doorCol: '#0284c7' },
-            { idx: 1, num: '14', cx: -7,  cz: -14, brick: '#7c2d12', brickDark: '#60200b', doorCol: '#dc2626' },
-            { idx: 2, num: '16', cx: 7,   cz: -14, brick: '#92400e', brickDark: '#78350f', doorCol: '#059669' },
-            { idx: 3, num: '18', cx: 21,  cz: -14, brick: '#854d0e', brickDark: '#713f12', doorCol: '#4f46e5' }
+        // Palettes for random building generation across the 8 plots
+        var WALL_FINISHES = [
+            { name: 'Northants Red Brick', brick: '#9a3412', brickDark: '#7c2d12' },
+            { name: 'Cotswold Yellow Stone', brick: '#ca8a04', brickDark: '#a16207' },
+            { name: 'White Cornish Render', brick: '#e2e8f0', brickDark: '#cbd5e1' },
+            { name: 'Cream Pebble-Dash', brick: '#fde68a', brickDark: '#fcd34d' },
+            { name: 'Warm Terracotta Brick', brick: '#b45309', brickDark: '#92400e' },
+            { name: 'Heritage Brown Brick', brick: '#78350f', brickDark: '#451a03' },
+            { name: 'Victorian Crimson Brick', brick: '#991b1b', brickDark: '#7f1d1d' },
+            { name: 'Limestone Grey Render', brick: '#94a3b8', brickDark: '#64748b' }
         ];
+        var ROOF_STYLES = [
+            { top: '#1e293b', side: '#0f172a' }, // Welsh Dark Slate
+            { top: '#7c2d12', side: '#431407' }, // Clay Red Tile
+            { top: '#334155', side: '#1e293b' }, // Mossy Charcoal
+            { top: '#3f3f46', side: '#27272a' }  // Graphite Shingle
+        ];
+        var DOOR_COLORS = ['#ff6b00', '#0284c7', '#dc2626', '#059669', '#4f46e5', '#78350f', '#0f172a', '#d97706'];
+        var GARDEN_ORNAMENTS = ['tree', 'flowers', 'hedges', 'bins', 'tree_and_flowers', 'bins_and_flowers'];
+
+        var HOUSES = [];
+
+        function generateRandomNeighborhood() {
+            HOUSES = [];
+            var plots = [
+                // 4 North Side Buildings (z < 0, facing South toward the road)
+                { idx: 0, num: '10', cx: -21, cz: -14.5, side: 1 },
+                { idx: 1, num: '12', cx: -7,  cz: -14.5, side: 1 },
+                { idx: 2, num: '14', cx: 7,   cz: -14.5, side: 1 },
+                { idx: 3, num: '16', cx: 21,  cz: -14.5, side: 1 },
+                // 4 South Side Buildings across the road (z > 0, facing North toward the road)
+                { idx: 4, num: '11', cx: -21, cz: 14.5,  side: -1 },
+                { idx: 5, num: '13', cx: -7,  cz: 14.5,  side: -1 },
+                { idx: 6, num: '15', cx: 7,   cz: 14.5,  side: -1 },
+                { idx: 7, num: '17', cx: 21,  cz: 14.5,  side: -1 }
+            ];
+
+            for (var i = 0; i < plots.length; i++) {
+                var p = plots[i];
+                var wf = WALL_FINISHES[(i + Math.floor(Math.random() * WALL_FINISHES.length)) % WALL_FINISHES.length];
+                var rf = ROOF_STYLES[Math.floor(Math.random() * ROOF_STYLES.length)];
+                var dc = DOOR_COLORS[Math.floor(Math.random() * DOOR_COLORS.length)];
+                var orn = GARDEN_ORNAMENTS[Math.floor(Math.random() * GARDEN_ORNAMENTS.length)];
+                HOUSES.push({
+                    idx: p.idx,
+                    num: p.num,
+                    cx: p.cx,
+                    cz: p.cz,
+                    side: p.side, // +1 = North side, -1 = South side
+                    styleName: wf.name,
+                    brick: wf.brick,
+                    brickDark: wf.brickDark,
+                    roofTop: rf.top,
+                    roofSide: rf.side,
+                    doorCol: dc,
+                    ornament: orn,
+                    roofHeight: 4.35 + (Math.random() * 0.55)
+                });
+            }
+        }
 
         var JOBS = [
             {
                 jobNum: 1,
                 street: 'Kettering Road, Kingsley',
-                houseIdx: 0, // #12
+                houseIdx: 1, // #12 (North side)
                 roomKey: 'hallway',
                 roomName: 'Front Hallway',
                 isDark: false,
                 spiders: 0,
                 baseTime: 85,
                 basePay: 120,
-                briefing: 'Job 1 at #12 Kettering Rd! Walk up the garden path to #12, open the front door (shut it inside for +£25 Draught Bonus!) and wire the Hallway panel.',
+                briefing: 'Job 1 at #12 Kettering Rd! Walk up the garden path across the green lawn to #12, open the front door (shut it inside for +£25 Draught Bonus!) and wire the Hallway panel.',
                 wires: [
                     { id: '12v', label: '12V + POWER', target: '12V + AUX', color: '#ef4444' },
                     { id: '0v',  label: '0V - GROUND', target: '0V - NEG',  color: '#3b82f6' },
@@ -707,14 +767,14 @@
             {
                 jobNum: 2,
                 street: 'Kettering Road, Kingsley',
-                houseIdx: 1, // #14
+                houseIdx: 5, // #13 (South side across the road!)
                 roomKey: 'lounge',
                 roomName: 'Living Room Lounge',
                 isDark: false,
                 spiders: 1,
                 baseTime: 82,
                 basePay: 150,
-                briefing: 'Next door at #14 Kettering Rd! Head into #14, open the inner door into the Living Room Lounge past the 60-inch telly, and wire the 4-zone panel!',
+                briefing: 'Cross the road to #13 on the South side! Walk up #13\'s garden path, head into the Living Room Lounge past the 60-inch telly, and wire the 4-zone panel!',
                 wires: [
                     { id: '12v', label: '12V + POWER', target: '12V + AUX', color: '#ef4444' },
                     { id: '0v',  label: '0V - GROUND', target: '0V - NEG',  color: '#3b82f6' },
@@ -725,14 +785,14 @@
             {
                 jobNum: 3,
                 street: 'Abington Avenue, Northampton',
-                houseIdx: 2, // #16
+                houseIdx: 2, // #14 (North side)
                 roomKey: 'kitchen',
                 roomName: 'Back Kitchen',
                 isDark: true,
                 spiders: 1,
                 baseTime: 80,
                 basePay: 185,
-                briefing: 'Tripped fuse at #16 Abington Ave! Your Headtorch 🔦 is on. Walk inside #16, head through the Lounge into the Back Kitchen, and wire the 5-zone panel!',
+                briefing: 'Tripped fuse at #14 Abington Ave! Your Headtorch 🔦 is on. Walk inside #14, head through the Lounge into the Back Kitchen, and wire the 5-zone panel!',
                 wires: [
                     { id: '12v', label: '12V + POWER', target: '12V + AUX', color: '#ef4444' },
                     { id: '0v',  label: '0V - GROUND', target: '0V - NEG',  color: '#3b82f6' },
@@ -744,14 +804,14 @@
             {
                 jobNum: 4,
                 street: 'Wellingborough Rd, Abington',
-                houseIdx: 3, // #18
+                houseIdx: 6, // #15 (South side)
                 roomKey: 'cupboard',
                 roomName: 'Under-Stairs Cupboard',
                 isDark: true,
                 spiders: 2,
                 baseTime: 78,
                 basePay: 225,
-                briefing: 'Pitch-black Under-Stairs Cupboard at #18! Head down the street to #18, open the cupboard door behind the hallway, and tap any spiders 3 times to shoo them!',
+                briefing: 'Pitch-black Under-Stairs Cupboard at #15 across the road! Open the cupboard door behind #15\'s hallway, and tap any spiders 3 times to shoo them!',
                 wires: [
                     { id: '12v', label: '12V + POWER', target: '12V + AUX', color: '#ef4444' },
                     { id: '0v',  label: '0V - GROUND', target: '0V - NEG',  color: '#3b82f6' },
@@ -764,14 +824,14 @@
             {
                 jobNum: 5,
                 street: 'Towcester Way, Delapre',
-                houseIdx: 1, // #14
+                houseIdx: 7, // #17 (South-East end of street)
                 roomKey: 'kitchen',
                 roomName: 'Back Kitchen',
                 isDark: true,
                 spiders: 2,
                 baseTime: 75,
                 basePay: 300,
-                briefing: 'VIP NSI Gold 7-wire install at #14 Towcester Way! Dark kitchen, two angry house spiders, big payout. Make Northants Security proud!',
+                briefing: 'VIP NSI Gold 7-wire install at #17 Towcester Way! Dark kitchen, two angry house spiders, big payout. Make Northants Security proud!',
                 wires: [
                     { id: '12v', label: '12V + POWER', target: '12V + AUX', color: '#ef4444' },
                     { id: '0v',  label: '0V - GROUND', target: '0V - NEG',  color: '#3b82f6' },
@@ -827,11 +887,11 @@
         };
 
         var player = {
-            x: -22.1,
+            x: -29.5,
             y: 1.65,
-            z: 2.5,
-            yaw: 0,
-            pitch: 0,
+            z: 0.0,
+            yaw: -Math.PI / 2, // Facing East straight down the central road so all 8 buildings & lawns are visible!
+            pitch: -0.02,
             bob: 0,
             radius: 0.34
         };
@@ -1021,64 +1081,116 @@
         }
 
         function buildEntireStreetScene() {
+            if (HOUSES.length === 0) {
+                generateRandomNeighborhood();
+            }
             worldQuads.length = 0;
             worldDoors.length = 0;
             colliders.length = 0;
 
-            // 1. Tarmac Cul-de-Sac Road & White Center Markings
-            addSubdividedQuad({x:-34,y:0,z:2}, {x:34,y:0,z:2}, {x:34,y:0,z:9}, {x:-34,y:0,z:9}, '#1e293b', '#334155', 14, 2);
-            for (var rx = -28; rx <= 28; rx += 6) {
-                addSubdividedQuad({x:rx,y:0.02,z:5.35}, {x:rx+2.8,y:0.02,z:5.35}, {x:rx+2.8,y:0.02,z:5.65}, {x:rx,y:0.02,z:5.65}, '#f8fafc', null, 1, 1);
+            // 1. Wide Central Tarmac Road (z = -3.4 to +3.4) & White Center Dashed Lines
+            addSubdividedQuad({x:-35,y:0,z:-3.4}, {x:35,y:0,z:-3.4}, {x:35,y:0,z:3.4}, {x:-35,y:0,z:3.4}, '#1e293b', '#334155', 16, 2);
+            for (var rx = -30; rx <= 28; rx += 5.5) {
+                addSubdividedQuad({x:rx,y:0.02,z:-0.15}, {x:rx+2.6,y:0.02,z:-0.15}, {x:rx+2.6,y:0.02,z:0.15}, {x:rx,y:0.02,z:0.15}, '#f8fafc', null, 1, 1);
             }
 
-            // 2. North & South Pavements
-            addSubdividedQuad({x:-34,y:0.03,z:-0.5}, {x:34,y:0.03,z:-0.5}, {x:34,y:0.03,z:2.0}, {x:-34,y:0.03,z:2.0}, '#64748b', '#475569', 14, 1);
-            addSubdividedQuad({x:-34,y:0.03,z:9.0}, {x:34,y:0.03,z:9.0}, {x:34,y:0.03,z:11.5}, {x:-34,y:0.03,z:11.5}, '#475569', '#334155', 14, 1);
+            // 2. North & South Pavements / Sidewalks (Grey Paving Slabs)
+            addSubdividedQuad({x:-35,y:0.03,z:-5.4}, {x:35,y:0.03,z:-5.4}, {x:35,y:0.03,z:-3.4}, {x:-35,y:0.03,z:-3.4}, '#64748b', '#475569', 16, 1);
+            addSubdividedQuad({x:-35,y:0.03,z:3.4},  {x:35,y:0.03,z:3.4},  {x:35,y:0.03,z:5.4},  {x:-35,y:0.03,z:5.4},  '#64748b', '#475569', 16, 1);
 
-            // 3. Build All 4 Enterable Multi-Room Houses (#12, #14, #16, #18)
+            // Road Kerb Edging Stones
+            addSubdividedQuad({x:-35,y:0.04,z:-3.5}, {x:35,y:0.04,z:-3.5}, {x:35,y:0.04,z:-3.35}, {x:-35,y:0.04,z:-3.35}, '#94a3b8', null, 14, 1);
+            addSubdividedQuad({x:-35,y:0.04,z:3.35}, {x:35,y:0.04,z:3.35}, {x:35,y:0.04,z:3.5},  {x:-35,y:0.04,z:3.5},  '#94a3b8', null, 14, 1);
+
+            // 3. Build All 8 Enterable Multi-Room Buildings & Their Lawns/Paths (#10 to #17)
             for (var i = 0; i < HOUSES.length; i++) {
                 buildSingleMultiRoomHouse(HOUSES[i]);
             }
 
-            // 4. Street Lamps & Trees along the Cul-de-Sac
-            [-28, -14, 0, 14, 28].forEach(function(lx) {
-                add3DBox(lx, 2.2, 1.4, 0.22, 4.4, 0.22, '#334155', '#1e293b', '#facc15', true);
-                add3DBox(lx, 4.45, 1.7, 0.65, 0.22, 0.65, '#fef08a', '#facc15', '#fef08a', false);
+            // 4. Street Lamps along Both Sides of the Road
+            [-27, -14, 0, 14, 27].forEach(function(lx) {
+                // North Pavement Lamp
+                add3DBox(lx, 2.1, -3.7, 0.2, 4.2, 0.2, '#334155', '#1e293b', '#facc15', true);
+                add3DBox(lx, 4.25, -3.4, 0.55, 0.2, 0.55, '#fef08a', '#facc15', '#fef08a', false);
+                // South Pavement Lamp
+                add3DBox(lx, 2.1, 3.7, 0.2, 4.2, 0.2, '#334155', '#1e293b', '#facc15', true);
+                add3DBox(lx, 4.25, 3.4, 0.55, 0.2, 0.55, '#fef08a', '#facc15', '#fef08a', false);
             });
+        }
+
+        // Helper for ordered Z min/max so both North (s=1) and South (s=-1) houses render identically
+        function addFloorPatch(x1, x2, zA, zB, y, col, border, su, sv) {
+            var zMin = Math.min(zA, zB), zMax = Math.max(zA, zB);
+            addSubdividedQuad({x:x1,y:y,z:zMin}, {x:x2,y:y,z:zMin}, {x:x2,y:y,z:zMax}, {x:x1,y:y,z:zMax}, col, border, su, sv);
         }
 
         function buildSingleMultiRoomHouse(h) {
             var cx = h.cx;
-            var cz = h.cz; // -14.0
-            var frontZ = cz + 4.0; // -10.0
-            var backZ  = cz - 4.0; // -18.0
+            var cz = h.cz;   // -14.5 (North) or +14.5 (South)
+            var s = h.side;  // +1 for North houses, -1 for South houses
+            var frontZ = cz + s * 4.0; // -10.5 or +10.5 (faces the road)
+            var backZ  = cz - s * 4.0; // -18.5 or +18.5
+            var paveZ  = cz + s * 9.1; // -5.4 or +5.4 (meets the pavement)
             var leftX  = cx - 4.5;
             var rightX = cx + 4.5;
             var midX   = cx - 0.2;
             var midZ   = cz;
 
-            // Front Garden Grass & Driveway Path
-            addSubdividedQuad({x:leftX,y:0.01,z:frontZ}, {x:rightX,y:0.01,z:frontZ}, {x:rightX,y:0.01,z:-0.5}, {x:leftX,y:0.01,z:-0.5}, '#15803d', '#166534', 3, 3);
-            addSubdividedQuad({x:cx-2.0,y:0.04,z:frontZ}, {x:cx-0.2,y:0.04,z:frontZ}, {x:cx-0.2,y:0.04,z:-0.5}, {x:cx-2.0,y:0.04,z:-0.5}, '#475569', '#334155', 1, 3);
+            // 1. LUSH GREEN FRONT LAWN OUTSIDE HOUSE + PAVED GARDEN PATH + GRAVEL DRIVEWAY
+            addFloorPatch(cx - 6.6, cx + 6.6, frontZ, paveZ, 0.015, '#15803d', '#166534', 4, 3);
+            // Striped Mowed Lawn Accent
+            addFloorPatch(cx - 4.2, cx + 4.2, frontZ + s * 0.8, paveZ - s * 0.8, 0.02, '#16a34a', '#15803d', 3, 2);
+            // Flagstone Front Garden Path from Pavement Gate to Front Doorstep
+            addFloorPatch(cx - 1.9, cx - 0.3, frontZ, paveZ, 0.04, '#cbd5e1', '#64748b', 1, 3);
+            // Side Gravel Driveway Strip
+            addFloorPatch(cx - 5.7, cx - 3.3, frontZ, paveZ, 0.03, '#475569', '#334155', 1, 2);
 
-            // Gate Post with House Number Plaque (#12, #14, #16, #18)
-            add3DBox(cx - 2.45, 0.65, -1.0, 0.35, 1.3, 0.35, h.brick, h.brickDark, '#cbd5e1', true);
-            add3DBox(cx - 2.45, 1.05, -0.8, 0.55, 0.42, 0.08, '#0f2537', '#ff6b00', '#ff6b00', false);
+            // Low Front Garden Boundary Hedgerow & Gate Pillar with House Number Plaque
+            add3DBox(cx + 2.2, 0.38, paveZ - s * 0.2, 4.2, 0.75, 0.32, '#14532d', '#166534', '#15803d', true);
+            add3DBox(cx - 2.35, 0.65, paveZ - s * 0.25, 0.38, 1.3, 0.38, h.brick, h.brickDark, '#e2e8f0', true);
+            add3DBox(cx - 2.35, 1.05, paveZ - s * 0.05, 0.55, 0.42, 0.1, '#0f2537', '#ff6b00', '#ff6b00', false);
 
-            // Interior Room Floors (Hallway, Lounge, Under-Stairs Cupboard, Back Kitchen)
-            addSubdividedQuad({x:leftX,y:0.02,z:midZ}, {x:midX,y:0.02,z:midZ}, {x:midX,y:0.02,z:frontZ}, {x:leftX,y:0.02,z:frontZ}, '#92400e', '#78350f', 2, 2);
-            addSubdividedQuad({x:midX,y:0.02,z:midZ}, {x:rightX,y:0.02,z:midZ}, {x:rightX,y:0.02,z:frontZ}, {x:midX,y:0.02,z:frontZ}, '#1e3a8a', '#172554', 2, 2);
-            addSubdividedQuad({x:leftX,y:0.02,z:backZ}, {x:midX,y:0.02,z:backZ}, {x:midX,y:0.02,z:midZ}, {x:leftX,y:0.02,z:midZ}, '#334155', '#1e293b', 2, 2);
-            addSubdividedQuad({x:midX,y:0.02,z:backZ}, {x:rightX,y:0.02,z:backZ}, {x:rightX,y:0.02,z:midZ}, {x:midX,y:0.02,z:midZ}, '#cbd5e1', '#94a3b8', 3, 3);
+            // Random Garden Ornaments on the Lawn (Trees, Flowerbeds, Wheelie Bins)
+            var lawnMidZ = (frontZ + paveZ) * 0.5;
+            if (h.ornament === 'tree' || h.ornament === 'tree_and_flowers') {
+                add3DBox(cx + 2.8, 0.9, lawnMidZ, 0.32, 1.8, 0.32, '#78350f', '#451a03', '#78350f', true);
+                add3DBox(cx + 2.8, 2.2, lawnMidZ, 1.5, 1.4, 1.5, '#15803d', '#166534', '#22c55e', false);
+            }
+            if (h.ornament === 'flowers' || h.ornament === 'tree_and_flowers' || h.ornament === 'bins_and_flowers') {
+                add3DBox(cx + 1.1, 0.18, frontZ + s * 0.9, 1.8, 0.32, 0.7, '#78350f', '#451a03', '#f43f5e', false);
+            }
+            if (h.ornament === 'bins' || h.ornament === 'bins_and_flowers') {
+                add3DBox(cx - 4.1, 0.52, frontZ + s * 0.7, 0.52, 1.04, 0.52, '#1e293b', '#0f172a', '#2563eb', true);
+                add3DBox(cx - 3.45, 0.52, frontZ + s * 0.7, 0.52, 1.04, 0.52, '#14532d', '#064e3b', '#22c55e', true);
+            }
 
-            // Pitched Roof Peak
-            var roofPeakY = 4.5, roofBaseY = 2.9;
-            addSubdividedQuad({x:leftX-0.3,y:roofPeakY,z:cz}, {x:rightX+0.3,y:roofPeakY,z:cz}, {x:rightX+0.3,y:roofBaseY,z:frontZ+0.3}, {x:leftX-0.3,y:roofBaseY,z:frontZ+0.3}, '#1e293b', '#0f172a', 3, 2);
+            // 2. INTERIOR ROOM FLOORS (Hallway, Lounge, Under-Stairs Cupboard, Back Kitchen)
+            addFloorPatch(leftX, midX, midZ, frontZ, 0.025, '#92400e', '#78350f', 2, 2);
+            addFloorPatch(midX, rightX, midZ, frontZ, 0.025, '#1e3a8a', '#172554', 2, 2);
+            addFloorPatch(leftX, midX, backZ, midZ, 0.025, '#334155', '#1e293b', 2, 2);
+            addFloorPatch(midX, rightX, backZ, midZ, 0.025, '#cbd5e1', '#94a3b8', 3, 3);
 
-            // External NS Orange & Blue Bellbox on Front Brickwork
-            add3DBox(cx - 3.2, 2.35, frontZ + 0.14, 0.45, 0.52, 0.14, '#ff6b00', '#0f2537', '#ff6b00', false);
+            // 3. RANDOMIZED PITCHED ROOF (Both Front & Back Slopes)
+            var roofPeakY = h.roofHeight, roofBaseY = 2.9;
+            addSubdividedQuad(
+                {x:leftX-0.3,y:roofPeakY,z:cz},
+                {x:rightX+0.3,y:roofPeakY,z:cz},
+                {x:rightX+0.3,y:roofBaseY,z:frontZ + s * 0.35},
+                {x:leftX-0.3,y:roofBaseY,z:frontZ + s * 0.35},
+                h.roofTop, h.roofSide, 3, 2
+            );
+            addSubdividedQuad(
+                {x:rightX+0.3,y:roofPeakY,z:cz},
+                {x:leftX-0.3,y:roofPeakY,z:cz},
+                {x:leftX-0.3,y:roofBaseY,z:backZ - s * 0.35},
+                {x:rightX+0.3,y:roofBaseY,z:backZ - s * 0.35},
+                h.roofSide, h.roofTop, 3, 1
+            );
 
-            // 1. FRONT EXTERIOR BRICK WALL (With Front Doorway & Framed Lounge Window)
+            // External NS Orange & Blue Bellbox on Front Facade
+            add3DBox(cx - 3.2, 2.35, frontZ + s * 0.15, 0.45, 0.52, 0.14, '#ff6b00', '#0f2537', '#ff6b00', false);
+
+            // 4. FRONT EXTERIOR WALL (With Front Doorway & Framed Lounge Window)
             add3DBox(cx - 3.1, 1.45, frontZ, 2.8, 2.9, 0.24, h.brick, h.brickDark, null, true);
             add3DBox(cx - 1.1, 2.55, frontZ, 1.2, 0.7, 0.24, h.brick, h.brickDark, null, false);
             add3DBox(cx + 0.25, 1.45, frontZ, 1.5, 2.9, 0.24, h.brick, h.brickDark, null, true);
@@ -1086,20 +1198,20 @@
             add3DBox(cx + 2.1, 0.45, frontZ, 2.2, 0.9, 0.24, h.brick, h.brickDark, '#e2e8f0', true);
             add3DBox(cx + 2.1, 2.5, frontZ, 2.2, 0.8, 0.24, h.brick, h.brickDark, null, false);
             // Translucent Window Glass
-            addSubdividedQuad({x:cx+1.0,y:2.1,z:frontZ}, {x:cx+3.2,y:2.1,z:frontZ}, {x:cx+3.2,y:0.9,z:frontZ}, {x:cx+1.0,y:0.9,z:frontZ}, 'rgba(125,211,252,0.32)', '#f8fafc', 2, 1);
+            addSubdividedQuad({x:cx+1.0,y:2.1,z:frontZ}, {x:cx+3.2,y:2.1,z:frontZ}, {x:cx+3.2,y:0.9,z:frontZ}, {x:cx+1.0,y:0.9,z:frontZ}, 'rgba(125,211,252,0.34)', '#f8fafc', 2, 1);
             add3DBox(cx + 3.85, 1.45, frontZ, 1.3, 2.9, 0.24, h.brick, h.brickDark, null, true);
 
-            // 2. OUTER LEFT, RIGHT & BACK WALLS
+            // 5. OUTER LEFT, RIGHT & BACK WALLS
             add3DBox(leftX, 1.45, cz, 0.24, 2.9, 8.0, h.brickDark, h.brick, null, true);
             add3DBox(rightX, 1.45, cz, 0.24, 2.9, 8.0, h.brickDark, h.brick, null, true);
             add3DBox(cx, 1.45, backZ, 9.0, 2.9, 0.24, h.brick, h.brickDark, null, true);
 
-            // 3. CENTRAL PARTITION WALL (Hallway <-> Lounge Doorway)
-            add3DBox(midX, 1.45, cz + 2.8, 0.18, 2.9, 2.4, '#cbd5e1', '#94a3b8', null, true);
-            add3DBox(midX, 2.55, cz + 1.0, 0.18, 0.7, 1.2, '#cbd5e1', '#94a3b8', null, false);
-            add3DBox(midX, 1.45, cz - 1.8, 0.18, 2.9, 4.4, '#cbd5e1', '#94a3b8', null, true);
+            // 6. CENTRAL PARTITION WALL (Hallway <-> Lounge Doorway)
+            add3DBox(midX, 1.45, cz + s * 2.8, 0.18, 2.9, 2.4, '#cbd5e1', '#94a3b8', null, true);
+            add3DBox(midX, 2.55, cz + s * 1.0, 0.18, 0.7, 1.2, '#cbd5e1', '#94a3b8', null, false);
+            add3DBox(midX, 1.45, cz - s * 1.8, 0.18, 2.9, 4.4, '#cbd5e1', '#94a3b8', null, true);
 
-            // 4. CROSS PARTITION WALL (Hallway <-> Cupboard & Lounge <-> Kitchen Doorways)
+            // 7. CROSS PARTITION WALL (Hallway <-> Cupboard & Lounge <-> Kitchen Doorways)
             add3DBox(cx - 3.35, 1.45, midZ, 2.3, 2.9, 0.18, '#cbd5e1', '#94a3b8', null, true);
             add3DBox(cx - 1.6, 2.55, midZ, 1.2, 0.7, 0.18, '#cbd5e1', '#94a3b8', null, false);
             add3DBox(cx - 0.6, 1.45, midZ, 0.8, 2.9, 0.18, '#cbd5e1', '#94a3b8', null, true);
@@ -1108,20 +1220,21 @@
             add3DBox(cx + 1.6, 2.55, midZ, 1.2, 0.7, 0.18, '#bfdbfe', '#93c5fd', null, false);
             add3DBox(cx + 3.35, 1.45, midZ, 2.3, 2.9, 0.18, '#bfdbfe', '#93c5fd', null, true);
 
-            // 5. SWINGING 3D DOORS ON HINGES
-            registerSwingingDoor(h, 'front', '#' + h.num + ' Front Door', cx - 1.7, frontZ, 1.2, 0, h.doorCol, true);
-            registerSwingingDoor(h, 'lounge', '#' + h.num + ' Lounge Door', midX, cz + 1.6, 1.2, Math.PI / 2, '#78350f', false);
-            registerSwingingDoor(h, 'cupboard', '#' + h.num + ' Cupboard Door', cx - 2.2, midZ, 1.2, 0, '#475569', false);
-            registerSwingingDoor(h, 'kitchen', '#' + h.num + ' Kitchen Door', cx + 1.0, midZ, 1.2, 0, '#78350f', false);
+            // 8. SWINGING 3D DOORS ON HINGES (Works for both North & South side houses)
+            registerSwingingDoor(h, 'front', '#' + h.num + ' Front Door', cx - 1.7, frontZ, 1.2, 0, s, h.doorCol, true);
+            var loungeHingeZ = s === 1 ? (cz + 1.6) : (cz - 0.4);
+            registerSwingingDoor(h, 'lounge', '#' + h.num + ' Lounge Door', midX, loungeHingeZ, 1.2, Math.PI / 2, 1, '#78350f', false);
+            registerSwingingDoor(h, 'cupboard', '#' + h.num + ' Cupboard Door', cx - 2.2, midZ, 1.2, 0, s, '#475569', false);
+            registerSwingingDoor(h, 'kitchen', '#' + h.num + ' Kitchen Door', cx + 1.0, midZ, 1.2, 0, s, '#78350f', false);
 
-            // 6. 3D INTERIOR FURNITURE (Sofa, 60" Telly & Stand, Kitchen Worktop)
-            add3DBox(cx + 1.8, 0.4, cz + 2.5, 1.8, 0.8, 0.8, '#1d4ed8', '#1e40af', '#2563eb', true);
-            add3DBox(cx + 3.9, 0.35, cz + 1.4, 0.5, 0.7, 1.5, '#1e293b', '#0f172a', '#334155', true);
-            add3DBox(cx + 3.85, 1.05, cz + 1.4, 0.1, 0.75, 1.35, '#090d16', '#38bdf8', '#1e293b', false);
-            add3DBox(cx + 3.7, 0.45, cz - 2.2, 0.9, 0.9, 2.3, '#475569', '#334155', '#e2e8f0', true);
+            // 9. 3D INTERIOR FURNITURE (Sofa, 60" Telly & Stand, Kitchen Worktop)
+            add3DBox(cx + 1.8, 0.4, cz + s * 2.5, 1.8, 0.8, 0.8, '#1d4ed8', '#1e40af', '#2563eb', true);
+            add3DBox(cx + 3.9, 0.35, cz + s * 1.4, 0.5, 0.7, 1.5, '#1e293b', '#0f172a', '#334155', true);
+            add3DBox(cx + 3.85, 1.05, cz + s * 1.4, 0.1, 0.75, 1.35, '#090d16', '#38bdf8', '#1e293b', false);
+            add3DBox(cx + 3.7, 0.45, cz - s * 2.2, 0.9, 0.9, 2.3, '#475569', '#334155', '#e2e8f0', true);
         }
 
-        function registerSwingingDoor(h, type, label, hingeX, hingeZ, width, closedRot, color, isFront) {
+        function registerSwingingDoor(h, type, label, hingeX, hingeZ, width, closedRot, swingDir, color, isFront) {
             var door = {
                 houseIdx: h.idx,
                 houseNum: h.num,
@@ -1131,7 +1244,7 @@
                 hingeZ: hingeZ,
                 width: width,
                 closedRot: closedRot,
-                openRot: closedRot - 1.42,
+                openRot: closedRot - (1.42 * (swingDir || 1)),
                 currentRot: closedRot,
                 color: color,
                 isOpen: false,
@@ -1151,19 +1264,30 @@
         function updateActiveAlarmPanelCoords() {
             var job = JOBS[game.jobIdx];
             var h = HOUSES[job.houseIdx];
-            var cx = h.cx, cz = h.cz;
+            var cx = h.cx, cz = h.cz, s = h.side;
             game.panelWorldPos.houseIdx = h.idx;
 
             if (job.roomKey === 'hallway') {
-                game.panelWorldPos.x = cx - 4.25; game.panelWorldPos.y = 1.48; game.panelWorldPos.z = cz + 2.0;
+                game.panelWorldPos.x = cx - 4.25; game.panelWorldPos.y = 1.48; game.panelWorldPos.z = cz + s * 2.0;
             } else if (job.roomKey === 'lounge') {
-                game.panelWorldPos.x = cx + 4.25; game.panelWorldPos.y = 1.48; game.panelWorldPos.z = cz + 2.5;
+                game.panelWorldPos.x = cx + 4.25; game.panelWorldPos.y = 1.48; game.panelWorldPos.z = cz + s * 2.5;
             } else if (job.roomKey === 'kitchen') {
-                game.panelWorldPos.x = cx + 2.0;  game.panelWorldPos.y = 1.48; game.panelWorldPos.z = cz - 3.78;
+                game.panelWorldPos.x = cx + 2.0;  game.panelWorldPos.y = 1.48; game.panelWorldPos.z = cz - s * 3.78;
             } else {
-                game.panelWorldPos.x = cx - 2.4;  game.panelWorldPos.y = 1.48; game.panelWorldPos.z = cz - 3.78;
+                game.panelWorldPos.x = cx - 2.4;  game.panelWorldPos.y = 1.48; game.panelWorldPos.z = cz - s * 3.78;
             }
         }
+
+        // Re-Roll all 8 buildings with brand new colors, roofs & garden layouts anytime!
+        window.rerollStreet = function() {
+            audio.coin();
+            generateRandomNeighborhood();
+            buildEntireStreetScene();
+            updateActiveAlarmPanelCoords();
+            var job = JOBS[game.jobIdx];
+            var h = HOUSES[job.houseIdx];
+            showDavidMessage("Street re-rolled! 8 fresh Northants properties generated. Target #" + h.num + " is now " + h.styleName + "!");
+        };
 
         /********************************************************************
          * 5. DYNAMIC 3D ENTITIES (SWINGING DOORS, UPGRADABLE VAN, ALARM BOX)
@@ -1227,7 +1351,7 @@
             var job = JOBS[game.jobIdx];
             var th = HOUSES[job.houseIdx];
             var bounceY = 5.6 + Math.sin(now * 0.0045) * 0.45;
-            var ax = th.cx - 1.1, az = th.cz + 3.8;
+            var ax = th.cx - 1.1, az = th.cz + th.side * 3.8;
             dyn.push({
                 pts: [
                     { x: ax - 0.75, y: bounceY + 1.1, z: az },
@@ -1239,18 +1363,28 @@
                 border: '#ffffff'
             });
 
-            // 4. Upgradable 3D Northants Security Van Parked on Street
-            var vx = th.cx - 3.6, vz = 4.2;
+            // 4. Upgradable 3D Northants Security Van Parked by Roadside Kerb
+            var vx = th.cx - 3.6, vz = th.side === 1 ? -2.1 : 2.1;
             var tier = game.upgrades.van_sprinter ? 2 : (game.upgrades.van_custom ? 1 : 0);
             var bodyCol = tier === 0 ? '#cbd5e1' : '#0f2537';
             var stripeCol = tier === 0 ? '#78350f' : '#ff6b00';
             // Van Side Body
             dyn.push({
                 pts: [
-                    { x: vx - 2.0, y: 2.0, z: vz - 0.95 },
-                    { x: vx + 2.0, y: 2.0, z: vz - 0.95 },
-                    { x: vx + 2.0, y: 0.35, z: vz - 0.95 },
-                    { x: vx - 2.0, y: 0.35, z: vz - 0.95 }
+                    { x: vx - 2.0, y: 2.0, z: vz - 0.9 },
+                    { x: vx + 2.0, y: 2.0, z: vz - 0.9 },
+                    { x: vx + 2.0, y: 0.35, z: vz - 0.9 },
+                    { x: vx - 2.0, y: 0.35, z: vz - 0.9 }
+                ],
+                color: bodyCol,
+                border: stripeCol
+            });
+            dyn.push({
+                pts: [
+                    { x: vx - 2.0, y: 2.0, z: vz + 0.9 },
+                    { x: vx + 2.0, y: 2.0, z: vz + 0.9 },
+                    { x: vx + 2.0, y: 0.35, z: vz + 0.9 },
+                    { x: vx - 2.0, y: 0.35, z: vz + 0.9 }
                 ],
                 color: bodyCol,
                 border: stripeCol
@@ -1258,10 +1392,10 @@
             // Van Orange Livery Stripe
             dyn.push({
                 pts: [
-                    { x: vx - 1.95, y: 1.25, z: vz - 0.97 },
-                    { x: vx + 1.95, y: 1.25, z: vz - 0.97 },
-                    { x: vx + 1.95, y: 0.85, z: vz - 0.97 },
-                    { x: vx - 1.95, y: 0.85, z: vz - 0.97 }
+                    { x: vx - 1.95, y: 1.25, z: vz - 0.92 },
+                    { x: vx + 1.95, y: 1.25, z: vz - 0.92 },
+                    { x: vx + 1.95, y: 0.85, z: vz - 0.92 },
+                    { x: vx - 1.95, y: 0.85, z: vz - 0.92 }
                 ],
                 color: stripeCol,
                 border: '#ffffff'
@@ -1269,23 +1403,22 @@
             // Van Front Cab & Windscreen
             dyn.push({
                 pts: [
-                    { x: vx + 2.0, y: 1.9, z: vz + 0.95 },
-                    { x: vx + 2.0, y: 1.9, z: vz - 0.95 },
-                    { x: vx + 2.0, y: 0.35, z: vz - 0.95 },
-                    { x: vx + 2.0, y: 0.35, z: vz + 0.95 }
+                    { x: vx + 2.0, y: 1.9, z: vz + 0.9 },
+                    { x: vx + 2.0, y: 1.9, z: vz - 0.9 },
+                    { x: vx + 2.0, y: 0.35, z: vz - 0.9 },
+                    { x: vx + 2.0, y: 0.35, z: vz + 0.9 }
                 ],
                 color: '#38bdf8',
                 border: bodyCol
             });
             if (tier === 2) {
-                // Flashing Amber Roof Beacon Bar on Sprinter
                 var beaconCol = (Math.floor(now / 180) % 2 === 0) ? '#facc15' : '#ff6b00';
                 dyn.push({
                     pts: [
-                        { x: vx - 0.5, y: 2.35, z: vz - 0.6 },
-                        { x: vx + 0.5, y: 2.35, z: vz - 0.6 },
-                        { x: vx + 0.5, y: 2.02, z: vz - 0.6 },
-                        { x: vx - 0.5, y: 2.02, z: vz - 0.6 }
+                        { x: vx - 0.5, y: 2.35, z: vz },
+                        { x: vx + 0.5, y: 2.35, z: vz },
+                        { x: vx + 0.5, y: 2.02, z: vz },
+                        { x: vx - 0.5, y: 2.02, z: vz }
                     ],
                     color: beaconCol,
                     border: '#ffffff'
@@ -1335,7 +1468,7 @@
             var w = canvas.width;
             var h = canvas.height;
 
-            // Gentle idle camera pan while on the Title Screen so the street looks alive!
+            // Gentle idle camera pan looking down the central avenue so all 8 buildings & lawns are on screen!
             var camX = player.x;
             var camY = player.y + Math.sin(player.bob) * 0.04;
             var camZ = player.z;
@@ -1343,8 +1476,10 @@
             var camPitch = player.pitch;
 
             if (!game.active && game.phase === 'title') {
-                camYaw = Math.sin(now * 0.00045) * 0.38;
-                camPitch = -0.04;
+                camX = -29.5;
+                camZ = 0.0;
+                camYaw = -Math.PI / 2 + Math.sin(now * 0.0005) * 0.32;
+                camPitch = -0.03;
             }
 
             var horizonY = h * 0.5 + Math.tan(camPitch) * (h * 0.72);
@@ -1374,10 +1509,10 @@
                 var q = allQuads[i];
                 var p = q.pts;
 
-                // Quick distance cull using quad center
+                // Distance cull generous enough to show the entire 8-house avenue
                 var mX = (p[0].x + p[2].x) * 0.5 - camX;
                 var mZ = (p[0].z + p[2].z) * 0.5 - camZ;
-                if (mX * mX + mZ * mZ > 2300) continue;
+                if (mX * mX + mZ * mZ > 4800) continue;
 
                 // Transform vertices into 3D Camera Space
                 var camPts = [];
@@ -1445,36 +1580,42 @@
         }
 
         function draw3DTargetHouseBadge(w, h, fov, camX, camY, camZ, cosY, sinY, cosP, sinP) {
+            // Draw House Number Badges above all 8 buildings + highlight the active Target House!
             var job = JOBS[game.jobIdx];
-            var th = HOUSES[job.houseIdx];
-            var tx = th.cx - 1.1;
-            var ty = 4.6;
-            var tz = th.cz + 4.1;
+            for (var i = 0; i < HOUSES.length; i++) {
+                var house = HOUSES[i];
+                var isTarget = (i === job.houseIdx);
+                var tx = house.cx - 1.1;
+                var ty = isTarget ? 4.8 : 3.5;
+                var tz = house.cz + house.side * 4.1;
 
-            var dx = tx - camX, dy = ty - camY, dz = tz - camZ;
-            var rx = dx * cosY - dz * sinY;
-            var rz1 = -dx * sinY - dz * cosY;
-            var ry = dy * cosP - rz1 * sinP;
-            var rz = dy * sinP + rz1 * cosP;
+                var dx = tx - camX, dy = ty - camY, dz = tz - camZ;
+                var rx = dx * cosY - dz * sinY;
+                var rz1 = -dx * sinY - dz * cosY;
+                var ry = dy * cosP - rz1 * sinP;
+                var rz = dy * sinP + rz1 * cosP;
 
-            if (rz > 0.4) {
-                var sx = w * 0.5 + (rx / rz) * fov;
-                var sy = h * 0.5 - (ry / rz) * fov;
-                if (sx > 20 && sx < w - 20 && sy > 20 && sy < h - 20) {
-                    ctx.save();
-                    ctx.fillStyle = 'rgba(15, 37, 55, 0.92)';
-                    ctx.strokeStyle = '#ff6b00';
-                    ctx.lineWidth = 2;
-                    ctx.beginPath();
-                    ctx.roundRect(sx - 56, sy - 18, 112, 28, 8);
-                    ctx.fill();
-                    ctx.stroke();
-                    ctx.fillStyle = '#fde047';
-                    ctx.font = '900 12px sans-serif';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText('TARGET #' + th.num, sx, sy - 4);
-                    ctx.restore();
+                if (rz > 0.6 && rz < 58) {
+                    var sx = w * 0.5 + (rx / rz) * fov;
+                    var sy = h * 0.5 - (ry / rz) * fov;
+                    if (sx > 20 && sx < w - 20 && sy > 20 && sy < h - 20) {
+                        ctx.save();
+                        ctx.fillStyle = isTarget ? 'rgba(255, 107, 0, 0.95)' : 'rgba(15, 37, 55, 0.82)';
+                        ctx.strokeStyle = isTarget ? '#ffffff' : '#38bdf8';
+                        ctx.lineWidth = isTarget ? 2.5 : 1.5;
+                        var bw = isTarget ? 116 : 52;
+                        var bh = isTarget ? 28 : 22;
+                        ctx.beginPath();
+                        ctx.roundRect(sx - bw * 0.5, sy - bh * 0.5, bw, bh, 7);
+                        ctx.fill();
+                        ctx.stroke();
+                        ctx.fillStyle = isTarget ? '#0f2537' : '#f8fafc';
+                        ctx.font = (isTarget ? '900 12px ' : '800 11px ') + 'sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(isTarget ? ('🎯 TARGET #' + house.num) : ('#' + house.num), sx, sy);
+                        ctx.restore();
+                    }
                 }
             }
         }
@@ -1544,7 +1685,7 @@
                 var h = HOUSES[i];
                 if (px >= h.cx - 4.5 && px <= h.cx + 4.5 && pz >= h.cz - 4.0 && pz <= h.cz + 4.0) {
                     var isLeft = px < h.cx - 0.2;
-                    var isFront = pz >= h.cz;
+                    var isFront = (h.side === 1) ? (pz >= h.cz) : (pz <= h.cz);
                     var rName = '';
                     if (isLeft && isFront) rName = 'Front Hallway';
                     else if (!isLeft && isFront) rName = 'Living Room Lounge';
@@ -1553,11 +1694,11 @@
                     return { inside: true, houseIdx: h.idx, houseNum: h.num, room: rName, label: '#' + h.num + ' ' + rName };
                 }
             }
-            return { inside: false, houseIdx: -1, houseNum: null, room: 'Street', label: 'Cul-de-Sac Street' };
+            return { inside: false, houseIdx: -1, houseNum: null, room: 'Street', label: 'Northants Avenue' };
         }
 
         function isBlockedByWall(nx, nz) {
-            if (nx < -33 || nx > 33 || nz < -20 || nz > 11) return true;
+            if (nx < -34 || nx > 34 || nz < -21 || nz > 21) return true;
             var r = player.radius;
             for (var i = 0; i < colliders.length; i++) {
                 var c = colliders[i];
@@ -1647,7 +1788,7 @@
 
             // Update Compass Bar & Quick Assist Button
             var goalX = inTargetHouse ? game.panelWorldPos.x : (targetHouse.cx - 1.1);
-            var goalZ = inTargetHouse ? game.panelWorldPos.z : (targetHouse.cz + 4.0);
+            var goalZ = inTargetHouse ? game.panelWorldPos.z : (targetHouse.cz + targetHouse.side * 4.0);
             var goalDist = Math.round(Math.hypot(goalX - player.x, goalZ - player.z));
             var angleToGoal = Math.atan2(-(goalX - player.x), -(goalZ - player.z));
             var relAngle = angleToGoal - player.yaw;
@@ -1691,20 +1832,19 @@
         function loadJobLevel(idx) {
             game.jobIdx = idx % JOBS.length;
             var job = JOBS[game.jobIdx];
-            var h = HOUSES[job.houseIdx];
 
-            // Reset doors closed
-            for (var i = 0; i < worldDoors.length; i++) {
-                worldDoors[i].isOpen = false;
-                worldDoors[i].currentRot = worldDoors[i].closedRot;
-            }
+            // Randomize the 8 houses each time a new shift starts!
+            generateRandomNeighborhood();
+            buildEntireStreetScene();
+
+            var h = HOUSES[job.houseIdx];
             updateActiveAlarmPanelCoords();
 
-            // Spawn player on street in front of assigned house
-            player.x = h.cx - 1.1;
-            player.z = 2.5;
-            player.yaw = 0;
-            player.pitch = 0;
+            // Spawn player on the central road looking down the avenue so multiple buildings on both sides are visible!
+            player.x = Math.max(-29, h.cx - 11.5);
+            player.z = 0.0;
+            player.yaw = Math.atan2(-(h.cx - 1.1 - player.x), -( (h.cz + h.side * 4.0) - player.z ));
+            player.pitch = -0.02;
 
             game.timeLeft = job.baseTime + (game.upgrades.tool_snips ? 10 : 0);
             game.connectedWires = [];
@@ -1715,7 +1855,7 @@
             game.phase = 'street';
 
             document.getElementById('hudJobBadge').textContent = 'JOB ' + job.jobNum + '/' + JOBS.length;
-            document.getElementById('hudLocationText').innerHTML = '#' + h.num + ' ' + job.street.split(',')[0] + ' • <span id="hudRoomName" style="color:#fde047;">Street</span>';
+            document.getElementById('hudLocationText').innerHTML = '#' + h.num + ' (' + h.styleName + ') • <span id="hudRoomName" style="color:#fde047;">Street</span>';
             document.getElementById('hudObjectiveText').textContent = '#' + h.num + ' ' + job.roomName;
             updateHudWallet();
 
@@ -1745,6 +1885,7 @@
             }
             var job = JOBS[game.jobIdx];
             var h = HOUSES[job.houseIdx];
+            var s = h.side;
             var loc = detectPlayerRoom(player.x, player.z);
 
             if (!loc.inside || loc.houseIdx !== job.houseIdx) {
@@ -1755,8 +1896,8 @@
                 }
                 audio.door(true);
                 player.x = h.cx - 1.2;
-                player.z = h.cz + 2.5;
-                player.yaw = 0;
+                player.z = h.cz + s * 2.5;
+                player.yaw = s === 1 ? 0 : Math.PI;
                 player.pitch = 0;
                 return;
             }
@@ -1770,13 +1911,13 @@
             if (!game.canWirePanel) {
                 audio.door(true);
                 if (job.roomKey === 'hallway') {
-                    player.x = h.cx - 2.9; player.z = h.cz + 2.0; player.yaw = Math.PI / 2;
+                    player.x = h.cx - 2.9; player.z = h.cz + s * 2.0; player.yaw = Math.PI / 2;
                 } else if (job.roomKey === 'lounge') {
-                    player.x = h.cx + 2.9; player.z = h.cz + 2.5; player.yaw = -Math.PI / 2;
+                    player.x = h.cx + 2.9; player.z = h.cz + s * 2.5; player.yaw = -Math.PI / 2;
                 } else if (job.roomKey === 'kitchen') {
-                    player.x = h.cx + 2.0; player.z = h.cz - 2.3; player.yaw = 0;
+                    player.x = h.cx + 2.0; player.z = h.cz - s * 2.3; player.yaw = s === 1 ? 0 : Math.PI;
                 } else {
-                    player.x = h.cx - 2.4; player.z = h.cz - 2.3; player.yaw = 0;
+                    player.x = h.cx - 2.4; player.z = h.cz - s * 2.3; player.yaw = s === 1 ? 0 : Math.PI;
                 }
             } else {
                 window.openWireModal();
