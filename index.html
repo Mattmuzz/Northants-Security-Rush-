@@ -7,7 +7,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Northants Security Rush v5.0 — HQ Office & Craig Edition</title>
+    <title>Northants Security Rush v6.0 — Ultra Atmosphere & Custom Branding Edition</title>
 
     <!-- Automatic Service Worker Unregistration to Prevent Stale Mobile Caching -->
     <script>
@@ -32,10 +32,11 @@
     </script>
 
     <!-- Embedded Web App Manifest for Android APK / PWA Packaging -->
-    <link rel="manifest" href='data:application/manifest+json,{"name":"Northants Security Rush v5.0 — HQ Office & Craig Edition","short_name":"NS Rush v5","description":"Ultra 3D Alarm Engineer Simulator with HQ Office & Colleague Craig for Northants Security","start_url":"./index.html","display":"fullscreen","orientation":"any","background_color":"#06101e","theme_color":"#ff6b00"}'>
+    <link rel="manifest" href='data:application/manifest+json,{"name":"Northants Security Rush v6.0 — Ultra Atmosphere & Branding","short_name":"NS Rush v6","description":"Ultra 3D Alarm Engineer Simulator with Dynamic Weather, Living Characters & Custom Branding Studio","start_url":"./index.html","display":"fullscreen","orientation":"any","background_color":"#06101e","theme_color":"#ff6b00"}'>
 
-    <!-- Three.js r128 Hardware-Accelerated WebGL 3D Engine -->
+    <!-- Three.js r128 Hardware-Accelerated WebGL 3D Engine + GLTFLoader for Friday 3D Models -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 
     <style>
         :root {
@@ -444,6 +445,33 @@
             background: #032215;
         }
 
+        .studio-card {
+            background: #061325;
+            border: 2px solid #38bdf8;
+            border-radius: 14px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .file-label {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: #ff6b00;
+            color: #06101e;
+            font-weight: 900;
+            font-size: 12px;
+            padding: 9px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .file-label input[type="file"] {
+            display: none;
+        }
+
         /* Spider Hazard */
         .spider-hazard {
             position: absolute;
@@ -485,6 +513,10 @@
             onclick="window.chatToCraig(); return false;" ontouchend="window.chatToCraig(); return false;">
             💬 CHAT TO COLLEAGUE CRAIG (ALARM ADVICE)
         </button>
+        <button type="button" id="davidHqActionBtn" class="action-btn" style="display:none;background:#ff6b00;color:#06101e;border:2px solid #ffffff;"
+            onclick="window.chatToDavidHQ(); return false;" ontouchend="window.chatToDavidHQ(); return false;">
+            👷‍♂️ CHAT TO BOSS DAVID IN PERSON (DAD JOKE)
+        </button>
         <button type="button" id="urnActionBtn" class="action-btn" style="display:none;background:#f59e0b;color:#06101e;border:2px solid #ffffff;"
             onclick="window.useHQUrn(); return false;" ontouchend="window.useHQUrn(); return false;">
             ☕ GRAB FREE BREW &amp; HOBNOB (+1 TEA FLASK)
@@ -509,7 +541,7 @@
                         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                             <span style="font-weight:900;font-size:12px;color:#ff6b00;">NORTHANTS SECURITY</span>
                             <span id="hudJobBadge" style="background:#1e3a8a;padding:2px 6px;border-radius:5px;font-size:10px;font-weight:800;">HQ BASE</span>
-                            <span class="version-pill" style="font-size:9px;padding:2px 7px;">✨ v5.0 HQ OFFICE &amp; CRAIG</span>
+                            <span class="version-pill" style="font-size:9px;padding:2px 7px;">✨ v6.0 ULTRA ATMOSPHERE &amp; BRANDING</span>
                         </div>
                         <div id="hudLocationText" style="font-size:11px;color:#bfdbfe;font-weight:700;margin-top:2px;">
                             Northants HQ • <span id="hudRoomName" style="color:#fde047;">Trade Office</span>
@@ -538,6 +570,10 @@
                         onclick="window.openShop(); return false;" ontouchend="window.openShop(); return false;">
                         🛒 <span class="hide-sm">Shop</span>
                     </button>
+                    <button type="button" class="hud-btn" style="background:#a855f7;color:#ffffff;"
+                        onclick="window.openBrandingModal(); return false;" ontouchend="window.openBrandingModal(); return false;">
+                        🎨 <span class="hide-sm">Branding</span>
+                    </button>
                     <button type="button" class="hud-btn" style="background:#0ea5e9;color:#04121f;"
                         onclick="window.teleportToHQ(); return false;" ontouchend="window.teleportToHQ(); return false;">
                         🏢 <span class="hide-sm">HQ</span>
@@ -553,12 +589,16 @@
                 </div>
             </div>
 
-            <!-- Live Target Compass & Street Re-Roll -->
-            <div style="display:flex;justify-content:center;gap:8px;align-items:center;flex-wrap:wrap;">
+            <!-- Live Target Compass, Weather Switcher & Street Re-Roll -->
+            <div style="display:flex;justify-content:center;gap:6px;align-items:center;flex-wrap:wrap;">
                 <div id="compassBar">
                     <span id="compassArrow">⬆️</span>
                     <span id="compassLabel">HQ Office: Answer Ringing Desk Phone (3m)</span>
                 </div>
+                <button type="button" id="weatherToggleBtn" class="hud-btn interactive" style="background:#0284c7;border:1px solid #bae6fd;padding:4px 10px;font-size:11px;margin-top:4px;border-radius:999px;"
+                    onclick="window.cycleWeather(); return false;" ontouchend="window.cycleWeather(); return false;">
+                    🌦️ Weather: Wet Dusk
+                </button>
                 <button type="button" class="hud-btn interactive" style="background:#334155;border:1px solid #94a3b8;padding:4px 10px;font-size:11px;margin-top:4px;border-radius:999px;"
                     onclick="window.rerollStreet(); return false;" ontouchend="window.rerollStreet(); return false;">
                     🎲 Re-Roll 8 Houses
@@ -616,9 +656,9 @@
     <!-- TITLE / START SHIFT MODAL                                           -->
     <!-- =================================================================== -->
     <div id="titleModal" class="modal-backdrop">
-        <div class="modal-card" style="text-align:center;max-width:615px;">
+        <div class="modal-card" style="text-align:center;max-width:635px;">
             <div style="margin-bottom:10px;">
-                <span class="version-pill">✨ v5.0 HQ OFFICE &amp; CRAIG EDITION — ULTRA 3D</span>
+                <span class="version-pill">✨ v6.0 ULTRA ATMOSPHERE &amp; CUSTOM BRANDING EDITION</span>
             </div>
 
             <div style="display:inline-flex;align-items:center;justify-content:center;gap:10px;margin:0 auto 8px;">
@@ -630,28 +670,137 @@
             </div>
 
             <p style="font-size:13px;color:#cbd5e1;line-height:1.45;margin:6px 0 12px;">
-                Start your shift inside the <strong>3D Northants Security HQ Office &amp; Workshop</strong>! Check the racking shelves stocked with spare panels and bell boxes, chat with colleague <strong>Craig</strong> at his dual-monitor desk for trade tips, answer the <strong>ringing dispatch phone</strong>, and head out the HQ door to your van!
+                Experience <strong>Dynamic Northamptonshire Weather</strong> (Wet Dusk puddles, 3D Heavy Rain, Pitch-Black Night calls &amp; Sunny Days), <strong>Neon Volumetric Bloom Halos</strong>, walking <strong>Boss David in HQ</strong>, prowling <strong>Sticky-Fingers Kev</strong>, passing street traffic, and the <strong>Custom Branding &amp; Audio Studio</strong>!
             </p>
 
             <div style="background:#06101e;border:1px solid #1e40af;border-radius:14px;padding:10px 12px;text-align:left;font-size:12px;color:#93c5fd;margin-bottom:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                <div>🏢 <strong>3D HQ Workshop:</strong> Stocked shelves with panels, bellboxes, cable drums &amp; drills!</div>
-                <div>👨‍🔧 <strong>Colleague Craig:</strong> Sits at dispatch desk giving real alarm wiring tips!</div>
-                <div>📞 <strong>Ringing Job Phone:</strong> SLA timer stays on Standby until you step out of HQ!</div>
-                <div>🏆 <strong>HQ Shop Cosmetics:</strong> Unlock the HQ Tea Urn, 55" CCTV Wall &amp; Gold Bellbox!</div>
+                <div>🌦️ <strong>Dynamic Weather &amp; Puddles:</strong> Wet tarmac reflections, 1,500 3D raindrops &amp; volumetric LED bloom!</div>
+                <div>🚶‍♂️ <strong>Living 3D World:</strong> Boss David pacing in HQ, anxious homeowners, prowling Kev &amp; passing cars!</div>
+                <div>🎨 <strong>Custom Branding Studio:</strong> Upload your real Northants Security logo, PCB photo &amp; voice clips!</div>
+                <div>📦 <strong>Friday PC 3D Model Hook:</strong> Ready for <code>van.glb</code> &amp; <code>drill.glb</code> in your GitHub folder!</div>
             </div>
 
-            <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                <button type="button" style="flex:0.8;min-width:120px;padding:14px;border-radius:14px;background:#3b82f6;color:#ffffff;font-weight:900;font-size:13px;"
-                    onclick="window.rerollStreet(); return false;" ontouchend="window.rerollStreet(); return false;">
-                    🎲 RE-ROLL STREET
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button type="button" style="flex:0.9;min-width:130px;padding:13px;border-radius:14px;background:#a855f7;color:#ffffff;font-weight:900;font-size:13px;"
+                    onclick="window.openBrandingModal(); return false;" ontouchend="window.openBrandingModal(); return false;">
+                    🎨 CUSTOM BRANDING
                 </button>
-                <button type="button" style="flex:1;min-width:130px;padding:14px;border-radius:14px;background:#10b981;color:#04121f;font-weight:900;font-size:14px;"
+                <button type="button" style="flex:0.9;min-width:120px;padding:13px;border-radius:14px;background:#10b981;color:#04121f;font-weight:900;font-size:13.5px;"
                     onclick="window.openShop(); return false;" ontouchend="window.openShop(); return false;">
                     🛒 SHOP (£<span id="titleCashLabel">100</span>)
                 </button>
-                <button type="button" class="pulse-orange" style="flex:1.6;min-width:190px;padding:15px;border-radius:14px;background:#ff6b00;color:#06101e;font-weight:900;font-size:16px;"
+                <button type="button" class="pulse-orange" style="flex:1.5;min-width:185px;padding:14px;border-radius:14px;background:#ff6b00;color:#06101e;font-weight:900;font-size:15.5px;"
                     onclick="window.startShift(); return false;" ontouchend="window.startShift(); return false;">
                     🏢 ENTER HQ OFFICE →
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- CUSTOM BRANDING, REAL PHOTOS, VOICE CLIPS & FRIDAY 3D GLB STUDIO    -->
+    <!-- =================================================================== -->
+    <div id="brandingModal" class="modal-backdrop" style="display:none;">
+        <div class="modal-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #38bdf8;padding-bottom:10px;">
+                <div>
+                    <h2 style="margin:0;font-size:19px;font-weight:900;color:#38bdf8;">🎨 CUSTOM BRANDING, PHOTO &amp; 3D MODEL STUDIO</h2>
+                    <div style="font-size:11.5px;color:#cbd5e1;">Auto-loads from your GitHub repo OR pick files straight from your phone/PC!</div>
+                </div>
+                <button type="button" style="background:#1e293b;color:#fff;width:36px;height:36px;border-radius:10px;font-weight:900;font-size:16px;"
+                    onclick="window.closeBrandingModal(); return false;" ontouchend="window.closeBrandingModal(); return false;">✕</button>
+            </div>
+
+            <div id="brandingStatusBanner" style="font-size:12px;font-weight:800;color:#4ade80;margin-top:8px;background:#041e19;border:1px solid #10b981;padding:8px 10px;border-radius:10px;">
+                ✅ Ready! Any image or voice clip you pick below applies to the 3D Van, HQ Banner, Bellboxes, Uniforms &amp; PCB immediately!
+            </div>
+
+            <div class="shop-grid" style="margin-top:10px;">
+                <!-- 1. Custom Company Logo -->
+                <div class="studio-card">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span style="font-weight:900;font-size:13px;color:#ff6b00;">🛡️ 1. COMPANY LOGO</span>
+                        <span id="logoStatusTag" style="font-size:10px;background:#1e293b;padding:2px 6px;border-radius:4px;color:#93c5fd;">GitHub: ./logo.png</span>
+                    </div>
+                    <div style="font-size:11px;color:#cbd5e1;line-height:1.35;">
+                        Wraps onto the <strong>3D Van Livery</strong>, <strong>HQ Office Banner</strong>, all 8 <strong>House Bellboxes</strong>, and <strong>Craig &amp; David's Uniforms</strong>!
+                    </div>
+                    <label class="file-label">
+                        🖼️ Pick Logo From Phone/PC
+                        <input type="file" accept="image/*" onchange="window.handleCustomFileUpload(event, 'logo')">
+                    </label>
+                </div>
+
+                <!-- 2. Custom Alarm PCB Photo -->
+                <div class="studio-card">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span style="font-weight:900;font-size:13px;color:#4ade80;">🔌 2. REAL ALARM PCB PHOTO</span>
+                        <span id="panelStatusTag" style="font-size:10px;background:#1e293b;padding:2px 6px;border-radius:4px;color:#93c5fd;">GitHub: ./panel.png</span>
+                    </div>
+                    <div style="font-size:11px;color:#cbd5e1;line-height:1.35;">
+                        Replaces the green circuit board background inside the <strong>Wiring Minigame</strong> with your real Texecom / Pyronix panel photo!
+                    </div>
+                    <label class="file-label" style="background:#22c55e;">
+                        📷 Pick PCB Photo
+                        <input type="file" accept="image/*" onchange="window.handleCustomFileUpload(event, 'panel')">
+                    </label>
+                </div>
+
+                <!-- 3. Boss David Voice Clip -->
+                <div class="studio-card">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span style="font-weight:900;font-size:13px;color:#fbbf24;">📻 3. BOSS DAVID VOICE CLIP</span>
+                        <span id="davidAudioTag" style="font-size:10px;background:#1e293b;padding:2px 6px;border-radius:4px;color:#93c5fd;">GitHub: ./david.mp3</span>
+                    </div>
+                    <div style="font-size:11px;color:#cbd5e1;line-height:1.35;">
+                        Plays whenever Boss David speaks on the walkie-talkie or when you chat to him in person inside HQ!
+                    </div>
+                    <label class="file-label" style="background:#f59e0b;">
+                        🎙️ Pick David Audio (.mp3/.wav)
+                        <input type="file" accept="audio/*" onchange="window.handleCustomFileUpload(event, 'davidAudio')">
+                    </label>
+                </div>
+
+                <!-- 4. Colleague Craig Voice Clip -->
+                <div class="studio-card">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span style="font-weight:900;font-size:13px;color:#38bdf8;">👨‍🔧 4. CRAIG VOICE CLIP</span>
+                        <span id="craigAudioTag" style="font-size:10px;background:#1e293b;padding:2px 6px;border-radius:4px;color:#93c5fd;">GitHub: ./craig.mp3</span>
+                    </div>
+                    <div style="font-size:11px;color:#cbd5e1;line-height:1.35;">
+                        Plays whenever you chat to colleague Craig at his dual-monitor dispatch desk in HQ!
+                    </div>
+                    <label class="file-label" style="background:#38bdf8;">
+                        🎙️ Pick Craig Audio (.mp3/.wav)
+                        <input type="file" accept="audio/*" onchange="window.handleCustomFileUpload(event, 'craigAudio')">
+                    </label>
+                </div>
+            </div>
+
+            <!-- Friday PC 3D Modelling (.GLB) Hook Guide -->
+            <div style="margin-top:12px;background:#06101e;border:2px dashed #ff6b00;border-radius:14px;padding:10px 12px;font-size:11.5px;color:#e2e8f0;line-height:1.45;">
+                <div style="font-weight:900;color:#ff6b00;font-size:12.5px;margin-bottom:4px;">
+                    📦 FRIDAY PC 3D MODELLING HOOKS (THREE.GLTFLoader Ready!)
+                </div>
+                When you're on your PC on Friday, export any 3D model from Blender / Poly Pizza / Sketchfab as binary glTF (<code>.glb</code>) and drop it into your GitHub repo alongside <code>index.html</code> — or test a <code>.glb</code> file right now below:
+                <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;align-items:center;">
+                    <span style="background:#0f2537;padding:4px 8px;border-radius:6px;font-family:monospace;color:#fde047;">./van.glb (Replaces 3D Street Van)</span>
+                    <span style="background:#0f2537;padding:4px 8px;border-radius:6px;font-family:monospace;color:#4ade80;">./drill.glb (Replaces Right-Hand Tool)</span>
+                    <label class="file-label" style="padding:5px 10px;font-size:11px;background:#3b82f6;color:#fff;">
+                        🧊 Test Local .GLB Van Model
+                        <input type="file" accept=".glb,.gltf" onchange="window.handleCustomFileUpload(event, 'vanGlb')">
+                    </label>
+                </div>
+            </div>
+
+            <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;">
+                <button type="button" style="background:#334155;color:#cbd5e1;padding:10px 14px;border-radius:10px;font-size:11px;font-weight:700;"
+                    onclick="window.clearCustomBranding(); return false;" ontouchend="window.clearCustomBranding(); return false;">
+                    Reset Custom Files
+                </button>
+                <button type="button" style="background:#ff6b00;color:#06101e;padding:12px 22px;border-radius:12px;font-weight:900;font-size:14px;"
+                    onclick="window.closeBrandingModal(); return false;" ontouchend="window.closeBrandingModal(); return false;">
+                    APPLY &amp; RETURN TO GAME →
                 </button>
             </div>
         </div>
@@ -786,6 +935,8 @@
             if (tm) tm.style.display = 'none';
             var sm = document.getElementById('shopModal');
             if (sm) sm.style.display = 'none';
+            var bm = document.getElementById('brandingModal');
+            if (bm) bm.style.display = 'none';
             var rm = document.getElementById('resultModal');
             if (rm) rm.style.display = 'none';
             var wm = document.getElementById('wireModal');
@@ -793,6 +944,34 @@
 
             audio.init();
             enterHQBase(game.jobIdx);
+        };
+
+        window.openBrandingModal = function() {
+            if (!debounceTap()) return;
+            audio.init();
+            var bm = document.getElementById('brandingModal');
+            if (bm) bm.style.display = 'flex';
+        };
+
+        window.closeBrandingModal = function() {
+            if (!debounceTap()) return;
+            var bm = document.getElementById('brandingModal');
+            if (bm) bm.style.display = 'none';
+        };
+
+        window.chatToDavidHQ = function() {
+            if (!debounceTap()) return;
+            var joke = DAVID_JOKES[game.jokeCounter % DAVID_JOKES.length];
+            game.jokeCounter++;
+            if (davidHqArmGroup) davidHqArmGroup.rotation.x = -1.0;
+            showCommsMessage('DAVID', "Boss David (In HQ): '" + joke + "'");
+        };
+
+        window.cycleWeather = function() {
+            if (!debounceTap()) return;
+            audio.init();
+            var nextIdx = (WEATHER_MODES.indexOf(game.weather) + 1) % WEATHER_MODES.length;
+            applyWeatherMode(WEATHER_MODES[nextIdx], true);
         };
 
         window.teleportToHQ = function() {
@@ -845,6 +1024,208 @@
             if (craigArmGroup) craigArmGroup.rotation.x = -0.9;
             showCommsMessage('CRAIG', tip);
         };
+
+        /********************************************************************
+         * 1B. CUSTOM BRANDING, REAL PHOTOS, AUDIO & FRIDAY .GLB LOADER
+         ********************************************************************/
+        var BRAND_STORAGE_KEY = 'northants_security_rush_v6_branding';
+        var customAssets = {
+            logoImg: null,
+            logoDataUrl: null,
+            panelDataUrl: null,
+            davidAudioObj: null,
+            craigAudioObj: null,
+            customVanMesh: null,
+            customDrillMesh: null
+        };
+
+        function loadSavedBranding() {
+            try {
+                var raw = localStorage.getItem(BRAND_STORAGE_KEY);
+                if (raw) {
+                    var parsed = JSON.parse(raw);
+                    if (parsed.logoDataUrl) applyCustomLogoUrl(parsed.logoDataUrl, 'Saved Custom Logo');
+                    if (parsed.panelDataUrl) applyCustomPanelUrl(parsed.panelDataUrl, 'Saved PCB Photo');
+                    if (parsed.davidAudioUrl) applyCustomAudioUrl(parsed.davidAudioUrl, 'david', 'Saved Voice Clip');
+                    if (parsed.craigAudioUrl) applyCustomAudioUrl(parsed.craigAudioUrl, 'craig', 'Saved Voice Clip');
+                }
+            } catch (e) {}
+            probeGitHubRepoCustomFiles();
+        }
+
+        function saveCustomBrandingState(key, val) {
+            try {
+                var raw = localStorage.getItem(BRAND_STORAGE_KEY);
+                var data = raw ? JSON.parse(raw) : {};
+                data[key] = val;
+                localStorage.setItem(BRAND_STORAGE_KEY, JSON.stringify(data));
+            } catch (e) {}
+        }
+
+        function probeGitHubRepoCustomFiles() {
+            // 1. Probe ./logo.png in GitHub repo
+            if (!customAssets.logoDataUrl) {
+                var probeLogo = new Image();
+                probeLogo.onload = function() {
+                    customAssets.logoImg = probeLogo;
+                    var tag = document.getElementById('logoStatusTag');
+                    if (tag) { tag.textContent = 'Loaded ./logo.png ✓'; tag.style.color = '#4ade80'; }
+                    refreshBranded3DTextures();
+                };
+                probeLogo.src = './logo.png';
+            }
+            // 2. Probe ./panel.png in GitHub repo
+            if (!customAssets.panelDataUrl) {
+                var probePanel = new Image();
+                probePanel.onload = function() {
+                    applyCustomPanelUrl('./panel.png', 'Loaded ./panel.png ✓');
+                };
+                probePanel.src = './panel.png';
+            }
+            // 3. Probe ./david.mp3 & ./craig.mp3
+            if (!customAssets.davidAudioObj) {
+                var da = new Audio();
+                da.oncanplaythrough = function() {
+                    customAssets.davidAudioObj = da;
+                    var tag = document.getElementById('davidAudioTag');
+                    if (tag) { tag.textContent = 'Loaded ./david.mp3 ✓'; tag.style.color = '#4ade80'; }
+                };
+                da.src = './david.mp3';
+            }
+            if (!customAssets.craigAudioObj) {
+                var ca = new Audio();
+                ca.oncanplaythrough = function() {
+                    customAssets.craigAudioObj = ca;
+                    var tag = document.getElementById('craigAudioTag');
+                    if (tag) { tag.textContent = 'Loaded ./craig.mp3 ✓'; tag.style.color = '#4ade80'; }
+                };
+                ca.src = './craig.mp3';
+            }
+            // 4. Friday PC .GLB Hooks: Probe ./van.glb & ./drill.glb if GLTFLoader is available
+            if (typeof THREE !== 'undefined' && THREE.GLTFLoader) {
+                var loader = new THREE.GLTFLoader();
+                loader.load('./van.glb', function(gltf) {
+                    if (gltf && gltf.scene) {
+                        customAssets.customVanMesh = gltf.scene;
+                        buildUpgradable3DVan();
+                    }
+                }, undefined, function() {});
+                loader.load('./drill.glb', function(gltf) {
+                    if (gltf && gltf.scene && rightHandGroup) {
+                        customAssets.customDrillMesh = gltf.scene;
+                        rightHandGroup.clear();
+                        gltf.scene.scale.set(0.25, 0.25, 0.25);
+                        rightHandGroup.add(gltf.scene);
+                    }
+                }, undefined, function() {});
+            }
+        }
+
+        function applyCustomLogoUrl(url, labelText) {
+            var img = new Image();
+            img.onload = function() {
+                customAssets.logoImg = img;
+                customAssets.logoDataUrl = url;
+                var tag = document.getElementById('logoStatusTag');
+                if (tag) { tag.textContent = labelText || 'Custom Logo Active ✓'; tag.style.color = '#4ade80'; }
+                refreshBranded3DTextures();
+            };
+            img.src = url;
+        }
+
+        function applyCustomPanelUrl(url, labelText) {
+            customAssets.panelDataUrl = url;
+            var board = document.getElementById('pcbBoard');
+            if (board) {
+                board.style.backgroundImage = 'linear-gradient(rgba(2,28,20,0.45), rgba(2,28,20,0.55)), url("' + url + '")';
+                board.style.backgroundSize = 'cover';
+                board.style.backgroundPosition = 'center';
+            }
+            var tag = document.getElementById('panelStatusTag');
+            if (tag) { tag.textContent = labelText || 'Custom PCB Active ✓'; tag.style.color = '#4ade80'; }
+        }
+
+        function applyCustomAudioUrl(url, who, labelText) {
+            var aud = new Audio(url);
+            if (who === 'david') {
+                customAssets.davidAudioObj = aud;
+                var dTag = document.getElementById('davidAudioTag');
+                if (dTag) { dTag.textContent = labelText || 'Custom Audio ✓'; dTag.style.color = '#4ade80'; }
+            } else {
+                customAssets.craigAudioObj = aud;
+                var cTag = document.getElementById('craigAudioTag');
+                if (cTag) { cTag.textContent = labelText || 'Custom Audio ✓'; cTag.style.color = '#4ade80'; }
+            }
+        }
+
+        window.handleCustomFileUpload = function(ev, type) {
+            var file = ev.target && ev.target.files && ev.target.files[0];
+            if (!file) return;
+            var banner = document.getElementById('brandingStatusBanner');
+
+            if (type === 'vanGlb' && typeof THREE !== 'undefined' && THREE.GLTFLoader) {
+                var objUrl = URL.createObjectURL(file);
+                var loader = new THREE.GLTFLoader();
+                loader.load(objUrl, function(gltf) {
+                    if (gltf && gltf.scene) {
+                        customAssets.customVanMesh = gltf.scene;
+                        buildUpgradable3DVan();
+                        audio.coin();
+                        if (banner) banner.textContent = '🧊 Custom 3D .GLB Van Model loaded onto the street!';
+                    }
+                });
+                return;
+            }
+
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var dataUrl = e.target.result;
+                audio.coin();
+                if (type === 'logo') {
+                    saveCustomBrandingState('logoDataUrl', dataUrl);
+                    applyCustomLogoUrl(dataUrl, file.name);
+                    if (banner) banner.textContent = '🛡️ Custom Logo applied to 3D Van, HQ Banner, Bellboxes & Uniforms!';
+                } else if (type === 'panel') {
+                    saveCustomBrandingState('panelDataUrl', dataUrl);
+                    applyCustomPanelUrl(dataUrl, file.name);
+                    if (banner) banner.textContent = '🔌 Custom Alarm PCB photo applied to the Wiring Panel!';
+                } else if (type === 'davidAudio') {
+                    saveCustomBrandingState('davidAudioUrl', dataUrl);
+                    applyCustomAudioUrl(dataUrl, 'david', file.name);
+                    if (banner) banner.textContent = '📻 Boss David custom voice clip loaded! Playing sample...';
+                    try { customAssets.davidAudioObj.currentTime = 0; customAssets.davidAudioObj.play(); } catch (err) {}
+                } else if (type === 'craigAudio') {
+                    saveCustomBrandingState('craigAudioUrl', dataUrl);
+                    applyCustomAudioUrl(dataUrl, 'craig', file.name);
+                    if (banner) banner.textContent = '👨‍🔧 Colleague Craig custom voice clip loaded! Playing sample...';
+                    try { customAssets.craigAudioObj.currentTime = 0; customAssets.craigAudioObj.play(); } catch (err) {}
+                }
+            };
+            reader.readAsDataURL(file);
+        };
+
+        window.clearCustomBranding = function() {
+            if (!debounceTap()) return;
+            try { localStorage.removeItem(BRAND_STORAGE_KEY); } catch (e) {}
+            customAssets.logoImg = null;
+            customAssets.logoDataUrl = null;
+            customAssets.panelDataUrl = null;
+            customAssets.davidAudioObj = null;
+            customAssets.craigAudioObj = null;
+            customAssets.customVanMesh = null;
+            var board = document.getElementById('pcbBoard');
+            if (board) board.style.backgroundImage = '';
+            refreshBranded3DTextures();
+            var banner = document.getElementById('brandingStatusBanner');
+            if (banner) banner.textContent = '🔄 Reset to built-in procedural Northants Security branding.';
+        };
+
+        function refreshBranded3DTextures() {
+            if (typeof THREE === 'undefined' || !scene) return;
+            initProceduralTextures();
+            rebuild3DStreetWorld();
+            updateActiveAlarmPanelCoords();
+        }
 
         window.useHQUrn = function() {
             if (!debounceTap()) return;
@@ -1276,7 +1657,9 @@
             canWirePanel: false,
             nearHQPhone: false,
             nearCraig: false,
+            nearDavidHQ: false,
             nearHQUrn: false,
+            weather: 'wet_dusk',
             panelWorldPos: { x: -11.2, y: 1.5, z: -12.5, houseIdx: 1 },
             upgrades: {
                 hq_urn: false,
@@ -1384,6 +1767,22 @@
                 [420, 310, 420, 310].forEach(function(f, i) {
                     setTimeout(function() { self.tone(f, 'sawtooth', 0.18, 0.18); }, i * 185);
                 });
+            },
+            rainTick: function() {
+                // Soft ambient raindrop patter sound when outdoors in Heavy Rain
+                try {
+                    if (!this.ctx || this.ctx.state !== 'running') return;
+                    var o = this.ctx.createOscillator();
+                    var g = this.ctx.createGain();
+                    o.type = 'triangle';
+                    o.frequency.setValueAtTime(180 + Math.random() * 160, this.ctx.currentTime);
+                    g.gain.setValueAtTime(0.012, this.ctx.currentTime);
+                    g.gain.exponentialRampToValueAtTime(0.0008, this.ctx.currentTime + 0.035);
+                    o.connect(g);
+                    g.connect(this.ctx.destination);
+                    o.start();
+                    o.stop(this.ctx.currentTime + 0.035);
+                } catch (e) {}
             }
         };
 
@@ -1632,6 +2031,12 @@
                 g.fillStyle = '#06101e';
                 g.font = '900 26px sans-serif';
                 g.fillText('01604 • NORTHAMPTON', w * 0.5, h * 0.68);
+                if (customAssets.logoImg) {
+                    try {
+                        g.drawImage(customAssets.logoImg, 18, 18, 110, 110);
+                        g.drawImage(customAssets.logoImg, w - 128, 18, 110, 110);
+                    } catch (e) {}
+                }
             }, 1, 1, 512);
 
             // Golden-Hour Sunset Sky Dome Texture
@@ -1662,8 +2067,45 @@
                 g.fillText('TRADE COUNTER • DISPATCH • WORKSHOP', w * 0.5, h * 0.58);
                 g.fillStyle = '#4ade80';
                 g.font = '900 24px monospace';
-                g.fillText('CRAIG ON DESK • 24/7 CALLOUTS', w * 0.5, h * 0.80);
+                g.fillText('CRAIG & DAVID • 24/7 CALLOUTS', w * 0.5, h * 0.80);
+                if (customAssets.logoImg) {
+                    try {
+                        g.drawImage(customAssets.logoImg, 24, 24, 96, 96);
+                        g.drawImage(customAssets.logoImg, w - 120, 24, 96, 96);
+                    } catch (e) {}
+                }
             }, 1, 1, 512);
+
+            // External Bellbox & Uniform Chest Logo Texture
+            TEX.bellLogo = makeCanvasTexture(function(g, w, h) {
+                g.fillStyle = '#ff6b00';
+                g.fillRect(0, 0, w, h);
+                g.fillStyle = '#06101e';
+                g.fillRect(8, h * 0.58, w - 16, h * 0.34);
+                g.fillStyle = '#ffffff';
+                g.font = '900 32px sans-serif';
+                g.textAlign = 'center';
+                g.fillText('NORTHANTS', w * 0.5, h * 0.35);
+                g.fillStyle = '#38bdf8';
+                g.font = '900 26px sans-serif';
+                g.fillText('SECURITY', w * 0.5, h * 0.82);
+                if (customAssets.logoImg) {
+                    try {
+                        g.drawImage(customAssets.logoImg, w * 0.2, 8, w * 0.6, h * 0.52);
+                    } catch (e) {}
+                }
+            }, 1, 1, 256);
+
+            // Volumetric Additive Radial Glow Halo Sprite Texture (for LEDs, Beacons & Streetlamps)
+            TEX.glowHalo = makeCanvasTexture(function(g, w, h) {
+                var grad = g.createRadialGradient(w * 0.5, h * 0.5, 2, w * 0.5, h * 0.5, w * 0.5);
+                grad.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)');
+                grad.addColorStop(0.32, 'rgba(255, 255, 255, 0.55)');
+                grad.addColorStop(0.7, 'rgba(255, 255, 255, 0.12)');
+                grad.addColorStop(1.0, 'rgba(255, 255, 255, 0.0)');
+                g.fillStyle = grad;
+                g.fillRect(0, 0, w, h);
+            }, 1, 1, 128);
 
             // 55" Live 4-Split CCTV Wall Monitor Texture
             TEX.cctvScreen = makeCanvasTexture(function(g, w, h) {
@@ -1721,12 +2163,46 @@
         var hqPhoneHandset = null;
         var craigHeadGroup = null;
         var craigArmGroup = null;
+        var davidHqGroup = null;
+        var davidHqArmGroup = null;
+        var homeownerGroup = null;
+        var kevBurglarGroup = null;
+        var passingCarGroup = null;
+        var rainSystem = null;
+        var skyMeshRef = null;
+        var hemiLightRef = null;
+        var sunLightRef = null;
+        var roadMaterialRef = null;
+        var puddleMeshes = [];
         var activePanelLED = null;
         var headtorchLight = null;
         var headtorchTarget = null;
         var leftHandGroup = null;
         var rightHandGroup = null;
         var bellboxStrobes = [];
+        var vanBeaconHalo = null;
+        var hqPhoneHalo = null;
+
+        var WEATHER_MODES = ['wet_dusk', 'heavy_rain', 'night_call', 'sunny_day'];
+        var WEATHER_LABELS = {
+            wet_dusk:   '🌦️ Weather: Wet Dusk',
+            heavy_rain: '🌧️ Weather: Heavy Rain',
+            night_call: '🌙 Weather: Night Call',
+            sunny_day:  '☀️ Weather: Sunny Day'
+        };
+
+        function createGlowHaloSprite(colorHex, scaleSize) {
+            var mat = new THREE.SpriteMaterial({
+                map: TEX.glowHalo,
+                color: colorHex,
+                transparent: true,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false
+            });
+            var sp = new THREE.Sprite(mat);
+            sp.scale.set(scaleSize, scaleSize, 1);
+            return sp;
+        }
 
         var worldDoors = [];
         var colliders = [];
@@ -1758,27 +2234,30 @@
             // Golden-Hour Sunset Sky Dome
             var skyGeo = new THREE.SphereGeometry(125, 24, 16);
             var skyMat = new THREE.MeshBasicMaterial({ map: TEX.skyDome, side: THREE.BackSide, fog: false });
-            var skyMesh = new THREE.Mesh(skyGeo, skyMat);
-            scene.add(skyMesh);
+            skyMeshRef = new THREE.Mesh(skyGeo, skyMat);
+            scene.add(skyMeshRef);
 
             // Warm Dusk Hemisphere Light
-            var hemi = new THREE.HemisphereLight(0xfdba74, 0x1e293b, 0.58);
-            scene.add(hemi);
+            hemiLightRef = new THREE.HemisphereLight(0xfdba74, 0x1e293b, 0.58);
+            scene.add(hemiLightRef);
 
             // Golden-Hour Directional Sun Casting Real-Time 3D Shadows
-            var sunLight = new THREE.DirectionalLight(0xffedd5, 1.15);
-            sunLight.position.set(-28, 24, 18);
-            sunLight.castShadow = true;
-            sunLight.shadow.mapSize.width = 1024;
-            sunLight.shadow.mapSize.height = 1024;
-            sunLight.shadow.camera.near = 2;
-            sunLight.shadow.camera.far = 95;
-            sunLight.shadow.camera.left = -38;
-            sunLight.shadow.camera.right = 38;
-            sunLight.shadow.camera.top = 30;
-            sunLight.shadow.camera.bottom = -30;
-            sunLight.shadow.bias = -0.0008;
-            scene.add(sunLight);
+            sunLightRef = new THREE.DirectionalLight(0xffedd5, 1.15);
+            sunLightRef.position.set(-28, 24, 18);
+            sunLightRef.castShadow = true;
+            sunLightRef.shadow.mapSize.width = 1024;
+            sunLightRef.shadow.mapSize.height = 1024;
+            sunLightRef.shadow.camera.near = 2;
+            sunLightRef.shadow.camera.far = 95;
+            sunLightRef.shadow.camera.left = -38;
+            sunLightRef.shadow.camera.right = 38;
+            sunLightRef.shadow.camera.top = 30;
+            sunLightRef.shadow.camera.bottom = -30;
+            sunLightRef.shadow.bias = -0.0008;
+            scene.add(sunLightRef);
+
+            // 1,500-Drop 3D Falling Rain Particle System for Northamptonshire Heavy Rain
+            build3DRainSystem();
 
             // Real-Time 3D SpotLight Headtorch attached to Camera
             headtorchLight = new THREE.SpotLight(0xfffbeb, 3.2, 28, Math.PI / 4.0, 0.45, 1.2);
@@ -1796,6 +2275,80 @@
             generateRandomNeighborhood();
             rebuild3DStreetWorld();
             updateActiveAlarmPanelCoords();
+            loadSavedBranding();
+            applyWeatherMode('wet_dusk', false);
+        }
+
+        function build3DRainSystem() {
+            if (typeof THREE === 'undefined' || !scene) return;
+            var dropCount = 1500;
+            var positions = new Float32Array(dropCount * 6); // LineSegments (2 vertices per streak)
+            for (var i = 0; i < dropCount; i++) {
+                var rx = (Math.random() - 0.5) * 68;
+                var ry = Math.random() * 18;
+                var rz = (Math.random() - 0.5) * 48;
+                var idx = i * 6;
+                positions[idx]     = rx;
+                positions[idx + 1] = ry;
+                positions[idx + 2] = rz;
+                positions[idx + 3] = rx - 0.08;
+                positions[idx + 4] = ry - 0.72;
+                positions[idx + 5] = rz;
+            }
+            var geo = new THREE.BufferGeometry();
+            geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            var mat = new THREE.LineBasicMaterial({ color: 0xbae6fd, transparent: true, opacity: 0.58 });
+            rainSystem = new THREE.LineSegments(geo, mat);
+            rainSystem.visible = false;
+            scene.add(rainSystem);
+        }
+
+        function applyWeatherMode(mode, announce) {
+            game.weather = mode;
+            var btn = document.getElementById('weatherToggleBtn');
+            if (btn && WEATHER_LABELS[mode]) btn.textContent = WEATHER_LABELS[mode];
+
+            if (!scene) return;
+            var isWet = (mode === 'wet_dusk' || mode === 'heavy_rain');
+
+            if (rainSystem) rainSystem.visible = (mode === 'heavy_rain');
+            if (roadMaterialRef) {
+                roadMaterialRef.roughness = isWet ? 0.16 : 0.78;
+                roadMaterialRef.metalness = isWet ? 0.62 : 0.08;
+            }
+            for (var i = 0; i < puddleMeshes.length; i++) {
+                puddleMeshes[i].visible = isWet;
+            }
+
+            if (mode === 'wet_dusk') {
+                scene.background.setHex(0x1b1534);
+                scene.fog.color.setHex(0x231934);
+                if (skyMeshRef) skyMeshRef.visible = true;
+                if (hemiLightRef) { hemiLightRef.color.setHex(0xfdba74); hemiLightRef.intensity = 0.58; }
+                if (sunLightRef)  { sunLightRef.color.setHex(0xffedd5); sunLightRef.intensity = 1.15; }
+            } else if (mode === 'heavy_rain') {
+                scene.background.setHex(0x0f172a);
+                scene.fog.color.setHex(0x0f172a);
+                if (skyMeshRef) skyMeshRef.visible = false;
+                if (hemiLightRef) { hemiLightRef.color.setHex(0x64748b); hemiLightRef.intensity = 0.42; }
+                if (sunLightRef)  { sunLightRef.color.setHex(0x94a3b8); sunLightRef.intensity = 0.45; }
+            } else if (mode === 'night_call') {
+                scene.background.setHex(0x030712);
+                scene.fog.color.setHex(0x030712);
+                if (skyMeshRef) skyMeshRef.visible = false;
+                if (hemiLightRef) { hemiLightRef.color.setHex(0x1e293b); hemiLightRef.intensity = 0.22; }
+                if (sunLightRef)  { sunLightRef.color.setHex(0x38bdf8); sunLightRef.intensity = 0.22; }
+            } else if (mode === 'sunny_day') {
+                scene.background.setHex(0x38bdf8);
+                scene.fog.color.setHex(0x7dd3fc);
+                if (skyMeshRef) skyMeshRef.visible = false;
+                if (hemiLightRef) { hemiLightRef.color.setHex(0xffffff); hemiLightRef.intensity = 0.85; }
+                if (sunLightRef)  { sunLightRef.color.setHex(0xfffbeb); sunLightRef.intensity = 1.45; }
+            }
+
+            if (announce) {
+                showCommsMessage('CRAIG', "Northamptonshire weather updated to " + WEATHER_LABELS[mode].replace('🌦️ ', '').replace('🌧️ ', '').replace('🌙 ', '').replace('☀️ ', '') + "!");
+            }
         }
 
         function build3DEngineerHands() {
@@ -1872,14 +2425,39 @@
             worldDoors.length = 0;
             colliders.length = 0;
             bellboxStrobes.length = 0;
+            puddleMeshes.length = 0;
 
-            // 1. Central Speckled Tarmac Road (z = -3.4 to +3.4)
-            var roadMat = new THREE.MeshStandardMaterial({ map: TEX.road, roughness: 0.78, metalness: 0.08 });
-            var roadMesh = new THREE.Mesh(new THREE.PlaneGeometry(78, 6.8), roadMat);
+            // 1. Central Speckled Tarmac Road (z = -3.4 to +3.4) with Wet Reflection Support
+            var isWetNow = (game.weather === 'wet_dusk' || game.weather === 'heavy_rain');
+            roadMaterialRef = new THREE.MeshStandardMaterial({
+                map: TEX.road,
+                roughness: isWetNow ? 0.16 : 0.78,
+                metalness: isWetNow ? 0.62 : 0.08
+            });
+            var roadMesh = new THREE.Mesh(new THREE.PlaneGeometry(78, 6.8), roadMaterialRef);
             roadMesh.rotation.x = -Math.PI / 2;
             roadMesh.position.set(0, 0.01, 0);
             roadMesh.receiveShadow = true;
             streetGroup.add(roadMesh);
+
+            // Shimmering Wet Tarmac Puddle Mirror Strips along the Road
+            var puddleMat = new THREE.MeshStandardMaterial({
+                color: 0x38bdf8,
+                emissive: 0xfde047,
+                emissiveIntensity: 0.18,
+                roughness: 0.03,
+                metalness: 0.95,
+                transparent: true,
+                opacity: 0.36
+            });
+            [-20, -7, 7, 20].forEach(function(px, idx) {
+                var pud = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 1.35), puddleMat);
+                pud.rotation.x = -Math.PI / 2;
+                pud.position.set(px, 0.018, (idx % 2 === 0) ? -1.4 : 1.4);
+                pud.visible = isWetNow;
+                streetGroup.add(pud);
+                puddleMeshes.push(pud);
+            });
 
             // Raised Concrete Kerb Stones along Road Edges
             var kerbMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.7 });
@@ -1913,10 +2491,17 @@
                 addBoxMesh(streetGroup, lx, 2.35, -3.6, 0.16, 4.7, 0.16, poleMat, true);
                 addBoxMesh(streetGroup, lx, 4.65, -3.1, 0.22, 0.14, 1.1, poleMat, false);
                 addBoxMesh(streetGroup, lx, 4.56, -2.75, 0.45, 0.12, 0.45, bulbMat, false, null, false, false);
+                var nHalo = createGlowHaloSprite(0xfef08a, 2.2);
+                nHalo.position.set(lx, 4.45, -2.75);
+                streetGroup.add(nHalo);
+
                 // South Lamp
                 addBoxMesh(streetGroup, lx, 2.35, 3.6, 0.16, 4.7, 0.16, poleMat, true);
                 addBoxMesh(streetGroup, lx, 4.65, 3.1, 0.22, 0.14, 1.1, poleMat, false);
                 addBoxMesh(streetGroup, lx, 4.56, 2.75, 0.45, 0.12, 0.45, bulbMat, false, null, false, false);
+                var sHalo = createGlowHaloSprite(0xfef08a, 2.2);
+                sHalo.position.set(lx, 4.45, 2.75);
+                streetGroup.add(sHalo);
 
                 // Warm PointLight Pool on Tarmac
                 var lampLight = new THREE.PointLight(0xfde047, 0.95, 19, 1.6);
@@ -1932,6 +2517,7 @@
 
             buildUpgradable3DVan();
             build3DHQOffice();
+            buildLivingStreetCharactersAndTraffic();
         }
 
         /********************************************************************
@@ -2066,6 +2652,9 @@
             var phoneBase = addBoxMesh(hqGroup, 1.15, 0.90, 30.85, 0.38, 0.12, 0.34, new THREE.MeshStandardMaterial({ color: 0x0f172a }), false);
             hqPhoneHandset = addBoxMesh(hqGroup, 1.15, 1.00, 30.85, 0.42, 0.09, 0.14, new THREE.MeshStandardMaterial({ color: 0xdc2626 }), false);
             hqPhoneLEDMesh = addBoxMesh(hqGroup, 1.28, 0.97, 30.98, 0.09, 0.09, 0.09, new THREE.MeshBasicMaterial({ color: 0xef4444 }), false, null, false, false);
+            hqPhoneHalo = createGlowHaloSprite(0xef4444, 0.85);
+            hqPhoneHalo.position.set(1.28, 1.02, 30.98);
+            hqGroup.add(hqPhoneHalo);
 
             hqPhoneConeMesh = new THREE.Mesh(
                 new THREE.ConeGeometry(0.32, 0.65, 8),
@@ -2077,6 +2666,9 @@
 
             // Colleague CRAIG 3D Character Model sitting behind Dispatch Desk (x = 2.65, z = 29.75)
             build3DColleagueCraig(2.65, 29.75);
+
+            // Boss DAVID 3D Character Model standing/pacing in HQ Office holding Clipboard & Mug
+            build3DBossDavidInHQ(-2.2, 33.0);
 
             // ---------------------------------------------------------------
             // UPGRADABLE 3D HQ SHOP COSMETICS (TEA URN, 55" CCTV, GOLD TROPHY)
@@ -2125,9 +2717,9 @@
             addBoxMesh(craigGroup, 0, 0.28, 0, 0.55, 0.55, 0.55, new THREE.MeshStandardMaterial({ color: 0x1e293b }), true);
             addBoxMesh(craigGroup, 0, 0.85, -0.26, 0.54, 0.75, 0.10, new THREE.MeshStandardMaterial({ color: 0x1e293b }), false);
 
-            // Craig's Torso in Northants Security Navy Polo with Orange Hi-Vis Trim
+            // Craig's Torso in Northants Security Navy Polo with Orange Hi-Vis Trim + Custom Chest Logo
             addBoxMesh(craigGroup, 0, 0.92, 0.04, 0.48, 0.62, 0.30, navyMat, false);
-            addBoxMesh(craigGroup, 0, 1.04, 0.20, 0.49, 0.14, 0.04, orangeMat, false);
+            addBoxMesh(craigGroup, 0, 1.04, 0.20, 0.49, 0.14, 0.04, new THREE.MeshBasicMaterial({ map: TEX.bellLogo }), false);
 
             // Craig's Head, Eyes, Smile & Headset Mic
             craigHeadGroup = new THREE.Group();
@@ -2157,6 +2749,102 @@
             craigGroup.add(craigArmGroup);
 
             hqGroup.add(craigGroup);
+        }
+
+        function build3DBossDavidInHQ(dx, dz) {
+            davidHqGroup = new THREE.Group();
+            davidHqGroup.position.set(dx, 0, dz);
+
+            var navyMat = new THREE.MeshStandardMaterial({ color: 0x06101e, roughness: 0.6 });
+            var hivisMat = new THREE.MeshStandardMaterial({ color: 0xff6b00, roughness: 0.35 });
+            var skinMat = new THREE.MeshStandardMaterial({ color: 0xfdba74, roughness: 0.6 });
+            var badgeMat = new THREE.MeshBasicMaterial({ map: TEX.bellLogo });
+
+            // Legs & Site Boots
+            addBoxMesh(davidHqGroup, -0.11, 0.38, 0, 0.16, 0.76, 0.18, navyMat, false);
+            addBoxMesh(davidHqGroup,  0.11, 0.38, 0, 0.16, 0.76, 0.18, navyMat, false);
+            // Torso in Boss David's Orange Hi-Vis Waistcoat + Custom Branded Chest Badge
+            addBoxMesh(davidHqGroup, 0, 1.05, 0, 0.48, 0.64, 0.28, hivisMat, false);
+            addBoxMesh(davidHqGroup, 0, 1.12, 0.15, 0.32, 0.22, 0.03, badgeMat, false);
+            // Head & Hardhat
+            addBoxMesh(davidHqGroup, 0, 1.54, 0, 0.31, 0.32, 0.31, skinMat, false);
+            addBoxMesh(davidHqGroup, 0, 1.74, 0, 0.36, 0.12, 0.38, new THREE.MeshStandardMaterial({ color: 0xfacc15 }), false);
+
+            // Right Arm holding Clipboard & Walkie-Talkie
+            davidHqArmGroup = new THREE.Group();
+            davidHqArmGroup.position.set(0.32, 1.24, 0);
+            var arm = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.44, 0.14), navyMat);
+            arm.position.set(0, -0.15, 0.12);
+            arm.rotation.x = -0.55;
+            var clipboard = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.32, 0.03), new THREE.MeshStandardMaterial({ color: 0x92400e }));
+            clipboard.position.set(0, -0.22, 0.30);
+            clipboard.rotation.x = -0.4;
+            davidHqArmGroup.add(arm, clipboard);
+            davidHqGroup.add(davidHqArmGroup);
+
+            hqGroup.add(davidHqGroup);
+        }
+
+        function buildLivingStreetCharactersAndTraffic() {
+            if (!streetGroup || HOUSES.length === 0) return;
+            var job = JOBS[game.jobIdx];
+            var th = HOUSES[job.houseIdx];
+            var s = th.side;
+
+            // 1. Anxious Homeowner inside Target House Hallway
+            homeownerGroup = new THREE.Group();
+            var sweaterMat = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.7 });
+            var jeansMat = new THREE.MeshStandardMaterial({ color: 0x1e3a8a, roughness: 0.8 });
+            var skinMat = new THREE.MeshStandardMaterial({ color: 0xfdba74, roughness: 0.6 });
+            addBoxMesh(homeownerGroup, -0.1, 0.36, 0, 0.15, 0.72, 0.16, jeansMat, false);
+            addBoxMesh(homeownerGroup,  0.1, 0.36, 0, 0.15, 0.72, 0.16, jeansMat, false);
+            addBoxMesh(homeownerGroup,  0,   0.98, 0, 0.44, 0.58, 0.26, sweaterMat, false);
+            addBoxMesh(homeownerGroup,  0,   1.44, 0, 0.28, 0.30, 0.28, skinMat, false);
+            // Waving Arms
+            addBoxMesh(homeownerGroup, -0.30, 1.15, 0.1, 0.12, 0.42, 0.12, sweaterMat, false);
+            addBoxMesh(homeownerGroup,  0.30, 1.15, 0.1, 0.12, 0.42, 0.12, sweaterMat, false);
+            homeownerGroup.position.set(th.cx - 2.4, 0, th.cz + s * 1.3);
+            streetGroup.add(homeownerGroup);
+
+            // 2. Sticky-Fingers Kev (The Burglar) prowling on the pavement outside Target House
+            kevBurglarGroup = new THREE.Group();
+            var stripeMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.8 });
+            var maskMat = new THREE.MeshStandardMaterial({ color: 0x090d16, roughness: 0.9 });
+            var swagMat = new THREE.MeshStandardMaterial({ color: 0xd6d3d1, roughness: 0.9 });
+            addBoxMesh(kevBurglarGroup, -0.1, 0.36, 0, 0.15, 0.72, 0.16, maskMat, false);
+            addBoxMesh(kevBurglarGroup,  0.1, 0.36, 0, 0.15, 0.72, 0.16, maskMat, false);
+            addBoxMesh(kevBurglarGroup,  0,   0.98, 0, 0.46, 0.60, 0.28, stripeMat, false);
+            addBoxMesh(kevBurglarGroup,  0,   1.02, 0.15, 0.47, 0.10, 0.02, new THREE.MeshBasicMaterial({ color: 0xf8fafc }), false);
+            addBoxMesh(kevBurglarGroup,  0,   1.44, 0, 0.28, 0.30, 0.28, skinMat, false);
+            // Beanie Hat & Swag Bag over shoulder
+            addBoxMesh(kevBurglarGroup,  0,   1.62, 0, 0.30, 0.14, 0.30, maskMat, false);
+            var swag = new THREE.Mesh(new THREE.DodecahedronGeometry(0.32, 1), swagMat);
+            swag.position.set(-0.28, 1.05, -0.22);
+            kevBurglarGroup.add(swag);
+            kevBurglarGroup.position.set(th.cx + 3.2, 0, s * 4.6);
+            streetGroup.add(kevBurglarGroup);
+
+            // 3. Passing 3D Hatchback Car with Glowing Headlights & Red Tail Lights cruising the avenue
+            passingCarGroup = new THREE.Group();
+            var carPaint = new THREE.MeshStandardMaterial({ color: 0xdc2626, metalness: 0.45, roughness: 0.25 });
+            var carGlass = new THREE.MeshStandardMaterial({ color: 0x38bdf8, metalness: 0.8, roughness: 0.1 });
+            addBoxMesh(passingCarGroup, 0, 0.52, 0, 2.9, 0.56, 1.52, carPaint, false);
+            addBoxMesh(passingCarGroup, -0.15, 0.96, 0, 1.65, 0.46, 1.36, carPaint, false);
+            addBoxMesh(passingCarGroup,  0.68, 0.95, 0, 0.08, 0.38, 1.26, carGlass, false);
+            // Glowing White Headlights + Halos & Red Tail Lights
+            var hlWhite = new THREE.MeshBasicMaterial({ color: 0xfef08a });
+            var tlRed = new THREE.MeshBasicMaterial({ color: 0xef4444 });
+            addBoxMesh(passingCarGroup,  1.46, 0.54, -0.52, 0.06, 0.16, 0.28, hlWhite, false, null, false, false);
+            addBoxMesh(passingCarGroup,  1.46, 0.54,  0.52, 0.06, 0.16, 0.28, hlWhite, false, null, false, false);
+            addBoxMesh(passingCarGroup, -1.46, 0.54, -0.52, 0.06, 0.16, 0.28, tlRed, false, null, false, false);
+            addBoxMesh(passingCarGroup, -1.46, 0.54,  0.52, 0.06, 0.16, 0.28, tlRed, false, null, false, false);
+            var carHaloL = createGlowHaloSprite(0xfef08a, 1.1);
+            carHaloL.position.set(1.55, 0.54, -0.52);
+            var carHaloR = createGlowHaloSprite(0xfef08a, 1.1);
+            carHaloR.position.set(1.55, 0.54, 0.52);
+            passingCarGroup.add(carHaloL, carHaloR);
+            passingCarGroup.position.set(-32, 0, 1.45);
+            streetGroup.add(passingCarGroup);
         }
 
         function buildSingle3DHouse(h) {
@@ -2277,11 +2965,14 @@
             addBoxMesh(streetGroup, cx - 1.1, 2.38, frontZ + s * 0.48, 1.65, 0.14, 0.9, upvcWhiteMat, false);
             addBoxMesh(streetGroup, cx - 1.1, 2.50, frontZ + s * 0.45, 1.72, 0.12, 0.95, roofMat, false);
 
-            // External Northants Security Orange & Blue Bellbox with Flashing Strobe LED
-            addBoxMesh(streetGroup, cx - 3.1, 2.38, frontZ + s * 0.15, 0.48, 0.56, 0.14, new THREE.MeshStandardMaterial({ color: 0xff6b00, roughness: 0.3 }), false);
+            // External Northants Security Orange & Blue Bellbox with Custom Logo & Flashing Strobe LED Halo
+            addBoxMesh(streetGroup, cx - 3.1, 2.38, frontZ + s * 0.15, 0.48, 0.56, 0.14, new THREE.MeshStandardMaterial({ map: TEX.bellLogo, roughness: 0.3 }), false);
             addBoxMesh(streetGroup, cx - 3.1, 2.22, frontZ + s * 0.19, 0.42, 0.18, 0.08, new THREE.MeshBasicMaterial({ color: 0x06101e }), false);
             var strobeMesh = addBoxMesh(streetGroup, cx - 3.1, 2.16, frontZ + s * 0.22, 0.22, 0.08, 0.08, new THREE.MeshBasicMaterial({ color: 0x38bdf8 }), false, null, false, false);
-            bellboxStrobes.push(strobeMesh);
+            var strobeHalo = createGlowHaloSprite(0x38bdf8, 0.95);
+            strobeHalo.position.set(cx - 3.1, 2.16, frontZ + s * 0.28);
+            streetGroup.add(strobeHalo);
+            bellboxStrobes.push(strobeMesh, strobeHalo);
 
             // 4. Front Exterior Wall + White UPVC Window Frame, Mullions & Sill
             addBoxMesh(streetGroup, cx - 3.1, 1.45, frontZ, 2.8, 2.9, 0.24, brickMat, true);
@@ -2400,6 +3091,16 @@
             var th = HOUSES[job.houseIdx];
             var vx = th.cx - 3.6;
             var vz = th.side === 1 ? -1.95 : 1.95;
+
+            // Friday PC .GLB Model Override if loaded
+            if (customAssets.customVanMesh) {
+                var clonedVan = customAssets.customVanMesh.clone();
+                vanGroup.add(clonedVan);
+                vanGroup.position.set(vx, 0, vz);
+                streetGroup.add(vanGroup);
+                return;
+            }
+
             var tier = game.upgrades.van_sprinter ? 2 : (game.upgrades.van_custom ? 1 : 0);
 
             var bodyMat = new THREE.MeshStandardMaterial({
@@ -2452,17 +3153,17 @@
             });
 
             // Roof Ladder Rack
-            var rack = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.1, 1.45), new THREE.MeshStandardMaterial({ color: 0xff6b00, metalness: 0.4 }));
-            rack.position.set(-0.35, 2.09, 0);
-            vanGroup.add(rack);
-
-            // Spinning Amber Roof Beacon Light + Dynamic PointLight
+            // Spinning Amber Roof Beacon Light + Dynamic PointLight + Volumetric Halo Sprite
             vanBeaconRotor = new THREE.Group();
             vanBeaconRotor.position.set(0.85, 2.22, 0);
             var dome = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.26, 0.24, 12), new THREE.MeshBasicMaterial({ color: 0xff9500 }));
             var reflector = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.14, 0.14), new THREE.MeshBasicMaterial({ color: 0xffffff }));
             vanBeaconRotor.add(dome, reflector);
             vanGroup.add(vanBeaconRotor);
+
+            vanBeaconHalo = createGlowHaloSprite(0xff9500, 2.1);
+            vanBeaconHalo.position.set(0.85, 2.32, 0);
+            vanGroup.add(vanBeaconHalo);
 
             vanBeaconLight = new THREE.PointLight(0xff8800, 2.2, 16, 1.5);
             vanBeaconLight.position.set(0.85, 2.45, 0);
@@ -2586,20 +3287,15 @@
                 showCommsMessage('DAVID', "⏱️ SLA Clock Running! Get across to House #" + hStart.num + " (" + jStart.street + ") and wire that panel!");
             }
 
-            // Adjust scene ambient darkness when inside a dark house or cupboard
-            var job = JOBS[game.jobIdx];
-            var inDarkRoom = loc.inside && !loc.isHQ && (job.isDark || loc.room === 'Under-Stairs Cupboard');
-            if (scene && scene.fog) {
-                scene.fog.density = inDarkRoom ? (game.torchOn ? 0.065 : 0.25) : 0.010;
-            }
-
-            // HQ Proximity Checks (Ringing Phone, Colleague Craig, Tea Urn)
+            // HQ Proximity Checks (Ringing Phone, Colleague Craig, Boss David in HQ, Tea Urn)
             var phoneDist = Math.hypot(player.x - 1.15, player.z - 30.85);
             var craigDist = Math.hypot(player.x - 2.65, player.z - 30.3);
+            var davidDist = davidHqGroup ? Math.hypot(player.x - davidHqGroup.position.x, player.z - davidHqGroup.position.z) : 99;
             var urnDist   = Math.hypot(player.x - 5.35, player.z - 34.2);
 
             game.nearHQPhone = loc.isHQ && phoneDist < 3.0;
             game.nearCraig   = loc.isHQ && craigDist < 3.2;
+            game.nearDavidHQ = loc.isHQ && davidDist < 2.9;
             game.nearHQUrn   = loc.isHQ && game.upgrades.hq_urn && urnDist < 2.6;
 
             var phoneBtn = document.getElementById('phoneActionBtn');
@@ -2610,6 +3306,11 @@
             var craigBtn = document.getElementById('craigActionBtn');
             if (craigBtn) {
                 craigBtn.style.display = (game.phase === 'street' && game.nearCraig) ? 'flex' : 'none';
+            }
+
+            var davidBtn = document.getElementById('davidHqActionBtn');
+            if (davidBtn) {
+                davidBtn.style.display = (game.phase === 'street' && game.nearDavidHQ) ? 'flex' : 'none';
             }
 
             var urnBtn = document.getElementById('urnActionBtn');
@@ -2699,6 +3400,10 @@
             game.jobIdx = idx % JOBS.length;
             var job = JOBS[game.jobIdx];
 
+            // Pick a dynamic Northamptonshire weather condition for each shift
+            var shiftWeather = WEATHER_MODES[idx % WEATHER_MODES.length];
+            applyWeatherMode(shiftWeather, false);
+
             generateRandomNeighborhood();
             rebuild3DStreetWorld();
             updateActiveAlarmPanelCoords();
@@ -2736,9 +3441,17 @@
         var radioTimeout = null;
         function showCommsMessage(speaker, msg) {
             if (speaker === 'CRAIG') {
-                audio.craigVoice();
+                if (customAssets.craigAudioObj) {
+                    try { customAssets.craigAudioObj.currentTime = 0; customAssets.craigAudioObj.play(); } catch (e) { audio.craigVoice(); }
+                } else {
+                    audio.craigVoice();
+                }
             } else {
-                audio.chirp();
+                if (customAssets.davidAudioObj) {
+                    try { customAssets.davidAudioObj.currentTime = 0; customAssets.davidAudioObj.play(); } catch (e) { audio.chirp(); }
+                } else {
+                    audio.chirp();
+                }
             }
             var box = document.getElementById('davidRadio');
             var txt = document.getElementById('davidRadioText');
@@ -3333,25 +4046,81 @@
                     craigArmGroup.rotation.x += (0 - craigArmGroup.rotation.x) * Math.min(1, dt * 4);
                 }
 
-                // Animate Ringing HQ Desk Phone & Red Marker Cone
+                // Animate Boss David pacing inside HQ Office & turning toward player
+                if (davidHqGroup && davidHqArmGroup) {
+                    davidHqGroup.position.x = -2.2 + Math.sin(now * 0.0012) * 1.35;
+                    davidHqGroup.position.z = 33.2 + Math.cos(now * 0.0012) * 0.65;
+                    davidHqGroup.rotation.y = Math.atan2(player.x - davidHqGroup.position.x, player.z - davidHqGroup.position.z);
+                    davidHqArmGroup.rotation.x += (-0.45 - davidHqArmGroup.rotation.x) * Math.min(1, dt * 4);
+                }
+
+                // Animate Anxious Homeowner inside Target House Hallway
+                if (homeownerGroup && HOUSES.length > 0) {
+                    var thHome = HOUSES[JOBS[game.jobIdx].houseIdx];
+                    homeownerGroup.position.x = thHome.cx - 2.3 + Math.sin(now * 0.0035) * 0.55;
+                    homeownerGroup.rotation.y = Math.sin(now * 0.0035) * 0.6 + (thHome.side === 1 ? 0 : Math.PI);
+                }
+
+                // Animate Sticky-Fingers Kev prowling outside Target House (sneaks closer as SLA timer drops!)
+                if (kevBurglarGroup && HOUSES.length > 0) {
+                    var thKev = HOUSES[JOBS[game.jobIdx].houseIdx];
+                    var urgency = game.slaRunning ? Math.max(0, Math.min(1, 1 - (game.timeLeft / 80))) : 0;
+                    kevBurglarGroup.position.x = (thKev.cx + 2.8 - urgency * 3.6) + Math.sin(now * 0.004) * 0.85;
+                    kevBurglarGroup.position.z = thKev.cz + thKev.side * (5.2 - urgency * 0.9);
+                    kevBurglarGroup.rotation.y = Math.cos(now * 0.004) * 0.8;
+                }
+
+                // Animate Passing Street Car cruising along central road
+                if (passingCarGroup) {
+                    passingCarGroup.position.x += dt * 7.2;
+                    if (passingCarGroup.position.x > 36) passingCarGroup.position.x = -36;
+                }
+
+                // Animate 1,500-Drop 3D Falling Rain System & Subtle Rain Audio Patter Outdoors
+                if (rainSystem && rainSystem.visible) {
+                    var posAttr = rainSystem.geometry.attributes.position;
+                    var arr = posAttr.array;
+                    for (var r = 0; r < arr.length; r += 6) {
+                        arr[r + 1] -= dt * 16.5;
+                        arr[r + 4] -= dt * 16.5;
+                        if (arr[r + 1] < 0) {
+                            var ny = 16 + Math.random() * 3;
+                            arr[r + 1] = ny;
+                            arr[r + 4] = ny - 0.72;
+                        }
+                    }
+                    posAttr.needsUpdate = true;
+                    if (game.active && player.z < 25.5 && Math.random() < 0.25) {
+                        audio.rainTick();
+                    }
+                }
+
+                // Animate Ringing HQ Desk Phone & Red Marker Cone + Volumetric Halo
                 if (hqPhoneConeMesh && hqPhoneLEDMesh && hqPhoneHandset) {
                     var isRinging = !game.callAnswered;
                     hqPhoneConeMesh.visible = isRinging;
                     if (isRinging) {
                         hqPhoneConeMesh.position.y = 1.82 + Math.sin(now * 0.008) * 0.16;
                         hqPhoneConeMesh.rotation.y = now * 0.004;
-                        hqPhoneLEDMesh.visible = Math.sin(now * 0.02) > 0;
+                        var blinkOn = Math.sin(now * 0.02) > 0;
+                        hqPhoneLEDMesh.visible = blinkOn;
+                        if (hqPhoneHalo) hqPhoneHalo.visible = blinkOn;
                         hqPhoneHandset.position.x = 1.15 + Math.sin(now * 0.05) * 0.015;
                     } else {
                         hqPhoneLEDMesh.visible = true;
+                        if (hqPhoneHalo) hqPhoneHalo.visible = false;
                         hqPhoneHandset.position.x = 1.15;
                     }
                 }
 
-                // Animate Spinning Amber Roof Beacon on Van
+                // Animate Spinning Amber Roof Beacon & Volumetric Halo on Van
                 if (vanBeaconRotor && vanBeaconLight) {
                     vanBeaconRotor.rotation.y = now * 0.012;
                     vanBeaconLight.intensity = 1.6 + Math.sin(now * 0.024) * 1.4;
+                    if (vanBeaconHalo) {
+                        var sScale = 1.9 + Math.sin(now * 0.024) * 0.65;
+                        vanBeaconHalo.scale.set(sScale, sScale, 1);
+                    }
                 }
 
                 // Pulse External Northants Security Bellbox Strobe LEDs
