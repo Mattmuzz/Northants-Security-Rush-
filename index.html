@@ -3,18 +3,107 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
-<title>Northants Security Rush — v9.0 Multi-Job, Ladder & Ultra Vehicles</title>
+<title>Northants Security Rush — v9.1 Bulletproof Start Edition</title>
+
+<!-- ==========================================================================
+     1. BULLETPROOF TOP-OF-PAGE BUTTON HANDLERS (ZERO EXTERNAL DEPENDENCIES)
+     These run immediately before Three.js or 3D code, guaranteeing all buttons
+     work on the very first tap on Android, iOS, and Desktop.
+     ========================================================================== -->
 <script>
-// Auto-clear stale Service Workers so GitHub updates show immediately
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister())).catch(()=>{});
-}
-if ('caches' in window) {
-  caches.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(()=>{});
-}
+// Clear stale service workers & caches
+try {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(function(regs) {
+      for (var i = 0; i < regs.length; i++) regs[i].unregister();
+    }).catch(function(){});
+  }
+  if ('caches' in window) {
+    caches.keys().then(function(keys) {
+      for (var i = 0; i < keys.length; i++) caches.delete(keys[i]);
+    }).catch(function(){});
+  }
+} catch (e) {}
+
+// Global Audio Helper
+window._audioCtx = null;
+window.playTone = function(freq, dur, type, vol) {
+  try {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    if (!window._audioCtx) window._audioCtx = new AC();
+    if (window._audioCtx.state === 'suspended') window._audioCtx.resume();
+    var osc = window._audioCtx.createOscillator();
+    var g = window._audioCtx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freq || 440, window._audioCtx.currentTime);
+    g.gain.setValueAtTime(vol || 0.08, window._audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, window._audioCtx.currentTime + (dur || 0.12));
+    osc.connect(g);
+    g.connect(window._audioCtx.destination);
+    osc.start();
+    osc.stop(window._audioCtx.currentTime + (dur || 0.12));
+  } catch (e) {}
+};
+
+window.showToast = function(msg, duration) {
+  try {
+    var el = document.getElementById('radioToast');
+    if (!el) return;
+    el.innerHTML = msg;
+    el.style.display = 'block';
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(function() {
+      el.style.display = 'none';
+    }, duration || 5400);
+  } catch (e) {}
+};
+
+// GUARANTEED START SHIFT HANDLER
+window.startShift = function() {
+  var tm = document.getElementById('titleModal');
+  if (tm) tm.style.display = 'none';
+  window.playTone(523, 0.12, 'sine');
+  setTimeout(function() { window.playTone(659, 0.18, 'sine'); }, 120);
+  if (typeof window.syncLadderVisuals === 'function') window.syncLadderVisuals();
+  if (typeof window.updateHud === 'function') window.updateHud();
+  window.showToast("💬 Craig: 'Morning mate! Walk up to the flashing red phone on my desk (or tap Answer Call) to grab your first Northampton job!'");
+};
+
+window.openShop = function() {
+  var sm = document.getElementById('shopModal');
+  if (sm) sm.style.display = 'flex';
+  if (typeof window.renderShop === 'function') window.renderShop();
+};
+window.closeShop = function() {
+  var sm = document.getElementById('shopModal');
+  if (sm) sm.style.display = 'none';
+};
+window.openNotesModal = function() {
+  var nm = document.getElementById('notesModal');
+  if (nm) nm.style.display = 'flex';
+};
+window.closeNotesModal = function() {
+  var nm = document.getElementById('notesModal');
+  if (nm) nm.style.display = 'none';
+};
+window.openBrandingModal = function() {
+  var bm = document.getElementById('brandingModal');
+  if (bm) bm.style.display = 'flex';
+};
+window.closeBrandingModal = function() {
+  var bm = document.getElementById('brandingModal');
+  if (bm) bm.style.display = 'none';
+};
+window.closeWireModal = function() {
+  var wm = document.getElementById('wireModal');
+  if (wm) wm.style.display = 'none';
+};
 </script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+
 <style>
   :root {
     --ns-orange: #ff6b00;
@@ -27,10 +116,11 @@ if ('caches' in window) {
     margin: 0; padding: 0; width: 100%; height: 100%;
     overflow: hidden; background: #050d1a;
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    color: #fff; touch-action: none;
+    color: #fff; touch-action: manipulation;
   }
   #gameCanvas {
     position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 1;
+    touch-action: none;
   }
   /* TOP HUD */
   #topHud {
@@ -105,7 +195,7 @@ if ('caches' in window) {
     text-align: center;
   }
 
-  /* RADIO TOAST (DAVID & CRAIG) */
+  /* RADIO TOAST */
   #radioToast {
     position: fixed; top: 82px; left: 50%; transform: translateX(-50%);
     z-index: 15; width: 92%; max-width: 500px;
@@ -146,6 +236,7 @@ if ('caches' in window) {
     backdrop-filter: blur(5px);
     display: flex; align-items: center; justify-content: center;
     padding: 14px; overflow-y: auto;
+    pointer-events: auto;
   }
   .modal-card {
     background: linear-gradient(160deg, #0d223d, #071324);
@@ -153,18 +244,21 @@ if ('caches' in window) {
     border-radius: 18px; width: 100%; max-width: 530px;
     max-height: 90vh; overflow-y: auto; padding: 18px;
     box-shadow: 0 16px 40px rgba(0,0,0,0.75);
+    pointer-events: auto;
   }
   .version-badge {
-    display: inline-block; background: linear-gradient(90deg, #ff6b00, #f59e0b);
+    display: inline-block; background: linear-gradient(90deg, #22c55e, #f59e0b);
     color: #050d1a; font-weight: 900; font-size: 11px;
     padding: 4px 10px; border-radius: 999px; margin-bottom: 8px;
   }
   .big-cta {
-    width: 100%; padding: 14px; border-radius: 12px; border: none;
+    width: 100%; padding: 15px; border-radius: 12px; border: 2px solid #86efac;
     background: linear-gradient(135deg, #22c55e, #16a34a);
     color: #fff; font-size: 16px; font-weight: 900; cursor: pointer;
-    margin-top: 10px; box-shadow: 0 6px 18px rgba(34,197,94,0.4);
+    margin-top: 10px; box-shadow: 0 6px 18px rgba(34,197,94,0.45);
+    pointer-events: auto; touch-action: manipulation;
   }
+  .big-cta:active { transform: scale(0.97); }
   .shop-item {
     display: flex; justify-content: space-between; align-items: center;
     background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14);
@@ -192,23 +286,24 @@ if ('caches' in window) {
     <div class="hud-pill">⭐ Shift #<span id="hudJobNum">1</span></div>
   </div>
   <div class="hud-group">
-    <button id="ladderHudBtn" class="hud-btn secondary" onclick="window.toggleCarryLadder()">🪜 Ladder: <span id="ladderStatus">IN HAND</span></button>
-    <button class="hud-btn secondary" onclick="window.cycleWeather()">🌦️ <span id="weatherLabel">Sunny Sky</span></button>
-    <button class="hud-btn secondary" onclick="window.toggleTorch()">🔦 Torch</button>
-    <button class="hud-btn secondary" onclick="window.drinkTea()">☕ Brew (<span id="teaCount">2</span>)</button>
+    <button id="quickPhoneBtn" class="hud-btn" style="background:linear-gradient(135deg,#ef4444,#b91c1c);" onclick="if(window.answerDispatchPhone)window.answerDispatchPhone();">📞 Answer HQ Phone</button>
+    <button id="ladderHudBtn" class="hud-btn secondary" onclick="if(window.toggleCarryLadder)window.toggleCarryLadder();">🪜 Ladder: <span id="ladderStatus">IN HAND</span></button>
+    <button class="hud-btn secondary" onclick="if(window.cycleWeather)window.cycleWeather();">🌦️ <span id="weatherLabel">Sunny Sky</span></button>
+    <button class="hud-btn secondary" onclick="if(window.toggleTorch)window.toggleTorch();">🔦 Torch</button>
+    <button class="hud-btn secondary" onclick="if(window.drinkTea)window.drinkTea();">☕ Brew (<span id="teaCount">2</span>)</button>
     <button class="hud-btn secondary" onclick="window.openBrandingModal()">🎨 Branding</button>
-    <button class="hud-btn secondary" onclick="window.openNotesModal()">📋 v9.0 Notes</button>
+    <button class="hud-btn secondary" onclick="window.openNotesModal()">📋 v9.1 Notes</button>
     <button class="hud-btn" onclick="window.openShop()">🛒 Trade Shop</button>
   </div>
 </div>
 
-<div id="compassBar">📞 HQ OFFICE: Answer the ringing red dispatch phone on Craig's desk!</div>
+<div id="compassBar">📞 HQ OFFICE: Tap "📞 Answer HQ Phone" or walk to Craig's desk!</div>
 <div id="radioToast"></div>
 
 <!-- CONTEXT ACTION BUTTONS -->
 <div id="actionPrompt">
-  <button id="actionBtn" class="action-main-btn" onclick="window.triggerContextAction()">ACTION</button>
-  <button id="subActionBtn" class="action-sub-btn" style="display:none;" onclick="window.triggerSubAction()">SUB ACTION</button>
+  <button id="actionBtn" class="action-main-btn" onclick="if(window.triggerContextAction)window.triggerContextAction();">ACTION</button>
+  <button id="subActionBtn" class="action-sub-btn" style="display:none;" onclick="if(window.triggerSubAction)window.triggerSubAction();">SUB ACTION</button>
 </div>
 
 <!-- TOUCH CONTROLS -->
@@ -218,7 +313,7 @@ if ('caches' in window) {
 <!-- TITLE MODAL -->
 <div id="titleModal" class="modal-backdrop">
   <div class="modal-card">
-    <span class="version-badge">✨ v9.0 — 3 JOB TYPES, CLIMBABLE LADDER & ULTRA 3D VEHICLES</span>
+    <span class="version-badge">✅ v9.1 BULLETPROOF START — 3 JOB TYPES, LADDER & ULTRA VEHICLES</span>
     <h2 style="margin:4px 0 6px;color:#ff6b00;">NORTHANTS SECURITY RUSH</h2>
     <p style="font-size:13px;color:#cbd5e1;margin:0 0 10px;">
       First-Person 3D Security Engineer Simulator — Intruder Alarms, CCTV Cameras & Bell Boxes
@@ -229,12 +324,15 @@ if ('caches' in window) {
       &nbsp;&nbsp;• <b>🔔 Bell Box Siren & Strobe Repair:</b> Pitch your ladder against the front brickwork, climb to 3.2m height & replace the piezo siren/strobe!<br>
       &nbsp;&nbsp;• <b>📹 IP PoE Turret CCTV Install:</b> Pitch your ladder under the eaves, climb up, terminate RJ45 Cat6 & focus the 4K lens!<br>
       ✅ <b>Inventory Ladder System:</b> Carry your aluminium trade ladder (or grab it off the van roof rack), pitch it at the wall, and climb up to high-level jobs!<br>
-      ✅ <b>Ultra Realistic 3D Vehicles:</b> Sculpted Ford Transit-style Northants Security van with sloped windscreen, alloy wheels, wing mirrors, roof rack ladder & realistic passing traffic!
+      ✅ <b>Ultra Realistic 3D Vehicles:</b> Sculpted Ford Transit-style Northants Security van with sloped windscreen, alloy wheels, wing mirrors & roof rack ladder!
     </div>
-    <button class="big-cta" onclick="window.startShift()">🚐 START SHIFT IN NORTHANTS HQ</button>
+    <!-- Dual inline + handler binding so it ALWAYS fires on mobile & desktop -->
+    <button id="startShiftBtn" class="big-cta" onclick="document.getElementById('titleModal').style.display='none'; if(window.startShift) window.startShift();">
+      🚐 START SHIFT IN NORTHANTS HQ
+    </button>
     <div style="display:flex;gap:8px;margin-top:8px;">
       <button class="hud-btn secondary" style="flex:1;padding:10px;" onclick="window.openShop()">🛒 Trade Counter Shop</button>
-      <button class="hud-btn secondary" style="flex:1;padding:10px;" onclick="window.openNotesModal()">📋 v9.0 Release Notes</button>
+      <button class="hud-btn secondary" style="flex:1;padding:10px;" onclick="window.openNotesModal()">📋 v9.1 Release Notes</button>
       <button class="hud-btn secondary" style="flex:1;padding:10px;" onclick="window.openBrandingModal()">🎨 Custom Branding</button>
     </div>
   </div>
@@ -244,20 +342,19 @@ if ('caches' in window) {
 <div id="notesModal" class="modal-backdrop" style="display:none;">
   <div class="modal-card">
     <div style="display:flex;justify-content:space-between;align-items:center;">
-      <h3 style="margin:0;color:#ff6b00;">📋 v9.0 Official Release Notes</h3>
+      <h3 style="margin:0;color:#ff6b00;">📋 v9.1 Official Release Notes</h3>
       <button class="hud-btn secondary" onclick="window.closeNotesModal()">✖ Close</button>
     </div>
     <div style="font-size:12px;color:#e2e8f0;line-height:1.5;margin-top:10px;">
+      <b style="color:#22c55e;">🔧 v9.1 Instant-Start Hotfix:</b><br>
+      • Moved all Start, Shop, and UI button handlers to a top-level dependency-free script and added a one-tap <b>📞 Answer HQ Phone</b> button on the HUD so you can start your first job immediately from anywhere in HQ.<br><br>
       <b style="color:#38bdf8;">🚨 1. Three Distinct Security Engineering Job Types</b><br>
       • <b>📟 Intruder Alarm EOL Panel:</b> Enter the hallway, close the front door for the +£25 Draught Bonus, and wire the 4-terminal panel.<br>
       • <b>🔔 External Bell Box Repair (3.2m):</b> Pitch your ladder at the glowing blue marker on the front wall, climb to 3.2m, and service the piezo siren & strobe.<br>
       • <b>📹 4K IP PoE Turret CCTV Install (3.2m):</b> Pitch your ladder beneath the left eaves, climb up, crimp Cat6 RJ45, seal the IP67 gland & focus the lens.<br><br>
       <b style="color:#38bdf8;">🪜 2. Interactive 3D Ladder & Van Roof-Rack System</b><br>
       • Carry your ladder in hand, stow/retrieve it from your Northants Security van's roof rack, pitch it against target walls, and climb to 3.2m height.<br>
-      • Upgrade to the <b>Trade Fibreglass Pro Ladder (£160)</b> in the Trade Shop.<br><br>
-      <b style="color:#38bdf8;">🚐 3. Sculpted 3D Vehicles & 360° Northamptonshire Sky</b><br>
-      • Multi-part Ford Transit-style van with sloped windscreen, grille, wing mirrors, alloy rims, roof bars, and amber beacon, plus two-way sculpted street cars.<br>
-      • Full 3D Sun, cratered Moon, 600 stars, 18 drifting cloud clusters, rolling hills, and 4 spinning wind turbines.
+      • Upgrade to the <b>Trade Fibreglass Pro Ladder (£160)</b> in the Trade Shop.
     </div>
   </div>
 </div>
@@ -286,24 +383,24 @@ if ('caches' in window) {
     </p>
     <div class="shop-item">
       <div><b>🛡️ Company Logo Image</b><br><small>Applies to 3D Van, Bellboxes & HQ Banner</small></div>
-      <input type="file" accept="image/*" onchange="window.uploadCustomLogo(event)" style="width:135px;font-size:11px;" />
+      <input type="file" accept="image/*" onchange="if(window.uploadCustomLogo)window.uploadCustomLogo(event)" style="width:135px;font-size:11px;" />
     </div>
     <div class="shop-item">
       <div><b>📟 Real Hardware PCB Photo</b><br><small>Applies inside the Job Minigame</small></div>
-      <input type="file" accept="image/*" onchange="window.uploadCustomPanel(event)" style="width:135px;font-size:11px;" />
+      <input type="file" accept="image/*" onchange="if(window.uploadCustomPanel)window.uploadCustomPanel(event)" style="width:135px;font-size:11px;" />
     </div>
     <div class="shop-item">
       <div><b>🚐 Custom 3D Van Model (.glb)</b><br><small>Replaces procedural van with your 3D model</small></div>
-      <input type="file" accept=".glb,.gltf" onchange="window.uploadCustomGLB(event,'van')" style="width:135px;font-size:11px;" />
+      <input type="file" accept=".glb,.gltf" onchange="if(window.uploadCustomGLB)window.uploadCustomGLB(event,'van')" style="width:135px;font-size:11px;" />
     </div>
     <div class="shop-item">
       <div><b>🪛 Custom 3D Tool Model (.glb)</b><br><small>Replaces right-hand engineer tool</small></div>
-      <input type="file" accept=".glb,.gltf" onchange="window.uploadCustomGLB(event,'drill')" style="width:135px;font-size:11px;" />
+      <input type="file" accept=".glb,.gltf" onchange="if(window.uploadCustomGLB)window.uploadCustomGLB(event,'drill')" style="width:135px;font-size:11px;" />
     </div>
   </div>
 </div>
 
-<!-- MULTI-JOB ENGINEERING MINIGAME MODAL (ALARM / BELLBOX / CCTV) -->
+<!-- MULTI-JOB ENGINEERING MINIGAME MODAL -->
 <div id="wireModal" class="modal-backdrop" style="display:none;">
   <div class="modal-card" id="wireCard">
     <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -318,111 +415,12 @@ if ('caches' in window) {
   </div>
 </div>
 
+<!-- ==========================================================================
+     2. MAIN 3D ENGINE & GAMEPLAY LOGIC (SANDBOXED SO UI NEVER LOCKS UP)
+     ========================================================================== -->
 <script>
-// ============================================================================
-// GLOBAL STATE & SAVE DATA
-// ============================================================================
-const STATE = {
-  cash: 150,
-  jobNum: 1,
-  teas: 2,
-  phase: 'HQ_RINGING', // 'HQ_RINGING' | 'ACTIVE_JOB'
-  jobType: 'ALARM',    // 'ALARM' | 'BELLBOX' | 'CCTV'
-  jobTypeLabel: '📟 Intruder Alarm Panel',
-  timer: 80,
-  maxTimer: 80,
-  weatherIdx: 0,
-  torchOn: true,
-  draughtPaid: false,
-  targetHouseIdx: 0,
-  activeJobStreet: '10 Kettering Rd',
-  hasLadderInHand: true,
-  ladderDeployed: false,
-  ladderHouseIdx: -1,
-  onLadder: false,
-  upgrades: {
-    snips: false,
-    fluke: false,
-    hivis: false,
-    fibreglassLadder: false,
-    vanTier: 0,
-    teaUrn: false,
-    cctv: false,
-    goldBell: false
-  }
-};
-
-try {
-  const saved = JSON.parse(localStorage.getItem('ns_rush_v9_save') || 'null');
-  if (saved) {
-    STATE.cash = saved.cash ?? 150;
-    STATE.jobNum = saved.jobNum ?? 1;
-    STATE.teas = saved.teas ?? 2;
-    Object.assign(STATE.upgrades, saved.upgrades || {});
-  }
-} catch(e){}
-
-function saveGame() {
-  try {
-    localStorage.setItem('ns_rush_v9_save', JSON.stringify({
-      cash: STATE.cash, jobNum: STATE.jobNum, teas: STATE.teas, upgrades: STATE.upgrades
-    }));
-  } catch(e){}
-  updateHud();
-}
-
-// ============================================================================
-// SOUND SYNTHESIS (WEB AUDIO)
-// ============================================================================
-let audioCtx = null;
-function playTone(freq, dur, type='sine', vol=0.08) {
-  try {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    const osc = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    osc.type = type;
-    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-    g.gain.setValueAtTime(vol, audioCtx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
-    osc.connect(g); g.connect(audioCtx.destination);
-    osc.start(); osc.stop(audioCtx.currentTime + dur);
-  } catch(e){}
-}
-
-// ============================================================================
-// DAD JOKES (BOSS DAVID) & TECH TIPS (COLLEAGUE CRAIG)
-// ============================================================================
-const DAVID_JOKES = [
-  "🎙️ Boss David: 'I bought a new step ladder for the van today... we get on great, I never knew my real ladder!'",
-  "🎙️ Boss David: 'Why did the CCTV camera apply for a loan? Because it was tired of always being framed!'",
-  "🎙️ Boss David: 'Customer asked if our external bellboxes are waterproof. I said: Mate, they've survived three Northampton bank holidays!'",
-  "🎙️ Boss David: 'Why did the alarm engineer break up with the PIR sensor? He felt like she was always watching his every move!'"
-];
-const CRAIG_TIPS = [
-  "💬 Craig: 'For Bell Box & CCTV Camera callouts, walk up to the blue ladder marker on the front wall, pitch your ladder, and climb up to 3.2m!'",
-  "💬 Craig: 'You already start with your trade ladder in hand! You can also stow or grab it off the van roof rack anytime.'",
-  "💬 Craig: 'When fitting a PoE Turret Camera up the ladder, terminate the Cat6 RJ45 first, then seal the weatherproof gland so rain doesn't corrode the pins!'",
-  "💬 Craig: 'On a Bell Box repair up the ladder, disconnect the 12V hold-off first before swapping the piezo siren—save your eardrums mate!'"
-];
-
-function showToast(msg, duration=5400) {
-  const el = document.getElementById('radioToast');
-  if (!el) return;
-  el.innerHTML = msg;
-  el.style.display = 'block';
-  clearTimeout(window._toastTimer);
-  window._toastTimer = setTimeout(() => { el.style.display = 'none'; }, duration);
-}
-
-// ============================================================================
-// PROCEDURAL TEXTURES & FLOATING 3D NAMEPLATE SPRITES
-// ============================================================================
-function makeBrickTex(baseHex, mortarHex='#cbd5e1') {
-  const c = document.createElement('canvas'); c.width = 256; c.height = 256;
-  const ctx = c.getContext('2d');
-  ctx.fillStyle = mortarHex; ctx.fillRect(0,0,256,256);
-  ctx.fillStyle = baseHex;
-  for (let row=0; row<8; row++) {
-    const y = row * 32;
-    const offse
+(function() {
+  // Bind explicit touchend listener on Start button for instant mobile response
+  var startBtn = document.getElementById('startShiftBtn');
+  if (startBtn) {
+    
