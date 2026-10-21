@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
-<title>Northants Security Rush — v10.0 Two-Storey Houses & Colour-Match Wiring</title>
+<title>Northants Security Rush — v9.0 Multi-Job, Ladder & Ultra Vehicles</title>
 <script>
 // Auto-clear stale Service Workers so GitHub updates show immediately
 if ('serviceWorker' in navigator) {
@@ -84,12 +84,12 @@ if ('caches' in window) {
     box-shadow: 0 0 6px #ff6b00;
   }
   #actionPrompt {
-    position: fixed; bottom: 145px; left: 50%; transform: translateX(-50%);
+    position: fixed; bottom: 150px; left: 50%; transform: translateX(-50%);
     z-index: 12; display: none; flex-direction: column; align-items: center; gap: 6px;
-    width: 92%; max-width: 430px; pointer-events: auto;
+    width: 92%; max-width: 420px; pointer-events: auto;
   }
   .action-main-btn {
-    width: 100%; padding: 12px 16px; border-radius: 14px;
+    width: 100%; padding: 13px 18px; border-radius: 14px;
     font-size: 14px; font-weight: 900; color: #fff;
     background: linear-gradient(135deg, #ff6b00, #c2410c);
     border: 2px solid #fed7aa; cursor: pointer;
@@ -150,7 +150,7 @@ if ('caches' in window) {
   .modal-card {
     background: linear-gradient(160deg, #0d223d, #071324);
     border: 2px solid var(--ns-orange);
-    border-radius: 18px; width: 100%; max-width: 540px;
+    border-radius: 18px; width: 100%; max-width: 530px;
     max-height: 90vh; overflow-y: auto; padding: 18px;
     box-shadow: 0 16px 40px rgba(0,0,0,0.75);
   }
@@ -169,24 +169,6 @@ if ('caches' in window) {
     display: flex; justify-content: space-between; align-items: center;
     background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14);
     border-radius: 10px; padding: 9px 11px; margin-bottom: 8px; gap: 8px;
-  }
-
-  /* COLOUR-TO-COLOUR WIRING BOARD */
-  .match-board {
-    position: relative; display: flex; justify-content: space-between;
-    gap: 18px; margin-top: 12px; padding: 12px;
-    background: rgba(6, 22, 16, 0.9); border: 2px solid #16a34a; border-radius: 12px;
-  }
-  .match-col {
-    display: flex; flex-direction: column; gap: 10px; width: 45%; z-index: 2;
-  }
-  .wire-lead-btn, .terminal-slot-btn {
-    padding: 11px 10px; border-radius: 9px; font-weight: 900; font-size: 12px;
-    color: #fff; border: 2px solid rgba(255,255,255,0.3); cursor: pointer;
-    text-align: left; transition: transform 0.1s;
-  }
-  .wire-lead-btn.selected {
-    outline: 3px solid #fde047; transform: scale(1.04);
   }
   .wire-grid {
     display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px;
@@ -215,6 +197,7 @@ if ('caches' in window) {
     <button class="hud-btn secondary" onclick="window.toggleTorch()">🔦 Torch</button>
     <button class="hud-btn secondary" onclick="window.drinkTea()">☕ Brew (<span id="teaCount">2</span>)</button>
     <button class="hud-btn secondary" onclick="window.openBrandingModal()">🎨 Branding</button>
+    <button class="hud-btn secondary" onclick="window.openNotesModal()">📋 v9.0 Notes</button>
     <button class="hud-btn" onclick="window.openShop()">🛒 Trade Shop</button>
   </div>
 </div>
@@ -230,26 +213,51 @@ if ('caches' in window) {
 
 <!-- TOUCH CONTROLS -->
 <div id="joyZone"><div id="joyKnob"></div></div>
-<div id="lookHint">👆 Drag right side to look<br>🕹️ Left stick / WASD to walk & climb</div>
+<div id="lookHint">👆 Drag right side to look<br>🕹️ Left stick / WASD to walk</div>
 
 <!-- TITLE MODAL -->
 <div id="titleModal" class="modal-backdrop">
   <div class="modal-card">
-    <span class="version-badge">✨ v10.0 — 2-STOREY UK HOUSES, RUNG-BY-RUNG LADDER & COLOUR WIRING</span>
+    <span class="version-badge">✨ v9.0 — 3 JOB TYPES, CLIMBABLE LADDER & ULTRA 3D VEHICLES</span>
     <h2 style="margin:4px 0 6px;color:#ff6b00;">NORTHANTS SECURITY RUSH</h2>
     <p style="font-size:13px;color:#cbd5e1;margin:0 0 10px;">
-      First-Person 3D Security Engineer Simulator — Realistic Two-Storey Houses & High-Eaves Ladder Work
+      First-Person 3D Security Engineer Simulator — Intruder Alarms, CCTV Cameras & Bell Boxes
     </p>
     <div style="background:rgba(0,0,0,0.35);border-radius:10px;padding:10px;font-size:12px;line-height:1.45;color:#e2e8f0;">
-      ✅ <b>Colour-to-Colour Alarm Panel Wiring Restored:</b> Select each coloured copper wire lead (`Red`, `Black`, `Green`, `Yellow`, `Blue`) on the left and connect it to its matching colour-coded terminal block on the right!<br>
-      ✅ <b>Sequence Game Kept for Outside Bell Boxes & CCTV:</b> High-level external Bell Boxes and 4K PoE Cameras keep the 4-stage engineering sequence!<br>
-      ✅ <b>Full Two-Storey UK Houses (6.2m Eaves / 8.8m Roof Peak):</b> Ground-floor bay windows, front porch canopies, upstairs bedroom UPVC windows, gutters, rainwater downpipes, and interior carpeted staircases!<br>
-      ✅ <b>Realistic Rung-by-Rung Extension Ladder (Up to 5.3m):</b> Pitch your 16-rung dual extension ladder and climb up/down rung-by-rung using your joystick (`W/S`) or climb buttons!
+      ✅ <b>3 Real Security Job Types:</b><br>
+      &nbsp;&nbsp;• <b>📟 Intruder Alarm EOL Panel:</b> Enter the property and wire the interior panel.<br>
+      &nbsp;&nbsp;• <b>🔔 Bell Box Siren & Strobe Repair:</b> Pitch your ladder against the front brickwork, climb to 3.2m height & replace the piezo siren/strobe!<br>
+      &nbsp;&nbsp;• <b>📹 IP PoE Turret CCTV Install:</b> Pitch your ladder under the eaves, climb up, terminate RJ45 Cat6 & focus the 4K lens!<br>
+      ✅ <b>Inventory Ladder System:</b> Carry your aluminium trade ladder (or grab it off the van roof rack), pitch it at the wall, and climb up to high-level jobs!<br>
+      ✅ <b>Ultra Realistic 3D Vehicles:</b> Sculpted Ford Transit-style Northants Security van with sloped windscreen, alloy wheels, wing mirrors, roof rack ladder & realistic passing traffic!
     </div>
     <button class="big-cta" onclick="window.startShift()">🚐 START SHIFT IN NORTHANTS HQ</button>
     <div style="display:flex;gap:8px;margin-top:8px;">
       <button class="hud-btn secondary" style="flex:1;padding:10px;" onclick="window.openShop()">🛒 Trade Counter Shop</button>
-      <button class="hud-btn secondary" style="flex:1;padding:10px;" onclick="window.openBrandingModal()">🎨 Custom Branding / GLB</button>
+      <button class="hud-btn secondary" style="flex:1;padding:10px;" onclick="window.openNotesModal()">📋 v9.0 Release Notes</button>
+      <button class="hud-btn secondary" style="flex:1;padding:10px;" onclick="window.openBrandingModal()">🎨 Custom Branding</button>
+    </div>
+  </div>
+</div>
+
+<!-- RELEASE NOTES MODAL -->
+<div id="notesModal" class="modal-backdrop" style="display:none;">
+  <div class="modal-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <h3 style="margin:0;color:#ff6b00;">📋 v9.0 Official Release Notes</h3>
+      <button class="hud-btn secondary" onclick="window.closeNotesModal()">✖ Close</button>
+    </div>
+    <div style="font-size:12px;color:#e2e8f0;line-height:1.5;margin-top:10px;">
+      <b style="color:#38bdf8;">🚨 1. Three Distinct Security Engineering Job Types</b><br>
+      • <b>📟 Intruder Alarm EOL Panel:</b> Enter the hallway, close the front door for the +£25 Draught Bonus, and wire the 4-terminal panel.<br>
+      • <b>🔔 External Bell Box Repair (3.2m):</b> Pitch your ladder at the glowing blue marker on the front wall, climb to 3.2m, and service the piezo siren & strobe.<br>
+      • <b>📹 4K IP PoE Turret CCTV Install (3.2m):</b> Pitch your ladder beneath the left eaves, climb up, crimp Cat6 RJ45, seal the IP67 gland & focus the lens.<br><br>
+      <b style="color:#38bdf8;">🪜 2. Interactive 3D Ladder & Van Roof-Rack System</b><br>
+      • Carry your ladder in hand, stow/retrieve it from your Northants Security van's roof rack, pitch it against target walls, and climb to 3.2m height.<br>
+      • Upgrade to the <b>Trade Fibreglass Pro Ladder (£160)</b> in the Trade Shop.<br><br>
+      <b style="color:#38bdf8;">🚐 3. Sculpted 3D Vehicles & 360° Northamptonshire Sky</b><br>
+      • Multi-part Ford Transit-style van with sloped windscreen, grille, wing mirrors, alloy rims, roof bars, and amber beacon, plus two-way sculpted street cars.<br>
+      • Full 3D Sun, cratered Moon, 600 stars, 18 drifting cloud clusters, rolling hills, and 4 spinning wind turbines.
     </div>
   </div>
 </div>
@@ -295,19 +303,18 @@ if ('caches' in window) {
   </div>
 </div>
 
-<!-- MULTI-JOB ENGINEERING MINIGAME MODAL -->
+<!-- MULTI-JOB ENGINEERING MINIGAME MODAL (ALARM / BELLBOX / CCTV) -->
 <div id="wireModal" class="modal-backdrop" style="display:none;">
   <div class="modal-card" id="wireCard">
     <div style="display:flex;justify-content:space-between;align-items:center;">
-      <h3 style="margin:0;color:#22c55e;" id="wireModalTitle">🔌 ALARM PANEL COLOUR-MATCH WIRING</h3>
+      <h3 style="margin:0;color:#22c55e;" id="wireModalTitle">🔌 TEXECOM / PYRONIX EOL PANEL WIRING</h3>
       <button class="hud-btn secondary" onclick="window.closeWireModal()">✖ Step Back</button>
     </div>
     <div style="background:#0f291e;border:2px solid #22c55e;border-radius:10px;padding:10px;margin-top:8px;font-family:monospace;">
-      <div style="color:#86efac;font-size:12px;">TESTER DISPLAY: <span id="lcdStatus">SELECT A WIRE LEAD THEN TAP MATCHING TERMINAL</span></div>
-      <div style="color:#fde047;font-size:11px;margin-top:4px;" id="flukeHint">Match each colour-coded cable core to its matching terminal!</div>
+      <div style="color:#86efac;font-size:12px;">TESTER DISPLAY: <span id="lcdStatus">CONNECT 4 TERMINALS IN ORDER</span></div>
+      <div style="color:#fde047;font-size:11px;margin-top:4px;" id="flukeHint">Complete all 4 engineering steps in sequence!</div>
     </div>
-    <!-- Container for either Colour-Match Board (ALARM) or Sequence Grid (BELLBOX / CCTV) -->
-    <div id="minigameContainer"></div>
+    <div class="wire-grid" id="wireGrid"></div>
   </div>
 </div>
 
@@ -322,19 +329,17 @@ const STATE = {
   phase: 'HQ_RINGING', // 'HQ_RINGING' | 'ACTIVE_JOB'
   jobType: 'ALARM',    // 'ALARM' | 'BELLBOX' | 'CCTV'
   jobTypeLabel: '📟 Intruder Alarm Panel',
-  timer: 85,
-  maxTimer: 85,
+  timer: 80,
+  maxTimer: 80,
   weatherIdx: 0,
   torchOn: true,
   draughtPaid: false,
   targetHouseIdx: 0,
   activeJobStreet: '10 Kettering Rd',
-  // LADDER INVENTORY & REALISTIC RUNG-BY-RUNG CLIMBING STATE
   hasLadderInHand: true,
   ladderDeployed: false,
   ladderHouseIdx: -1,
   onLadder: false,
-  ladderMaxHeight: 5.25, // High 2nd-floor eaves height!
   upgrades: {
     snips: false,
     fluke: false,
@@ -348,7 +353,7 @@ const STATE = {
 };
 
 try {
-  const saved = JSON.parse(localStorage.getItem('ns_rush_v10_save') || 'null');
+  const saved = JSON.parse(localStorage.getItem('ns_rush_v9_save') || 'null');
   if (saved) {
     STATE.cash = saved.cash ?? 150;
     STATE.jobNum = saved.jobNum ?? 1;
@@ -359,7 +364,7 @@ try {
 
 function saveGame() {
   try {
-    localStorage.setItem('ns_rush_v10_save', JSON.stringify({
+    localStorage.setItem('ns_rush_v9_save', JSON.stringify({
       cash: STATE.cash, jobNum: STATE.jobNum, teas: STATE.teas, upgrades: STATE.upgrades
     }));
   } catch(e){}
@@ -389,16 +394,16 @@ function playTone(freq, dur, type='sine', vol=0.08) {
 // DAD JOKES (BOSS DAVID) & TECH TIPS (COLLEAGUE CRAIG)
 // ============================================================================
 const DAVID_JOKES = [
-  "🎙️ Boss David: 'These new two-storey houses are proper tall mate—working up that extension ladder really takes my career to another level!'",
-  "🎙️ Boss David: 'I bought a new extension ladder for the van today... we get on great, I never knew my real ladder!'",
+  "🎙️ Boss David: 'I bought a new step ladder for the van today... we get on great, I never knew my real ladder!'",
   "🎙️ Boss David: 'Why did the CCTV camera apply for a loan? Because it was tired of always being framed!'",
-  "🎙️ Boss David: 'Customer asked if our external bellboxes are waterproof. I said: Mate, they've survived three Northampton bank holidays!'"
+  "🎙️ Boss David: 'Customer asked if our external bellboxes are waterproof. I said: Mate, they've survived three Northampton bank holidays!'",
+  "🎙️ Boss David: 'Why did the alarm engineer break up with the PIR sensor? He felt like she was always watching his every move!'"
 ];
 const CRAIG_TIPS = [
-  "💬 Craig: 'Inside the houses, match each coloured alarm wire (Red, Black, Green, Yellow, Blue) straight to its matching colour terminal!'",
-  "💬 Craig: 'Look at the size of the houses now—proper 2-storey Northamptonshire semis with bay windows, gutters, and upstairs bedrooms!'",
-  "💬 Craig: 'When you pitch your extension ladder for a Bell Box or CCTV job, push forward on the stick (or tap Climb Up) to climb rung-by-rung up to 5.3m!'",
-  "💬 Craig: 'Don't look down when you're at the top of the ladder at 5.3m—you're level with the upstairs bedroom windows!'"
+  "💬 Craig: 'For Bell Box & CCTV Camera callouts, walk up to the blue ladder marker on the front wall, pitch your ladder, and climb up to 3.2m!'",
+  "💬 Craig: 'You already start with your trade ladder in hand! You can also stow or grab it off the van roof rack anytime.'",
+  "💬 Craig: 'When fitting a PoE Turret Camera up the ladder, terminate the Cat6 RJ45 first, then seal the weatherproof gland so rain doesn't corrode the pins!'",
+  "💬 Craig: 'On a Bell Box repair up the ladder, disconnect the 12V hold-off first before swapping the piezo siren—save your eardrums mate!'"
 ];
 
 function showToast(msg, duration=5400) {
@@ -420,297 +425,4 @@ function makeBrickTex(baseHex, mortarHex='#cbd5e1') {
   ctx.fillStyle = baseHex;
   for (let row=0; row<8; row++) {
     const y = row * 32;
-    const offset = (row % 2) * 32;
-    for (let col=-1; col<5; col++) {
-      ctx.fillRect(col*64 + offset + 2, y + 2, 60, 28);
-    }
-  }
-  const tex = new THREE.CanvasTexture(c);
-  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(4, 4);
-  return tex;
-}
-
-function makeLawnTex() {
-  const c = document.createElement('canvas'); c.width = 128; c.height = 128;
-  const ctx = c.getContext('2d');
-  for (let i=0; i<8; i++) {
-    ctx.fillStyle = (i%2===0) ? '#15803d' : '#166534';
-    ctx.fillRect(i*16, 0, 16, 128);
-  }
-  const tex = new THREE.CanvasTexture(c);
-  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(4, 4);
-  return tex;
-}
-
-function makeWindowTex(isLit=true) {
-  const c = document.createElement('canvas'); c.width = 128; c.height = 128;
-  const ctx = c.getContext('2d');
-  // White UPVC Outer Frame
-  ctx.fillStyle = '#f8fafc';
-  ctx.fillRect(0, 0, 128, 128);
-  // Glass panes with subtle sky/curtain reflection
-  ctx.fillStyle = isLit ? '#fef08a' : '#1e3a5f';
-  ctx.fillRect(10, 10, 50, 108);
-  ctx.fillRect(68, 10, 50, 108);
-  ctx.fillStyle = 'rgba(56, 189, 248, 0.35)';
-  ctx.fillRect(10, 10, 50, 52);
-  ctx.fillRect(68, 10, 50, 52);
-  // Horizontal transom bar
-  ctx.fillStyle = '#f8fafc';
-  ctx.fillRect(0, 58, 128, 8);
-  return new THREE.CanvasTexture(c);
-}
-
-function makeVanLiveryTex(tier=0) {
-  const c = document.createElement('canvas'); c.width = 512; c.height = 256;
-  const ctx = c.getContext('2d');
-  ctx.fillStyle = tier === 0 ? '#f1f5f9' : (tier === 1 ? '#0a2240' : '#06152d');
-  ctx.fillRect(0,0,512,256);
-  ctx.fillStyle = '#ff6b00';
-  ctx.fillRect(0, 172, 512, 44);
-  ctx.fillStyle = '#38bdf8';
-  ctx.fillRect(0, 162, 512, 10);
-  ctx.fillStyle = tier === 0 ? '#0a2240' : '#ffffff';
-  ctx.font = '900 33px sans-serif';
-  ctx.fillText('NORTHANTS SECURITY', 24, 96);
-  ctx.fillStyle = tier === 0 ? '#ea580c' : '#38bdf8';
-  ctx.font = 'bold 21px sans-serif';
-  ctx.fillText('ALARMS • HD CCTV • 24HR CALLOUT', 24, 136);
-  return new THREE.CanvasTexture(c);
-}
-
-function makeNameplateSprite(text, bgHex='#ff6b00', borderHex='#ffffff') {
-  const c = document.createElement('canvas'); c.width = 512; c.height = 128;
-  const ctx = c.getContext('2d');
-  ctx.fillStyle = bgHex;
-  ctx.strokeStyle = borderHex;
-  ctx.lineWidth = 8;
-  ctx.beginPath();
-  if (ctx.roundRect) ctx.roundRect(12, 16, 488, 96, 28);
-  else ctx.rect(12, 16, 488, 96);
-  ctx.fill();
-  ctx.stroke();
-  ctx.fillStyle = '#ffffff';
-  ctx.font = '900 28px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(text, 256, 64);
-  const tex = new THREE.CanvasTexture(c);
-  const mat = new THREE.SpriteMaterial({ map: tex, depthTest: false });
-  const sp = new THREE.Sprite(mat);
-  sp.scale.set(3.5, 0.88, 1);
-  sp.renderOrder = 999;
-  return sp;
-}
-
-function makeGlowSprite(hexColor, size=3.5) {
-  const c = document.createElement('canvas'); c.width = 128; c.height = 128;
-  const ctx = c.getContext('2d');
-  const g = ctx.createRadialGradient(64,64,4, 64,64,60);
-  g.addColorStop(0, hexColor);
-  g.addColorStop(0.4, hexColor);
-  g.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.fillStyle = g;
-  ctx.fillRect(0,0,128,128);
-  const tex = new THREE.CanvasTexture(c);
-  const mat = new THREE.SpriteMaterial({ map: tex, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true });
-  const s = new THREE.Sprite(mat);
-  s.scale.set(size, size, 1);
-  return s;
-}
-
-// ============================================================================
-// 3D DUAL-SECTION EXTENSION LADDER BUILDER (5.6m Tall for Two-Storey Eaves!)
-// ============================================================================
-function create3DLadderMesh(height=5.6, width=0.56, rungs=16, isFibreglass=false) {
-  const g = new THREE.Group();
-  const railMat = new THREE.MeshStandardMaterial({
-    color: isFibreglass ? 0xfacc15 : 0xcbd5e1,
-    metalness: isFibreglass ? 0.25 : 0.85,
-    roughness: 0.28
-  });
-  const rungMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.8, roughness: 0.35 });
-  const footMat = new THREE.MeshStandardMaterial({ color: 0xff6b00, roughness: 0.8 });
-
-  // Base stabiliser bar at bottom
-  const stabiliser = new THREE.Mesh(new THREE.BoxGeometry(width*1.45, 0.07, 0.09), footMat);
-  stabiliser.position.set(0, 0.04, 0);
-  g.add(stabiliser);
-
-  const leftRail = new THREE.Mesh(new THREE.BoxGeometry(0.06, height, 0.09), railMat);
-  leftRail.position.set(-width/2, height/2, 0);
-  const rightRail = new THREE.Mesh(new THREE.BoxGeometry(0.06, height, 0.09), railMat);
-  rightRail.position.set(width/2, height/2, 0);
-  g.add(leftRail, rightRail);
-
-  for (let r=1; r<=rungs; r++) {
-    const ry = (r / (rungs + 1)) * height;
-    const rung = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, width, 10), rungMat);
-    rung.rotation.z = Math.PI/2;
-    rung.position.set(0, ry, 0);
-    g.add(rung);
-  }
-  return g;
-}
-
-// ============================================================================
-// THREE.JS SCENE, SKY, CLOUDS, SUN/MOON & NORTHAMPTONSHIRE HORIZON
-// ============================================================================
-const canvas = document.getElementById('gameCanvas');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.1;
-
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x38bdf8);
-scene.fog = new THREE.FogExp2(0x7dd3fc, 0.0038);
-
-const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.15, 440);
-const player = { x: 0, y: 1.7, targetY: 1.7, z: 34.5, yaw: 0, pitch: 0 };
-camera.position.set(player.x, player.y, player.z);
-
-// LIGHTS
-const hemiLight = new THREE.HemisphereLight(0xdbeafe, 0x1e293b, 0.85);
-scene.add(hemiLight);
-
-const sunLight = new THREE.DirectionalLight(0xfff7ed, 1.15);
-sunLight.position.set(45, 75, -35);
-sunLight.castShadow = true;
-sunLight.shadow.mapSize.width = 1024;
-sunLight.shadow.mapSize.height = 1024;
-sunLight.shadow.camera.near = 5;
-sunLight.shadow.camera.far = 190;
-const d = 60;
-sunLight.shadow.camera.left = -d; sunLight.shadow.camera.right = d;
-sunLight.shadow.camera.top = d; sunLight.shadow.camera.bottom = -d;
-scene.add(sunLight);
-
-// HEADTORCH SPOTLIGHT
-const torchLight = new THREE.SpotLight(0xffffff, 1.8, 35, Math.PI/5, 0.45, 1.2);
-torchLight.position.set(0, 0, 0);
-torchLight.target.position.set(0, 0, -5);
-camera.add(torchLight);
-camera.add(torchLight.target);
-scene.add(camera);
-
-// FIRST-PERSON HANDS, SCREWDRIVER & CARRIED MINI LADDER
-const handGroup = new THREE.Group();
-const leftArm = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.11, 0.42), new THREE.MeshStandardMaterial({color:0x0a2240}));
-leftArm.position.set(-0.32, -0.28, -0.45);
-const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.11, 0.42), new THREE.MeshStandardMaterial({color:0x0a2240}));
-rightArm.position.set(0.32, -0.28, -0.45);
-
-const carriedLadderMesh = create3DLadderMesh(1.2, 0.22, 6, false);
-carriedLadderMesh.rotation.x = Math.PI / 2.2;
-carriedLadderMesh.position.set(-0.38, -0.26, -0.55);
-
-const rightToolGroup = new THREE.Group();
-const driverHandle = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.18, 12), new THREE.MeshStandardMaterial({color:0xff6b00}));
-driverHandle.rotation.x = Math.PI/2;
-const driverShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.18, 8), new THREE.MeshStandardMaterial({color:0xe2e8f0, metalness:0.8}));
-driverShaft.rotation.x = Math.PI/2;
-driverShaft.position.z = -0.15;
-rightToolGroup.add(driverHandle, driverShaft);
-rightToolGroup.position.set(0.32, -0.22, -0.62);
-
-handGroup.add(leftArm, rightArm, carriedLadderMesh, rightToolGroup);
-camera.add(handGroup);
-
-// PITCHED 5.6m EXTENSION LADDER AGAINST TWO-STOREY HOUSE WALL
-const pitchedLadderGroup = new THREE.Group();
-const worldLadderMesh = create3DLadderMesh(5.65, 0.58, 16, false);
-worldLadderMesh.rotation.x = 0.17; // Realistic 75-degree safe leaning angle against 2-storey brickwork
-pitchedLadderGroup.add(worldLadderMesh);
-const pitchedLadderBadge = makeNameplateSprite('🪜 CLIMB EXTENSION LADDER (TO 5.3m EAVES)', '#22c55e', '#ffffff');
-pitchedLadderBadge.position.set(0, 2.5, 0.45);
-pitchedLadderGroup.add(pitchedLadderBadge);
-pitchedLadderGroup.visible = false;
-scene.add(pitchedLadderGroup);
-
-// ============================================================================
-// SKY CELESTIAL SYSTEM: 3D SUN, CRATERED MOON, STARS, DRIFTING CLOUDS & HORIZON
-// ============================================================================
-const skyGroup = new THREE.Group();
-scene.add(skyGroup);
-
-const sunGroup = new THREE.Group();
-const sunDisc = new THREE.Mesh(new THREE.SphereGeometry(7.5, 24, 24), new THREE.MeshBasicMaterial({ color: 0xfef08a }));
-const sunHalo = makeGlowSprite('#f59e0b', 42);
-sunGroup.add(sunDisc, sunHalo);
-sunGroup.position.set(75, 88, -145);
-skyGroup.add(sunGroup);
-
-const moonGroup = new THREE.Group();
-const moonDisc = new THREE.Mesh(
-  new THREE.SphereGeometry(6.0, 24, 24),
-  new THREE.MeshStandardMaterial({ color: 0xf8fafc, emissive: 0xcbd5e1, emissiveIntensity: 0.7, roughness: 0.8 })
-);
-const moonHalo = makeGlowSprite('#bae6fd', 30);
-moonGroup.add(moonDisc, moonHalo);
-moonGroup.position.set(-70, 92, -140);
-moonGroup.visible = false;
-skyGroup.add(moonGroup);
-
-const starGeo = new THREE.BufferGeometry();
-const starPos = new Float32Array(600 * 3);
-for (let i=0; i<600; i++) {
-  const theta = Math.random() * Math.PI * 2;
-  const phi = Math.random() * Math.PI * 0.46;
-  const r = 240;
-  starPos[i*3]   = r * Math.sin(phi) * Math.cos(theta);
-  starPos[i*3+1] = r * Math.cos(phi) + 15;
-  starPos[i*3+2] = r * Math.sin(phi) * Math.sin(theta);
-}
-starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 1.6, transparent: true, opacity: 0.0 });
-const starField = new THREE.Points(starGeo, starMat);
-skyGroup.add(starField);
-
-const cloudClusters = [];
-const cloudMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95 });
-for (let i=0; i<18; i++) {
-  const cg = new THREE.Group();
-  const puffs = 4 + Math.floor(Math.random()*4);
-  for (let p=0; p<puffs; p++) {
-    const puff = new THREE.Mesh(new THREE.SphereGeometry(4.5 + Math.random()*3.8, 12, 12), cloudMat);
-    puff.position.set((p - puffs/2)*4.2, (Math.random()-0.5)*1.8, (Math.random()-0.5)*3.2);
-    puff.scale.y = 0.58;
-    cg.add(puff);
-  }
-  cg.position.set(-160 + Math.random()*320, 46 + Math.random()*28, -160 + Math.random()*260);
-  cg.userData = { speed: 1.4 + Math.random()*1.8 };
-  skyGroup.add(cg);
-  cloudClusters.push(cg);
-}
-
-const horizonGroup = new THREE.Group();
-scene.add(horizonGroup);
-const windTurbineRotors = [];
-
-function buildSurroundings() {
-  const hillMat = new THREE.MeshStandardMaterial({ color: 0x14532d, roughness: 0.95 });
-  const hillPositions = [
-    [0, -14, -145, 95, 28, 45], [-110, -12, -90, 75, 25, 65],
-    [110, -12, -90, 75, 26, 65], [-125, -14, 10, 65, 22, 85],
-    [125, -14, 10, 65, 22, 85], [0, -14, 115, 110, 24, 45]
-  ];
-  hillPositions.forEach(hp => {
-    const hill = new THREE.Mesh(new THREE.SphereGeometry(1, 18, 12), hillMat);
-    hill.position.set(hp[0], hp[1], hp[2]);
-    hill.scale.set(hp[3], hp[4], hp[5]);
-    horizonGroup.add(hill);
-  });
-
-  for (let i=0; i<26; i++) {
-    const angle = (i / 26) * Math.PI * 2;
-    const dist = 118 + (i%3)*12;
-    const bx = Math.cos(angle) * dist, bz = Math.sin(angle) * dist;
-    const bh = 8 + (i%5)*4, bw = 6 + (i%3)*3;
-    const bldg = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, bw), new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.9 }));
-    bldg.position.set(bx, bh/2, bz);
+    const offse
