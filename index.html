@@ -7,7 +7,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Northants Security Rush v4.0 ULTRA 3D</title>
+    <title>Northants Security Rush v5.0 — HQ Office & Craig Edition</title>
 
     <!-- Automatic Service Worker Unregistration to Prevent Stale Mobile Caching -->
     <script>
@@ -32,7 +32,7 @@
     </script>
 
     <!-- Embedded Web App Manifest for Android APK / PWA Packaging -->
-    <link rel="manifest" href='data:application/manifest+json,{"name":"Northants Security Rush v4.0 ULTRA 3D","short_name":"NS Rush v4","description":"Ultra 3D Alarm Engineer Simulator for Northants Security","start_url":"./index.html","display":"fullscreen","orientation":"any","background_color":"#06101e","theme_color":"#ff6b00"}'>
+    <link rel="manifest" href='data:application/manifest+json,{"name":"Northants Security Rush v5.0 — HQ Office & Craig Edition","short_name":"NS Rush v5","description":"Ultra 3D Alarm Engineer Simulator with HQ Office & Colleague Craig for Northants Security","start_url":"./index.html","display":"fullscreen","orientation":"any","background_color":"#06101e","theme_color":"#ff6b00"}'>
 
     <!-- Three.js r128 Hardware-Accelerated WebGL 3D Engine -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -246,6 +246,12 @@
             50% { box-shadow: 0 0 0 13px rgba(255, 107, 0, 0); }
         }
         .pulse-orange { animation: pulse-orange 1.4s infinite; }
+
+        @keyframes pulse-red {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.95); }
+            50% { box-shadow: 0 0 0 14px rgba(239, 68, 68, 0); }
+        }
+        .pulse-red { animation: pulse-red 1.1s infinite; }
 
         /* Bottom D-Pad & Controls */
         .hud-bottom {
@@ -469,8 +475,20 @@
     <!-- CENTER CROSSHAIR -->
     <div id="crosshair"></div>
 
-    <!-- INTERACTIVE 3D DOOR & PANEL ACTION PROMPTS -->
+    <!-- INTERACTIVE 3D HQ, DOOR & PANEL ACTION PROMPTS -->
     <div id="promptStack">
+        <button type="button" id="phoneActionBtn" class="action-btn pulse-red" style="display:none;background:#ef4444;color:#ffffff;border:2px solid #fef08a;"
+            onclick="window.answerHQPhone(); return false;" ontouchend="window.answerHQPhone(); return false;">
+            📞 <span id="phoneActionText">ANSWER RINGING JOB CALL (SPACE / TAP)</span>
+        </button>
+        <button type="button" id="craigActionBtn" class="action-btn" style="display:none;background:#0ea5e9;color:#06101e;border:2px solid #ffffff;"
+            onclick="window.chatToCraig(); return false;" ontouchend="window.chatToCraig(); return false;">
+            💬 CHAT TO COLLEAGUE CRAIG (ALARM ADVICE)
+        </button>
+        <button type="button" id="urnActionBtn" class="action-btn" style="display:none;background:#f59e0b;color:#06101e;border:2px solid #ffffff;"
+            onclick="window.useHQUrn(); return false;" ontouchend="window.useHQUrn(); return false;">
+            ☕ GRAB FREE BREW &amp; HOBNOB (+1 TEA FLASK)
+        </button>
         <button type="button" id="doorActionBtn" class="action-btn" style="display:none;background:#1d4ed8;color:#fff;border:2px solid #93c5fd;"
             onclick="window.useDoor(); return false;" ontouchend="window.useDoor(); return false;">
             🚪 <span id="doorActionText">OPEN DOOR (E / TAP)</span>
@@ -490,24 +508,24 @@
                     <div>
                         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                             <span style="font-weight:900;font-size:12px;color:#ff6b00;">NORTHANTS SECURITY</span>
-                            <span id="hudJobBadge" style="background:#1e3a8a;padding:2px 6px;border-radius:5px;font-size:10px;font-weight:800;">JOB 1/5</span>
-                            <span class="version-pill" style="font-size:9px;padding:2px 7px;">✨ v4.0 ULTRA 3D</span>
+                            <span id="hudJobBadge" style="background:#1e3a8a;padding:2px 6px;border-radius:5px;font-size:10px;font-weight:800;">HQ BASE</span>
+                            <span class="version-pill" style="font-size:9px;padding:2px 7px;">✨ v5.0 HQ OFFICE &amp; CRAIG</span>
                         </div>
                         <div id="hudLocationText" style="font-size:11px;color:#bfdbfe;font-weight:700;margin-top:2px;">
-                            #12 Kettering Rd • <span id="hudRoomName" style="color:#fde047;">Avenue</span>
+                            Northants HQ • <span id="hudRoomName" style="color:#fde047;">Trade Office</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="hud-card">
                     <div>
-                        <div style="font-size:9px;color:#93c5fd;font-weight:800;text-transform:uppercase;">Target Room</div>
-                        <div id="hudObjectiveText" style="font-size:11.5px;color:#fbbf24;font-weight:800;">#12 Front Hallway</div>
+                        <div style="font-size:9px;color:#93c5fd;font-weight:800;text-transform:uppercase;">Dispatch Status</div>
+                        <div id="hudObjectiveText" style="font-size:11.5px;color:#fbbf24;font-weight:800;">📞 Answer HQ Desk Phone</div>
                     </div>
                     <div style="width:2px;height:26px;background:#1e40af;"></div>
-                    <div style="text-align:center;min-width:56px;">
+                    <div style="text-align:center;min-width:74px;">
                         <div style="font-size:9px;color:#93c5fd;font-weight:800;text-transform:uppercase;">SLA Timer</div>
-                        <div id="hudTimerText" style="font-size:17px;font-weight:900;color:#ffffff;">85.0s</div>
+                        <div id="hudTimerText" style="font-size:14px;font-weight:900;color:#4ade80;">STANDBY (IN HQ)</div>
                     </div>
                 </div>
 
@@ -519,6 +537,10 @@
                     <button type="button" class="hud-btn" style="background:#10b981;color:#04121f;"
                         onclick="window.openShop(); return false;" ontouchend="window.openShop(); return false;">
                         🛒 <span class="hide-sm">Shop</span>
+                    </button>
+                    <button type="button" class="hud-btn" style="background:#0ea5e9;color:#04121f;"
+                        onclick="window.teleportToHQ(); return false;" ontouchend="window.teleportToHQ(); return false;">
+                        🏢 <span class="hide-sm">HQ</span>
                     </button>
                     <button type="button" class="hud-btn" style="background:#f59e0b;color:#04121f;"
                         onclick="window.toggleTorch(); return false;" ontouchend="window.toggleTorch(); return false;">
@@ -535,7 +557,7 @@
             <div style="display:flex;justify-content:center;gap:8px;align-items:center;flex-wrap:wrap;">
                 <div id="compassBar">
                     <span id="compassArrow">⬆️</span>
-                    <span id="compassLabel">Target: House #12 Front Door (12m)</span>
+                    <span id="compassLabel">HQ Office: Answer Ringing Desk Phone (3m)</span>
                 </div>
                 <button type="button" class="hud-btn interactive" style="background:#334155;border:1px solid #94a3b8;padding:4px 10px;font-size:11px;margin-top:4px;border-radius:999px;"
                     onclick="window.rerollStreet(); return false;" ontouchend="window.rerollStreet(); return false;">
@@ -543,19 +565,19 @@
                 </button>
             </div>
 
-            <!-- Boss David Radio Walkie-Talkie -->
+            <!-- Boss David & Colleague Craig Comms Box -->
             <div id="davidRadio" class="radio-hidden">
                 <div style="display:flex;align-items:flex-start;gap:10px;">
-                    <div style="width:40px;height:40px;border-radius:10px;background:#ff6b00;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">
+                    <div id="radioAvatarBox" style="width:40px;height:40px;border-radius:10px;background:#ff6b00;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">
                         👷‍♂️
                     </div>
                     <div style="flex:1;">
                         <div style="display:flex;justify-content:space-between;align-items:center;">
-                            <span style="font-size:10.5px;font-weight:900;color:#ff6b00;text-transform:uppercase;">BOSS DAVID • CHANNEL 1</span>
+                            <span id="radioSpeakerTitle" style="font-size:10.5px;font-weight:900;color:#ff6b00;text-transform:uppercase;">BOSS DAVID • CHANNEL 1</span>
                             <span style="font-size:10px;color:#4ade80;font-weight:800;">● LIVE</span>
                         </div>
                         <div id="davidRadioText" style="font-size:12px;line-height:1.35;margin-top:3px;color:#f1f5f9;">
-                            "Welcome to v4.0 ULTRA 3D! Check out the golden-hour shadows and spinning amber van beacon!"
+                            "Welcome to Northants Security HQ! Answer the ringing desk phone or have a word with Craig!"
                         </div>
                     </div>
                 </div>
@@ -580,7 +602,7 @@
             <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;" class="interactive">
                 <button type="button" id="quickWalkBtn" class="hud-btn" style="background:#1e3a8a;border:2px solid #60a5fa;padding:9px 13px;font-size:12px;"
                     onclick="window.sprintToTarget(); return false;" ontouchend="window.sprintToTarget(); return false;">
-                    ⚡ <span id="quickWalkText">SPRINT TO HOUSE #12</span>
+                    ⚡ <span id="quickWalkText">ANSWER HQ PHONE</span>
                 </button>
                 <button type="button" class="hud-btn" style="background:#ff6b00;color:#06101e;border:2px solid #fff;padding:9px 13px;font-size:12px;"
                     onclick="window.drinkTea(); return false;" ontouchend="window.drinkTea(); return false;">
@@ -594,9 +616,9 @@
     <!-- TITLE / START SHIFT MODAL                                           -->
     <!-- =================================================================== -->
     <div id="titleModal" class="modal-backdrop">
-        <div class="modal-card" style="text-align:center;max-width:595px;">
+        <div class="modal-card" style="text-align:center;max-width:615px;">
             <div style="margin-bottom:10px;">
-                <span class="version-pill">✨ v4.0 ULTRA 3D — REAL-TIME SHADOWS &amp; BUMP TEXTURES</span>
+                <span class="version-pill">✨ v5.0 HQ OFFICE &amp; CRAIG EDITION — ULTRA 3D</span>
             </div>
 
             <div style="display:inline-flex;align-items:center;justify-content:center;gap:10px;margin:0 auto 8px;">
@@ -608,14 +630,14 @@
             </div>
 
             <p style="font-size:13px;color:#cbd5e1;line-height:1.45;margin:6px 0 12px;">
-                Experience hardware-accelerated <strong>Golden-Hour Dusk 3D</strong> with <strong>real-time dynamic shadows</strong>, bump-mapped Northamptonshire brickwork, pitched roofs with chimneys, porch canopies, glowing streetlamps, a spinning amber van beacon, and <strong>8 enterable multi-room homes (#10–#17)</strong>!
+                Start your shift inside the <strong>3D Northants Security HQ Office &amp; Workshop</strong>! Check the racking shelves stocked with spare panels and bell boxes, chat with colleague <strong>Craig</strong> at his dual-monitor desk for trade tips, answer the <strong>ringing dispatch phone</strong>, and head out the HQ door to your van!
             </p>
 
             <div style="background:#06101e;border:1px solid #1e40af;border-radius:14px;padding:10px 12px;text-align:left;font-size:12px;color:#93c5fd;margin-bottom:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                <div>🌅 <strong>Golden-Hour Shadows:</strong> Real-time 3D sun &amp; streetlamp pools of light!</div>
-                <div>🧱 <strong>3D Bump Maps:</strong> Recessed brick mortar, roof slates &amp; striped grass!</div>
-                <div>🚨 <strong>Spinning Van Beacon:</strong> Rotating amber roof strobe &amp; NS livery!</div>
-                <div>🛒 <strong>£100 Starting Cash:</strong> Buy Knipex Snips, Fluke &amp; Custom Vans!</div>
+                <div>🏢 <strong>3D HQ Workshop:</strong> Stocked shelves with panels, bellboxes, cable drums &amp; drills!</div>
+                <div>👨‍🔧 <strong>Colleague Craig:</strong> Sits at dispatch desk giving real alarm wiring tips!</div>
+                <div>📞 <strong>Ringing Job Phone:</strong> SLA timer stays on Standby until you step out of HQ!</div>
+                <div>🏆 <strong>HQ Shop Cosmetics:</strong> Unlock the HQ Tea Urn, 55" CCTV Wall &amp; Gold Bellbox!</div>
             </div>
 
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
@@ -629,7 +651,7 @@
                 </button>
                 <button type="button" class="pulse-orange" style="flex:1.6;min-width:190px;padding:15px;border-radius:14px;background:#ff6b00;color:#06101e;font-weight:900;font-size:16px;"
                     onclick="window.startShift(); return false;" ontouchend="window.startShift(); return false;">
-                    🚐 START SHIFT →
+                    🏢 ENTER HQ OFFICE →
                 </button>
             </div>
         </div>
@@ -642,8 +664,8 @@
         <div class="modal-card">
             <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #1e3a8a;padding-bottom:10px;">
                 <div>
-                    <h2 style="margin:0;font-size:20px;font-weight:900;color:#ff6b00;">🛒 NORTHANTS TRADE COUNTER SHOP</h2>
-                    <div style="font-size:11.5px;color:#93c5fd;">Upgrade your 3D van on the street, VDE tools &amp; lunchbox!</div>
+                    <h2 style="margin:0;font-size:20px;font-weight:900;color:#ff6b00;">🛒 NORTHANTS TRADE &amp; HQ UPGRADE SHOP</h2>
+                    <div style="font-size:11.5px;color:#93c5fd;">Upgrade your 3D HQ Office, street van, VDE tools &amp; lunchbox!</div>
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;">
                     <div style="background:#06101e;border:2px solid #4ade80;padding:6px 12px;border-radius:10px;font-weight:900;color:#4ade80;font-size:15px;" id="shopWalletText">
@@ -655,7 +677,7 @@
             </div>
 
             <div id="shopFeedbackText" style="font-size:12px;font-weight:800;color:#fde047;min-height:18px;margin-top:6px;">
-                Select an upgrade below to kit out your engineer and 3D van on the road!
+                Buy HQ Office cosmetics, vans, or tools below — 3D HQ items appear immediately on the office floor!
             </div>
 
             <div class="shop-grid" id="shopGridContainer"></div>
@@ -667,7 +689,7 @@
                 </button>
                 <button type="button" style="background:#ff6b00;color:#06101e;padding:12px 24px;border-radius:12px;font-weight:900;font-size:14px;"
                     onclick="window.closeShop(); return false;" ontouchend="window.closeShop(); return false;">
-                    DONE &amp; BACK TO STREET →
+                    DONE &amp; BACK TO SHIFT →
                 </button>
             </div>
         </div>
@@ -740,7 +762,7 @@
                 </button>
                 <button type="button" id="resultNextBtn" style="flex:1.4;padding:13px;border-radius:12px;background:#ff6b00;color:#06101e;font-weight:900;font-size:14px;"
                     onclick="window.nextOrRetryJob(); return false;" ontouchend="window.nextOrRetryJob(); return false;">
-                    NEXT PROPERTY →
+                    BACK TO HQ OFFICE →
                 </button>
             </div>
         </div>
@@ -770,7 +792,74 @@
             if (wm) wm.style.display = 'none';
 
             audio.init();
-            loadJobLevel(game.jobIdx);
+            enterHQBase(game.jobIdx);
+        };
+
+        window.teleportToHQ = function() {
+            if (!debounceTap()) return;
+            audio.init();
+            var wm = document.getElementById('wireModal');
+            if (wm) wm.style.display = 'none';
+            player.x = 0.0;
+            player.z = 32.8;
+            player.yaw = 0;
+            player.pitch = -0.02;
+            game.phase = 'street';
+            showCommsMessage('CRAIG', "Welcome back to Northants Security HQ mate! Grab a brew or answer the desk phone when it rings!");
+        };
+
+        window.answerHQPhone = function() {
+            if (!debounceTap()) return;
+            if (!game.active) return;
+            if (game.callAnswered) {
+                var j0 = JOBS[game.jobIdx];
+                var h0 = HOUSES[j0.houseIdx];
+                showCommsMessage('DAVID', "You've already got the ticket for #" + h0.num + " " + j0.street + "! Head out the HQ Exit Door to your van!");
+                return;
+            }
+            game.callAnswered = true;
+            game.phoneRinging = false;
+            game.slaRunning = false; // SLA stays on Standby until player walks out HQ door
+            game.toolSwing = 1.0;
+            audio.pickupPhone();
+
+            var job = JOBS[game.jobIdx];
+            var h = HOUSES[job.houseIdx];
+            var roomHint = game.upgrades.hq_cctv
+                ? ('📺 HQ Live CCTV confirms the panel is in the ' + job.roomName.toUpperCase() + '!')
+                : ('Search inside #' + h.num + ' to locate the ' + job.roomName + ' panel!');
+
+            document.getElementById('hudJobBadge').textContent = 'JOB ' + job.jobNum + '/' + JOBS.length;
+            document.getElementById('hudObjectiveText').textContent = 'Exit HQ -> #' + h.num + ' (' + (game.upgrades.hq_cctv ? job.roomName : 'Find Panel') + ')';
+            document.getElementById('hudTimerText').textContent = 'STANDBY (EXIT HQ)';
+            document.getElementById('hudTimerText').style.color = '#38bdf8';
+
+            showCommsMessage('DAVID', "📞 DISPATCH TICKET: House #" + h.num + ", " + job.street + " (" + h.styleName + "). " + roomHint + " Head out the HQ Exit Door to start your SLA timer!");
+        };
+
+        window.chatToCraig = function() {
+            if (!debounceTap()) return;
+            audio.craigVoice();
+            var tip = CRAIG_TIPS[game.craigTipCounter % CRAIG_TIPS.length];
+            game.craigTipCounter++;
+            if (craigArmGroup) craigArmGroup.rotation.x = -0.9;
+            showCommsMessage('CRAIG', tip);
+        };
+
+        window.useHQUrn = function() {
+            if (!debounceTap()) return;
+            if (!game.upgrades.hq_urn) return;
+            if (game.freeBrewClaimedThisJob) {
+                audio.buzz();
+                showCommsMessage('CRAIG', "Steady on mate, save some Yorkshire Tea and Hobnobs for me! You get one free refill per job.");
+                return;
+            }
+            game.freeBrewClaimedThisJob = true;
+            game.teaCount += 1;
+            game.teaSlowTimer = Math.max(game.teaSlowTimer, game.upgrades.snack_mug ? 14.0 : 7.0);
+            saveProgress();
+            audio.coin();
+            showCommsMessage('CRAIG', "Nothing beats a fresh cuppa from the HQ Tea Urn and a Chocolate Hobnob! +1 Tea added to your flask!");
         };
 
         window.openShop = function() {
@@ -795,24 +884,31 @@
             updateActiveAlarmPanelCoords();
             var job = JOBS[game.jobIdx];
             var h = HOUSES[job.houseIdx];
-            showDavidMessage("v4.0 Street re-rolled! 8 fresh 3D Northants properties generated. Target #" + h.num + " is " + h.styleName + "!");
+            showCommsMessage('DAVID', "v5.0 Neighborhood re-rolled! 8 fresh Northants homes generated outside HQ. Target #" + h.num + " is " + h.styleName + "!");
         };
 
         window.useDoor = function() {
             if (!debounceTap()) return;
             var d = game.nearestDoor;
             if (!d) return;
+
+            if (d.type === 'hq_exit' && !game.callAnswered) {
+                audio.buzz();
+                showCommsMessage('CRAIG', "Hold up mate! Answer the ringing HQ dispatch phone on the desk before you head out to the van!");
+                return;
+            }
+
             d.isOpen = !d.isOpen;
             audio.door(d.isOpen);
             game.toolSwing = 1.0;
 
             var loc = detectPlayerRoom(player.x, player.z);
-            if (d.isFront && !d.isOpen && loc.inside && !game.draughtClaimed) {
+            if (d.isFront && !d.isOpen && loc.inside && !loc.isHQ && !game.draughtClaimed) {
                 game.draughtClaimed = true;
                 game.cash += 25;
                 saveProgress();
                 audio.coin();
-                showDavidMessage("Proper polite engineer! Customer tipped you +£25 Draught Bonus for shutting the front door behind you!");
+                showCommsMessage('DAVID', "Proper polite engineer! Customer tipped you +£25 Draught Bonus for shutting the front door behind you!");
             }
         };
         window.interactNearestDoor = window.useDoor;
@@ -820,7 +916,12 @@
         window.openWiring = function() {
             if (!debounceTap()) return;
             if (!game.active) return;
+            if (!game.callAnswered) {
+                showCommsMessage('CRAIG', "You need to answer the dispatch phone at HQ first mate!");
+                return;
+            }
             game.phase = 'wiring';
+            game.slaRunning = true;
             game.toolSwing = 1.0;
             var job = JOBS[game.jobIdx];
             var h = HOUSES[job.houseIdx];
@@ -870,7 +971,7 @@
             game.teaSlowTimer = game.upgrades.snack_mug ? 14.0 : 7.0;
             saveProgress();
             audio.coin();
-            showDavidMessage(game.upgrades.snack_mug
+            showCommsMessage('DAVID', game.upgrades.snack_mug
                 ? "Sports Direct Giant Mug deployed! SLA countdown slowed for 14 seconds!"
                 : "Proper Yorkshire Brew! SLA timer slowed down for 7 seconds!");
         };
@@ -880,7 +981,7 @@
             if (!debounceTap()) return;
             var joke = DAVID_JOKES[game.jokeCounter % DAVID_JOKES.length];
             game.jokeCounter++;
-            showDavidMessage(joke);
+            showCommsMessage('DAVID', joke);
         };
         window.radioDavid = window.davidRadio;
 
@@ -890,14 +991,39 @@
                 var tm = document.getElementById('titleModal');
                 if (tm) tm.style.display = 'none';
                 audio.init();
-                loadJobLevel(game.jobIdx);
+                enterHQBase(game.jobIdx);
                 return;
             }
+
             var job = JOBS[game.jobIdx];
             var h = HOUSES[job.houseIdx];
             var s = h.side;
             var loc = detectPlayerRoom(player.x, player.z);
 
+            // Step 1: If phone is still ringing in HQ, step to desk and answer it
+            if (!game.callAnswered) {
+                player.x = 1.65;
+                player.z = 32.2;
+                player.yaw = 0;
+                window.answerHQPhone();
+                return;
+            }
+
+            // Step 2: If inside HQ with ticket in hand, open HQ exit door and step out to the van
+            if (loc.isHQ) {
+                for (var k = 0; k < worldDoors.length; k++) {
+                    if (worldDoors[k].type === 'hq_exit') worldDoors[k].isOpen = true;
+                }
+                audio.door(true);
+                player.x = h.cx - 1.2;
+                player.z = 0.0;
+                player.yaw = Math.atan2(-(h.cx - 1.1 - player.x), -((h.cz + s * 4.0) - player.z));
+                game.slaRunning = true;
+                showCommsMessage('DAVID', "SLA Timer started! Walk up #" + h.num + "'s garden path and fit that panel!");
+                return;
+            }
+
+            // Step 3: Outside on street -> step inside target house
             if (!loc.inside || loc.houseIdx !== job.houseIdx) {
                 for (var i = 0; i < worldDoors.length; i++) {
                     if (worldDoors[i].houseIdx === job.houseIdx && worldDoors[i].type === 'front') {
@@ -905,6 +1031,7 @@
                     }
                 }
                 audio.door(true);
+                game.slaRunning = true;
                 player.x = h.cx - 1.2;
                 player.z = h.cz + s * 2.5;
                 player.yaw = s === 1 ? 0 : Math.PI;
@@ -912,6 +1039,7 @@
                 return;
             }
 
+            // Step 4: Inside target house -> step to panel room or open wiring
             for (var j = 0; j < worldDoors.length; j++) {
                 if (worldDoors[j].houseIdx === job.houseIdx && !worldDoors[j].isFront) {
                     worldDoors[j].isOpen = true;
@@ -935,19 +1063,32 @@
         };
 
         /********************************************************************
-         * 2. GAME STATE, SHOP ITEMS & 8 RANDOMIZED BUILDINGS DATA
+         * 2. GAME STATE, SHOP ITEMS, CRAIG TIPS & 8 RANDOMIZED BUILDINGS
          ********************************************************************/
-        var SAVE_STORAGE_KEY = 'northants_security_rush_v4_ultra3d';
+        var SAVE_STORAGE_KEY = 'northants_security_rush_v5_hq_craig';
 
         var SHOP_ITEMS = [
-            { id: 'tool_snips', name: 'Knipex Pro Snips', icon: '✂️', cost: 80, desc: '+10s SLA timer on every shift & super-fast terminations.' },
-            { id: 'tool_fluke', name: 'Fluke Digital Meter', icon: '📟', cost: 150, desc: 'Highlights the matching PCB terminal in bright green!' },
-            { id: 'gear_hivis', name: 'NS Hi-Vis Bomber', icon: '🦺', cost: 75, desc: 'Smart uniform! Customers tip +25% extra on every job.' },
-            { id: 'van_custom', name: 'Signwritten NS Custom', icon: '🚐', cost: 250, desc: 'Upgrades your 3D van on the street to Orange & Blue NS Livery!' },
-            { id: 'van_sprinter', name: 'PIR-Detect Sprinter', icon: '🚨', cost: 600, desc: 'Pro 3D mobile workshop with twin beacons, ladder racks & gold alloys!' },
-            { id: 'snack_tea', name: 'Yorkshire Tea Refill', icon: '☕', cost: 20, desc: 'Adds +2 steaming mugs of builder\'s tea to your flask.', consumable: true },
-            { id: 'snack_greggs', name: 'Greggs Sausage Roll', icon: '🥐', cost: 30, desc: 'Permanent +35% faster walking speed down the street!' },
-            { id: 'snack_mug', name: 'Sports Direct Giant Mug', icon: '🍺', cost: 90, desc: 'Doubles your Cuppa Tea time-slow duration to 14 seconds!' }
+            { id: 'hq_urn',      name: 'HQ Tea Urn & Hobnobs',     icon: '☕', cost: 150, desc: 'Spawns a 3D chrome Tea Urn & Hobnob tin in HQ! Grab 1 free brew every job.' },
+            { id: 'hq_cctv',     name: '55" Live CCTV Wall',       icon: '📺', cost: 300, desc: 'Mounts a 4-cam CCTV monitor on the HQ wall & reveals the exact panel room on dispatch!' },
+            { id: 'hq_trophy',   name: 'Golden Bellbox & Plaque',  icon: '🏆', cost: 500, desc: 'Mounts a gleaming 3D Gold Bellbox Trophy in HQ & boosts all job payouts by +15%!' },
+            { id: 'tool_snips',  name: 'Knipex Pro Snips',         icon: '✂️', cost: 80,  desc: '+10s SLA timer on every shift & super-fast terminations.' },
+            { id: 'tool_fluke',  name: 'Fluke Digital Meter',      icon: '📟', cost: 150, desc: 'Highlights the matching PCB terminal in bright green!' },
+            { id: 'gear_hivis',  name: 'NS Hi-Vis Bomber',         icon: '🦺', cost: 75,  desc: 'Smart uniform! Customers tip +25% extra on every job.' },
+            { id: 'van_custom',  name: 'Signwritten NS Custom',    icon: '🚐', cost: 250, desc: 'Upgrades your 3D van on the street to Orange & Blue NS Livery!' },
+            { id: 'van_sprinter',name: 'PIR-Detect Sprinter',      icon: '🚨', cost: 600, desc: 'Pro 3D mobile workshop with twin beacons, ladder racks & gold alloys!' },
+            { id: 'snack_tea',   name: 'Yorkshire Tea Refill',     icon: '🫖', cost: 20,  desc: 'Adds +2 steaming mugs of builder\'s tea to your flask.', consumable: true },
+            { id: 'snack_greggs',name: 'Greggs Sausage Roll',      icon: '🥐', cost: 30,  desc: 'Permanent +35% faster walking speed down the street!' },
+            { id: 'snack_mug',   name: 'Sports Direct Giant Mug',  icon: '🍺', cost: 90,  desc: 'Doubles your Cuppa Tea time-slow duration to 14 seconds!' }
+        ];
+
+        var CRAIG_TIPS = [
+            "Craig: 'Alright mate! Tip for today: always check your 4k7 and 2k2 EOL resistors before closing the panel lid — saves a false tamper callout at 3am!'",
+            "Craig: 'Never mount a lounge PIR directly above a radiator or facing a UPVC conservatory — rising hot air triggers false alarms faster than Sticky-Fingers Kev!'",
+            "Craig: 'Watch out for stray copper whiskers on the 12V Aux terminals! One loose strand touching 0V will pop the glass fuse on the PCB.'",
+            "Craig: 'When you step inside a customer's hallway, shut the front door behind you — Northants folks always tip +£25 for keeping the heat in!'",
+            "Craig: 'Always load-test the 7Ah 12V SLA standby battery on service jobs. If it drops below 10.8V under bell load, grab a fresh Yuasa off the HQ shelf behind me!'",
+            "Craig: 'If you save up £300 for the 55-inch CCTV Wall Monitor here in HQ, I can tell you the exact room the panel is fitted in as soon as the phone rings!'",
+            "Craig: 'External bellbox strobe wire is always blue on our Northants Security looms — terminate it clean into STROBE - and you're golden!'"
         ];
 
         var WALL_FINISHES = [
@@ -1006,7 +1147,7 @@
         var JOBS = [
             {
                 jobNum: 1,
-                street: 'Kettering Road, Kingsley',
+                street: 'Kettering Road, Northampton',
                 houseIdx: 1, // #12
                 roomKey: 'hallway',
                 roomName: 'Front Hallway',
@@ -1014,7 +1155,6 @@
                 spiders: 0,
                 baseTime: 85,
                 basePay: 120,
-                briefing: 'v4.0 ULTRA 3D Shift! Walk past your flashing Northants Security van up the garden path to #12, open the front door (close it inside for +£25 Draught Bonus!) and wire the Hallway panel.',
                 wires: [
                     { id: '12v', label: '12V + POWER', target: '12V + AUX', color: '#ef4444' },
                     { id: '0v',  label: '0V - GROUND', target: '0V - NEG',  color: '#3b82f6' },
@@ -1023,7 +1163,7 @@
             },
             {
                 jobNum: 2,
-                street: 'Kettering Road, Kingsley',
+                street: 'Rockingham Rd, Kettering',
                 houseIdx: 5, // #13 across road
                 roomKey: 'lounge',
                 roomName: 'Living Room Lounge',
@@ -1031,7 +1171,6 @@
                 spiders: 1,
                 baseTime: 82,
                 basePay: 150,
-                briefing: 'Cross the tarmac road to #13 on the South side! Walk up #13\'s garden path, head into the Living Room Lounge past the 60-inch telly, and wire the 4-zone panel!',
                 wires: [
                     { id: '12v', label: '12V + POWER', target: '12V + AUX', color: '#ef4444' },
                     { id: '0v',  label: '0V - GROUND', target: '0V - NEG',  color: '#3b82f6' },
@@ -1041,7 +1180,7 @@
             },
             {
                 jobNum: 3,
-                street: 'Abington Avenue, Northampton',
+                street: 'Oxford Street, Wellingborough',
                 houseIdx: 2, // #14
                 roomKey: 'kitchen',
                 roomName: 'Back Kitchen',
@@ -1049,7 +1188,6 @@
                 spiders: 1,
                 baseTime: 80,
                 basePay: 185,
-                briefing: 'Tripped fuse at #14 Abington Ave! Your 3D SpotLight Headtorch 🔦 is on. Head through #14\'s Lounge into the Back Kitchen and wire the 5-zone panel!',
                 wires: [
                     { id: '12v', label: '12V + POWER', target: '12V + AUX', color: '#ef4444' },
                     { id: '0v',  label: '0V - GROUND', target: '0V - NEG',  color: '#3b82f6' },
@@ -1060,7 +1198,7 @@
             },
             {
                 jobNum: 4,
-                street: 'Wellingborough Rd, Abington',
+                street: 'Watling Street, Towcester',
                 houseIdx: 6, // #15
                 roomKey: 'cupboard',
                 roomName: 'Under-Stairs Cupboard',
@@ -1068,7 +1206,6 @@
                 spiders: 2,
                 baseTime: 78,
                 basePay: 225,
-                briefing: 'Dark Under-Stairs Cupboard at #15 across the road! Open the cupboard door behind #15\'s hallway, and tap any spiders 3 times to shoo them!',
                 wires: [
                     { id: '12v', label: '12V + POWER', target: '12V + AUX', color: '#ef4444' },
                     { id: '0v',  label: '0V - GROUND', target: '0V - NEG',  color: '#3b82f6' },
@@ -1080,7 +1217,7 @@
             },
             {
                 jobNum: 5,
-                street: 'Towcester Way, Delapre',
+                street: 'High Street, Rushden & Daventry',
                 houseIdx: 7, // #17
                 roomKey: 'kitchen',
                 roomName: 'Back Kitchen',
@@ -1088,7 +1225,6 @@
                 spiders: 2,
                 baseTime: 75,
                 basePay: 300,
-                briefing: 'VIP NSI Gold 7-wire install at #17 Towcester Way! Dark kitchen, two angry house spiders, big payout. Make Northants Security proud!',
                 wires: [
                     { id: '12v', label: '12V + POWER', target: '12V + AUX', color: '#ef4444' },
                     { id: '0v',  label: '0V - GROUND', target: '0V - NEG',  color: '#3b82f6' },
@@ -1123,6 +1259,12 @@
             draughtClaimed: false,
             lastOutcomeWin: true,
             jokeCounter: 0,
+            craigTipCounter: 0,
+            phoneRinging: true,
+            callAnswered: false,
+            slaRunning: false,
+            freeBrewClaimedThisJob: false,
+            lastRingSoundTime: 0,
             toolSwing: 0,
             selectedWireId: null,
             draggingWireId: null,
@@ -1132,8 +1274,14 @@
             shuffledTargets: [],
             nearestDoor: null,
             canWirePanel: false,
+            nearHQPhone: false,
+            nearCraig: false,
+            nearHQUrn: false,
             panelWorldPos: { x: -11.2, y: 1.5, z: -12.5, houseIdx: 1 },
             upgrades: {
+                hq_urn: false,
+                hq_cctv: false,
+                hq_trophy: false,
                 tool_snips: false,
                 tool_fluke: false,
                 gear_hivis: false,
@@ -1144,18 +1292,19 @@
             }
         };
 
+        // Player spawns inside the 3D Northants Security HQ Office (z = 26..38)
         var player = {
-            x: -26.0,
+            x: -0.4,
             y: 1.65,
-            z: 0.0,
-            yaw: -Math.PI / 2,
+            z: 33.4,
+            yaw: 0.0,
             pitch: -0.02,
             bob: 0,
             radius: 0.36
         };
 
         /********************************************************************
-         * 3. WEB AUDIO SYNTHESIZER
+         * 3. WEB AUDIO SYNTHESIZER (WITH HQ PHONE RING & CRAIG VOICE)
          ********************************************************************/
         var audio = {
             ctx: null,
@@ -1181,6 +1330,27 @@
                     o.start();
                     o.stop(this.ctx.currentTime + (dur || 0.12));
                 } catch (e) {}
+            },
+            phoneRing: function() {
+                // Classic British Telecom double-trill office phone ring
+                var self = this;
+                [0, 65, 220, 285].forEach(function(delay) {
+                    setTimeout(function() {
+                        self.tone(860, 'square', 0.055, 0.07);
+                        self.tone(1120, 'sine', 0.055, 0.07);
+                    }, delay);
+                });
+            },
+            pickupPhone: function() {
+                this.tone(540, 'triangle', 0.07, 0.15);
+                var self = this;
+                setTimeout(function() { self.tone(980, 'sine', 0.11, 0.15); }, 65);
+            },
+            craigVoice: function() {
+                var self = this;
+                [310, 390, 350, 440].forEach(function(f, i) {
+                    setTimeout(function() { self.tone(f, 'triangle', 0.06, 0.11); }, i * 60);
+                });
             },
             chirp: function() {
                 this.tone(1350, 'square', 0.05, 0.07);
@@ -1475,6 +1645,46 @@
                 g.fillStyle = grad;
                 g.fillRect(0, 0, w, h);
             }, 1, 1, 512);
+
+            // Northants Security HQ Wall Banner Texture
+            TEX.hqBanner = makeCanvasTexture(function(g, w, h) {
+                g.fillStyle = '#06101e';
+                g.fillRect(0, 0, w, h);
+                g.strokeStyle = '#ff6b00';
+                g.lineWidth = 14;
+                g.strokeRect(10, 10, w - 20, h - 20);
+                g.fillStyle = '#ff6b00';
+                g.font = '900 42px sans-serif';
+                g.textAlign = 'center';
+                g.fillText('NORTHANTS SECURITY HQ', w * 0.5, h * 0.34);
+                g.fillStyle = '#ffffff';
+                g.font = '900 26px sans-serif';
+                g.fillText('TRADE COUNTER • DISPATCH • WORKSHOP', w * 0.5, h * 0.58);
+                g.fillStyle = '#4ade80';
+                g.font = '900 24px monospace';
+                g.fillText('CRAIG ON DESK • 24/7 CALLOUTS', w * 0.5, h * 0.80);
+            }, 1, 1, 512);
+
+            // 55" Live 4-Split CCTV Wall Monitor Texture
+            TEX.cctvScreen = makeCanvasTexture(function(g, w, h) {
+                g.fillStyle = '#020617';
+                g.fillRect(0, 0, w, h);
+                var cams = ['CAM 01: STREET NORTH', 'CAM 02: STREET SOUTH', 'CAM 03: VAN BAY', 'CAM 04: PANEL SCAN'];
+                for (var i = 0; i < 4; i++) {
+                    var cx = (i % 2) * (w / 2);
+                    var cy = Math.floor(i / 2) * (h / 2);
+                    g.fillStyle = i === 3 ? '#052e16' : '#0f172a';
+                    g.fillRect(cx + 6, cy + 6, w / 2 - 12, h / 2 - 12);
+                    g.strokeStyle = '#38bdf8';
+                    g.lineWidth = 3;
+                    g.strokeRect(cx + 6, cy + 6, w / 2 - 12, h / 2 - 12);
+                    g.fillStyle = '#4ade80';
+                    g.font = '900 18px monospace';
+                    g.fillText(cams[i], cx + 16, cy + 30);
+                    g.fillStyle = '#ef4444';
+                    g.fillText('● REC', cx + w / 2 - 68, cy + 30);
+                }
+            }, 1, 1, 512);
         }
 
         function makeHouseNumberPlaqueTexture(numStr, isTarget) {
@@ -1495,16 +1705,22 @@
         }
 
         /********************************************************************
-         * 6. THREE.JS v4.0 ULTRA 3D SCENE, REAL-TIME SHADOWS & VAN BEACON
+         * 6. THREE.JS v5.0 ULTRA 3D SCENE, HQ OFFICE, CRAIG & VAN BEACON
          ********************************************************************/
         var scene = null;
         var camera = null;
         var renderer = null;
         var streetGroup = null;
+        var hqGroup = null;
         var vanGroup = null;
         var vanBeaconLight = null;
         var vanBeaconRotor = null;
         var targetConeMesh = null;
+        var hqPhoneConeMesh = null;
+        var hqPhoneLEDMesh = null;
+        var hqPhoneHandset = null;
+        var craigHeadGroup = null;
+        var craigArmGroup = null;
         var activePanelLED = null;
         var headtorchLight = null;
         var headtorchTarget = null;
@@ -1715,6 +1931,232 @@
             streetGroup.add(targetConeMesh);
 
             buildUpgradable3DVan();
+            build3DHQOffice();
+        }
+
+        /********************************************************************
+         * 6B. PLAYABLE 3D NORTHANTS SECURITY HQ OFFICE & COLLEAGUE CRAIG
+         ********************************************************************/
+        function build3DHQOffice() {
+            if (!streetGroup) return;
+            if (hqGroup) streetGroup.remove(hqGroup);
+            hqGroup = new THREE.Group();
+            streetGroup.add(hqGroup);
+
+            // HQ Courtyard & Paved Walkway connecting Street (z = 5.5) to HQ Front Door (z = 26.0)
+            var walkMat = new THREE.MeshStandardMaterial({ map: TEX.pavement, roughness: 0.8 });
+            var walkMesh = new THREE.Mesh(new THREE.PlaneGeometry(5.5, 21.0), walkMat);
+            walkMesh.rotation.x = -Math.PI / 2;
+            walkMesh.position.set(0, 0.025, 16.0);
+            walkMesh.receiveShadow = true;
+            hqGroup.add(walkMesh);
+
+            // HQ Interior Polished Workshop Floor (x: -6.5 to +6.5, z: 26.0 to 38.0)
+            var hqFloorMat = new THREE.MeshStandardMaterial({ map: TEX.kitchenTile, roughness: 0.4, metalness: 0.1 });
+            var hqFloor = new THREE.Mesh(new THREE.PlaneGeometry(13.0, 12.0), hqFloorMat);
+            hqFloor.rotation.x = -Math.PI / 2;
+            hqFloor.position.set(0, 0.035, 32.0);
+            hqFloor.receiveShadow = true;
+            hqGroup.add(hqFloor);
+
+            // HQ Ceiling & Warm Office Ceiling Lights
+            var ceilMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.8 });
+            addBoxMesh(hqGroup, 0, 3.35, 32.0, 13.4, 0.25, 12.4, ceilMat, false);
+            var panelLightMat = new THREE.MeshBasicMaterial({ color: 0xfffbeb });
+            addBoxMesh(hqGroup, -2.5, 3.20, 31.5, 1.8, 0.06, 0.9, panelLightMat, false, null, false, false);
+            addBoxMesh(hqGroup,  2.5, 3.20, 31.5, 1.8, 0.06, 0.9, panelLightMat, false, null, false, false);
+
+            var hqPointLight = new THREE.PointLight(0xfffbeb, 1.35, 18, 1.3);
+            hqPointLight.position.set(0, 2.95, 31.5);
+            hqGroup.add(hqPointLight);
+
+            // HQ Walls (Northants Navy & Orange Dado Trim)
+            var hqWallMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.75 });
+            var orangeTrimMat = new THREE.MeshStandardMaterial({ color: 0xff6b00, roughness: 0.4 });
+            var brickExtMat = makeBrickMaterial('#7c2414', '#631414', '#cbd5e1', 4, 2);
+
+            // Front Wall (z = 26.0) with Central Exit Doorway (x: -0.75 to +0.75)
+            addBoxMesh(hqGroup, -3.62, 1.65, 26.0, 5.75, 3.3, 0.26, hqWallMat, true);
+            addBoxMesh(hqGroup,  3.62, 1.65, 26.0, 5.75, 3.3, 0.26, hqWallMat, true);
+            addBoxMesh(hqGroup,  0.0,  2.78, 26.0, 1.50, 1.05, 0.26, hqWallMat, false);
+            // Exterior Sign above HQ Door
+            var bannerMat = new THREE.MeshBasicMaterial({ map: TEX.hqBanner });
+            addBoxMesh(hqGroup, 0.0, 2.85, 25.82, 4.6, 0.85, 0.08, bannerMat, false, null, false, false);
+            addBoxMesh(hqGroup, 0.0, 2.75, 37.80, 5.2, 1.15, 0.08, bannerMat, false, null, false, false);
+
+            // Back Wall (z = 38.0), West Wall (x = -6.5) & East Wall (x = +6.5)
+            addBoxMesh(hqGroup,  0.0, 1.65, 38.0, 13.0, 3.3, 0.26, hqWallMat, true);
+            addBoxMesh(hqGroup, -6.5, 1.65, 32.0, 0.26, 3.3, 12.0, hqWallMat, true);
+            addBoxMesh(hqGroup,  6.5, 1.65, 32.0, 0.26, 3.3, 12.0, hqWallMat, true);
+            // Orange Dado Stripes inside HQ
+            addBoxMesh(hqGroup, -6.34, 1.1, 32.0, 0.05, 0.14, 11.6, orangeTrimMat, false);
+            addBoxMesh(hqGroup,  6.34, 1.1, 32.0, 0.05, 0.14, 11.6, orangeTrimMat, false);
+
+            // Swinging HQ Exit Door (hinged at x = -0.75, z = 26.0)
+            createSwinging3DDoor(
+                { idx: -1, num: 'HQ' },
+                'hq_exit',
+                'HQ Exit Door to Van',
+                -0.75,
+                26.0,
+                1.5,
+                0,
+                -1,
+                0xff6b00,
+                false
+            );
+
+            // ---------------------------------------------------------------
+            // INDUSTRIAL RACKING SHELVES (West Wall x = -5.4, z = 28.5..35.5)
+            // Stocked with Spare Alarm Panels, Bell Boxes, Cable Drums & Tools
+            // ---------------------------------------------------------------
+            var steelMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.7, roughness: 0.3 });
+            var shelfMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.7 });
+            addBoxMesh(hqGroup, -5.5, 1.2, 32.0, 1.2, 2.4, 6.6, new THREE.MeshBasicMaterial({ visible: false }), true); // Collider
+            // Uprights
+            [-5.9, -5.0].forEach(function(rx) {
+                [28.8, 32.0, 35.2].forEach(function(rz) {
+                    addBoxMesh(hqGroup, rx, 1.35, rz, 0.08, 2.7, 0.08, steelMat, false);
+                });
+            });
+            // 3 Shelf Decks
+            [0.45, 1.25, 2.05].forEach(function(sy) {
+                addBoxMesh(hqGroup, -5.45, sy, 32.0, 1.05, 0.06, 6.5, shelfMat, false);
+            });
+
+            // Stock on Shelves: Spare White Texecom/Euro Alarm Panels, Orange/Blue Bell Boxes & Cable Drums
+            var panelBoxMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.35 });
+            var bellOrangeMat = new THREE.MeshStandardMaterial({ color: 0xff6b00, roughness: 0.3 });
+            var bellBlueMat = new THREE.MeshStandardMaterial({ color: 0x1d4ed8, roughness: 0.3 });
+            var drumMat = new THREE.MeshStandardMaterial({ color: 0xeab308, roughness: 0.5 });
+
+            for (var sz = 29.3; sz <= 34.8; sz += 1.35) {
+                // Top Shelf: External Northants Security Bell Boxes
+                addBoxMesh(hqGroup, -5.35, 2.34, sz, 0.38, 0.48, 0.44, bellOrangeMat, false);
+                addBoxMesh(hqGroup, -5.14, 2.22, sz, 0.06, 0.20, 0.38, bellBlueMat, false);
+                // Middle Shelf: Spare Boxed Alarm Control Panels with Red LED
+                addBoxMesh(hqGroup, -5.35, 1.54, sz, 0.42, 0.48, 0.52, panelBoxMat, false);
+                addBoxMesh(hqGroup, -5.12, 1.62, sz, 0.05, 0.10, 0.24, new THREE.MeshBasicMaterial({ color: 0x22c55e }), false);
+                // Bottom Shelf: 100m Reels of 8-Core Alarm Cable & Yuasa 12V Batteries
+                var reel = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.32, 12), drumMat);
+                reel.position.set(-5.35, 0.65, sz);
+                hqGroup.add(reel);
+            }
+
+            // Engineer Tool Workbench (Back-Left Corner x = -3.2, z = 36.6) with Red Toolbox & Cordless Drill
+            addBoxMesh(hqGroup, -3.2, 0.45, 36.7, 2.4, 0.9, 1.1, new THREE.MeshStandardMaterial({ color: 0x78350f }), true);
+            addBoxMesh(hqGroup, -3.6, 1.06, 36.7, 0.65, 0.34, 0.38, new THREE.MeshStandardMaterial({ color: 0xdc2626, metalness: 0.4 }), false);
+            addBoxMesh(hqGroup, -2.6, 1.02, 36.6, 0.28, 0.26, 0.18, new THREE.MeshStandardMaterial({ color: 0xfacc15 }), false);
+
+            // ---------------------------------------------------------------
+            // DISPATCH DESK, DUAL MONITORS, RINGING PHONE & COLLEAGUE CRAIG
+            // ---------------------------------------------------------------
+            var deskMat = new THREE.MeshStandardMaterial({ color: 0x92400e, roughness: 0.55 });
+            addBoxMesh(hqGroup, 2.3, 0.42, 30.8, 3.2, 0.84, 1.35, deskMat, true);
+
+            // Dual Dispatch Monitors on Craig's Desk
+            var monFrameMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.4 });
+            var monGlowMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+            addBoxMesh(hqGroup, 2.85, 1.12, 30.75, 0.82, 0.52, 0.07, monFrameMat, false);
+            addBoxMesh(hqGroup, 2.85, 1.12, 30.79, 0.74, 0.44, 0.02, monGlowMat, false, null, false, false);
+            addBoxMesh(hqGroup, 1.95, 1.12, 30.75, 0.82, 0.52, 0.07, monFrameMat, false);
+            addBoxMesh(hqGroup, 1.95, 1.12, 30.79, 0.74, 0.44, 0.02, new THREE.MeshBasicMaterial({ color: 0x4ade80 }), false, null, false, false);
+
+            // Ringing HQ Dispatch Desk Phone (x = 1.15, y = 0.92, z = 30.85)
+            var phoneBase = addBoxMesh(hqGroup, 1.15, 0.90, 30.85, 0.38, 0.12, 0.34, new THREE.MeshStandardMaterial({ color: 0x0f172a }), false);
+            hqPhoneHandset = addBoxMesh(hqGroup, 1.15, 1.00, 30.85, 0.42, 0.09, 0.14, new THREE.MeshStandardMaterial({ color: 0xdc2626 }), false);
+            hqPhoneLEDMesh = addBoxMesh(hqGroup, 1.28, 0.97, 30.98, 0.09, 0.09, 0.09, new THREE.MeshBasicMaterial({ color: 0xef4444 }), false, null, false, false);
+
+            hqPhoneConeMesh = new THREE.Mesh(
+                new THREE.ConeGeometry(0.32, 0.65, 8),
+                new THREE.MeshBasicMaterial({ color: 0xef4444 })
+            );
+            hqPhoneConeMesh.rotation.x = Math.PI;
+            hqPhoneConeMesh.position.set(1.15, 1.85, 30.85);
+            hqGroup.add(hqPhoneConeMesh);
+
+            // Colleague CRAIG 3D Character Model sitting behind Dispatch Desk (x = 2.65, z = 29.75)
+            build3DColleagueCraig(2.65, 29.75);
+
+            // ---------------------------------------------------------------
+            // UPGRADABLE 3D HQ SHOP COSMETICS (TEA URN, 55" CCTV, GOLD TROPHY)
+            // ---------------------------------------------------------------
+            // Side Break Table (East Wall x = 5.3, z = 34.2)
+            addBoxMesh(hqGroup, 5.35, 0.42, 34.2, 1.2, 0.84, 2.2, new THREE.MeshStandardMaterial({ color: 0x334155 }), true);
+
+            if (game.upgrades.hq_urn) {
+                // Gleaming Chrome HQ Tea Urn + Red Tap + Blue Hobnobs Biscuit Tin
+                var chromeMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.88, roughness: 0.15 });
+                var urnBody = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.26, 0.68, 16), chromeMat);
+                urnBody.position.set(5.35, 1.18, 34.5);
+                var urnLid = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 0.08, 16), new THREE.MeshStandardMaterial({ color: 0x0f172a }));
+                urnLid.position.set(5.35, 1.54, 34.5);
+                hqGroup.add(urnBody, urnLid);
+                // Biscuit Tin
+                addBoxMesh(hqGroup, 5.35, 0.98, 33.65, 0.36, 0.28, 0.36, new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.3 }), false);
+            }
+
+            if (game.upgrades.hq_cctv) {
+                // 55" Live 4-Split CCTV Wall Monitor mounted on East Wall (x = 6.28, y = 2.05, z = 31.5)
+                addBoxMesh(hqGroup, 6.32, 2.05, 31.5, 0.12, 1.45, 2.45, new THREE.MeshStandardMaterial({ color: 0x0f172a }), false);
+                var cctvMat = new THREE.MeshBasicMaterial({ map: TEX.cctvScreen });
+                addBoxMesh(hqGroup, 6.24, 2.05, 31.5, 0.04, 1.32, 2.30, cctvMat, false, null, false, false);
+            }
+
+            if (game.upgrades.hq_trophy) {
+                // Golden Bellbox Trophy on Pedestal (x = 3.2, z = 36.4) + NSI Gold Wall Plaque
+                var goldMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, metalness: 0.85, roughness: 0.18, emissive: 0x422006 });
+                addBoxMesh(hqGroup, 3.2, 0.55, 36.4, 0.75, 1.1, 0.75, new THREE.MeshStandardMaterial({ color: 0x0f172a }), true);
+                addBoxMesh(hqGroup, 3.2, 1.42, 36.4, 0.52, 0.62, 0.22, goldMat, false);
+                addBoxMesh(hqGroup, 3.2, 2.15, 37.80, 1.5, 0.95, 0.06, goldMat, false);
+            }
+        }
+
+        function build3DColleagueCraig(cx, cz) {
+            var craigGroup = new THREE.Group();
+            craigGroup.position.set(cx, 0, cz);
+
+            var navyMat = new THREE.MeshStandardMaterial({ color: 0x06101e, roughness: 0.65 });
+            var orangeMat = new THREE.MeshStandardMaterial({ color: 0xff6b00, roughness: 0.4 });
+            var skinMat = new THREE.MeshStandardMaterial({ color: 0xfdba74, roughness: 0.6 });
+            var hairMat = new THREE.MeshStandardMaterial({ color: 0x451a03, roughness: 0.8 });
+
+            // Office Swivel Chair
+            addBoxMesh(craigGroup, 0, 0.28, 0, 0.55, 0.55, 0.55, new THREE.MeshStandardMaterial({ color: 0x1e293b }), true);
+            addBoxMesh(craigGroup, 0, 0.85, -0.26, 0.54, 0.75, 0.10, new THREE.MeshStandardMaterial({ color: 0x1e293b }), false);
+
+            // Craig's Torso in Northants Security Navy Polo with Orange Hi-Vis Trim
+            addBoxMesh(craigGroup, 0, 0.92, 0.04, 0.48, 0.62, 0.30, navyMat, false);
+            addBoxMesh(craigGroup, 0, 1.04, 0.20, 0.49, 0.14, 0.04, orangeMat, false);
+
+            // Craig's Head, Eyes, Smile & Headset Mic
+            craigHeadGroup = new THREE.Group();
+            craigHeadGroup.position.set(0, 1.42, 0.06);
+            var headCube = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.34, 0.32), skinMat);
+            var hairCube = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.11, 0.34), hairMat);
+            hairCube.position.set(0, 0.15, -0.01);
+            var eyeMat = new THREE.MeshBasicMaterial({ color: 0x0f172a });
+            var eyeL = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, 0.02), eyeMat);
+            eyeL.position.set(-0.07, 0.03, 0.16);
+            var eyeR = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, 0.02), eyeMat);
+            eyeR.position.set(0.07, 0.03, 0.16);
+            var smile = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.03, 0.02), new THREE.MeshBasicMaterial({ color: 0x7c2d12 }));
+            smile.position.set(0, -0.08, 0.16);
+            craigHeadGroup.add(headCube, hairCube, eyeL, eyeR, smile);
+            craigGroup.add(craigHeadGroup);
+
+            // Craig's Waving Right Arm holding a Mug of Yorkshire Tea
+            craigArmGroup = new THREE.Group();
+            craigArmGroup.position.set(-0.32, 1.12, 0.08);
+            var rArm = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.42, 0.14), navyMat);
+            rArm.position.set(0, -0.15, 0.12);
+            rArm.rotation.x = -0.65;
+            var mug = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.14, 10), orangeMat);
+            mug.position.set(0, -0.22, 0.32);
+            craigArmGroup.add(rArm, mug);
+            craigGroup.add(craigArmGroup);
+
+            hqGroup.add(craigGroup);
         }
 
         function buildSingle3DHouse(h) {
@@ -2063,6 +2505,9 @@
          * 7. ROOM DETECTION, COLLISION & COMPASS NAVIGATION
          ********************************************************************/
         function detectPlayerRoom(px, pz) {
+            if (px >= -6.5 && px <= 6.5 && pz >= 26.0 && pz <= 38.0) {
+                return { inside: true, isHQ: true, houseIdx: -1, houseNum: 'HQ', room: 'HQ Office', label: 'Northants HQ Office' };
+            }
             for (var i = 0; i < HOUSES.length; i++) {
                 var h = HOUSES[i];
                 if (px >= h.cx - 4.5 && px <= h.cx + 4.5 && pz >= h.cz - 4.0 && pz <= h.cz + 4.0) {
@@ -2073,14 +2518,14 @@
                     else if (!isLeft && isFront) rName = 'Living Room Lounge';
                     else if (isLeft && !isFront) rName = 'Under-Stairs Cupboard';
                     else rName = 'Back Kitchen';
-                    return { inside: true, houseIdx: h.idx, houseNum: h.num, room: rName, label: '#' + h.num + ' ' + rName };
+                    return { inside: true, isHQ: false, houseIdx: h.idx, houseNum: h.num, room: rName, label: '#' + h.num + ' ' + rName };
                 }
             }
-            return { inside: false, houseIdx: -1, houseNum: null, room: 'Street', label: 'Northants Avenue' };
+            return { inside: false, isHQ: false, houseIdx: -1, houseNum: null, room: 'Street', label: 'Northants Avenue' };
         }
 
         function isBlockedByWall(nx, nz) {
-            if (nx < -35 || nx > 35 || nz < -21 || nz > 21) return true;
+            if (nx < -35 || nx > 35 || nz < -21 || nz > 37.8) return true;
             var r = player.radius;
             for (var i = 0; i < colliders.length; i++) {
                 var c = colliders[i];
@@ -2097,7 +2542,7 @@
 
         function updateMovementAndPrompts(dt) {
             var speedMult = game.upgrades.snack_greggs ? 1.38 : 1.0;
-            var moveSpeed = 4.8 * speedMult;
+            var moveSpeed = 4.9 * speedMult;
             var turnSpeed = 2.15;
 
             if (keysDown['ArrowLeft'] || keysDown['KeyQ'] || dpadState.turnL) player.yaw += turnSpeed * dt;
@@ -2133,11 +2578,43 @@
             var roomEl = document.getElementById('hudRoomName');
             if (roomEl) roomEl.textContent = loc.label;
 
+            // Start SLA Timer automatically once player answers call & steps outside HQ (z < 25.5)
+            if (game.callAnswered && !game.slaRunning && !loc.isHQ && player.z < 25.5) {
+                game.slaRunning = true;
+                var jStart = JOBS[game.jobIdx];
+                var hStart = HOUSES[jStart.houseIdx];
+                showCommsMessage('DAVID', "⏱️ SLA Clock Running! Get across to House #" + hStart.num + " (" + jStart.street + ") and wire that panel!");
+            }
+
             // Adjust scene ambient darkness when inside a dark house or cupboard
             var job = JOBS[game.jobIdx];
-            var inDarkRoom = loc.inside && (job.isDark || loc.room === 'Under-Stairs Cupboard');
+            var inDarkRoom = loc.inside && !loc.isHQ && (job.isDark || loc.room === 'Under-Stairs Cupboard');
             if (scene && scene.fog) {
-                scene.fog.density = inDarkRoom ? (game.torchOn ? 0.065 : 0.25) : 0.012;
+                scene.fog.density = inDarkRoom ? (game.torchOn ? 0.065 : 0.25) : 0.010;
+            }
+
+            // HQ Proximity Checks (Ringing Phone, Colleague Craig, Tea Urn)
+            var phoneDist = Math.hypot(player.x - 1.15, player.z - 30.85);
+            var craigDist = Math.hypot(player.x - 2.65, player.z - 30.3);
+            var urnDist   = Math.hypot(player.x - 5.35, player.z - 34.2);
+
+            game.nearHQPhone = loc.isHQ && phoneDist < 3.0;
+            game.nearCraig   = loc.isHQ && craigDist < 3.2;
+            game.nearHQUrn   = loc.isHQ && game.upgrades.hq_urn && urnDist < 2.6;
+
+            var phoneBtn = document.getElementById('phoneActionBtn');
+            if (phoneBtn) {
+                phoneBtn.style.display = (game.phase === 'street' && !game.callAnswered && (game.nearHQPhone || loc.isHQ)) ? 'flex' : 'none';
+            }
+
+            var craigBtn = document.getElementById('craigActionBtn');
+            if (craigBtn) {
+                craigBtn.style.display = (game.phase === 'street' && game.nearCraig) ? 'flex' : 'none';
+            }
+
+            var urnBtn = document.getElementById('urnActionBtn');
+            if (urnBtn) {
+                urnBtn.style.display = (game.phase === 'street' && game.nearHQUrn && !game.freeBrewClaimedThisJob) ? 'flex' : 'none';
             }
 
             // Nearest interactive door
@@ -2167,8 +2644,8 @@
             // Distance to active alarm panel
             var targetHouse = HOUSES[job.houseIdx];
             var pDist = Math.hypot(player.x - game.panelWorldPos.x, player.z - game.panelWorldPos.z);
-            var inTargetHouse = loc.inside && loc.houseIdx === job.houseIdx;
-            game.canWirePanel = inTargetHouse && pDist < 2.85;
+            var inTargetHouse = loc.inside && !loc.isHQ && loc.houseIdx === job.houseIdx;
+            game.canWirePanel = game.callAnswered && inTargetHouse && pDist < 2.85;
 
             var wireBtn = document.getElementById('wireActionBtn');
             if (wireBtn) {
@@ -2176,9 +2653,21 @@
             }
 
             // Update Compass & Quick Assist Button
-            var goalX = inTargetHouse ? game.panelWorldPos.x : (targetHouse.cx - 1.1);
-            var goalZ = inTargetHouse ? game.panelWorldPos.z : (targetHouse.cz + targetHouse.side * 4.0);
-            var goalDist = Math.round(Math.hypot(goalX - player.x, goalZ - player.z));
+            var goalX = 1.15, goalZ = 30.85, compassMsg = '';
+            if (!game.callAnswered) {
+                goalX = 1.15; goalZ = 30.85;
+                compassMsg = '📞 HQ Desk: Answer Ringing Job Call (' + Math.round(phoneDist) + 'm)';
+            } else if (loc.isHQ) {
+                goalX = 0.0; goalZ = 26.0;
+                compassMsg = '🚪 Exit HQ Door to Van & House #' + targetHouse.num + ' (' + Math.round(Math.hypot(player.x, player.z - 26.0)) + 'm)';
+            } else if (!inTargetHouse) {
+                goalX = targetHouse.cx - 1.1; goalZ = targetHouse.cz + targetHouse.side * 4.0;
+                compassMsg = 'Target: House #' + targetHouse.num + ' Front Door (' + Math.round(Math.hypot(goalX - player.x, goalZ - player.z)) + 'm)';
+            } else {
+                goalX = game.panelWorldPos.x; goalZ = game.panelWorldPos.z;
+                compassMsg = 'Inside #' + targetHouse.num + ' -> ' + job.roomName + ' Panel (' + Math.round(pDist) + 'm)';
+            }
+
             var angleToGoal = Math.atan2(-(goalX - player.x), -(goalZ - player.z));
             var relAngle = angleToGoal - player.yaw;
             while (relAngle > Math.PI) relAngle -= Math.PI * 2;
@@ -2191,24 +2680,22 @@
             var cArrow = document.getElementById('compassArrow');
             var cLabel = document.getElementById('compassLabel');
             if (cArrow) cArrow.textContent = arrowIcon;
-            if (cLabel) {
-                cLabel.textContent = inTargetHouse
-                    ? ('Inside #' + targetHouse.num + ' -> ' + job.roomName + ' Panel (' + goalDist + 'm)')
-                    : ('Target: House #' + targetHouse.num + ' Front Door (' + goalDist + 'm)');
-            }
+            if (cLabel) cLabel.textContent = compassMsg;
 
             var qwTxt = document.getElementById('quickWalkText');
             if (qwTxt) {
-                if (!inTargetHouse) qwTxt.textContent = 'SPRINT TO #' + targetHouse.num + ' DOOR';
+                if (!game.callAnswered) qwTxt.textContent = '📞 ANSWER HQ PHONE';
+                else if (loc.isHQ) qwTxt.textContent = '🚐DEPLOY TO VAN & #' + targetHouse.num;
+                else if (!inTargetHouse) qwTxt.textContent = 'SPRINT TO #' + targetHouse.num + ' DOOR';
                 else if (!game.canWirePanel) qwTxt.textContent = 'STEP TO ' + job.roomName.toUpperCase();
                 else qwTxt.textContent = 'WIRE #' + targetHouse.num + ' PANEL NOW';
             }
         }
 
         /********************************************************************
-         * 8. LEVEL LOADER, RADIO & SHOP LOGIC
+         * 8. HQ BASE LOADER, COMMS RADIO & SHOP LOGIC
          ********************************************************************/
-        function loadJobLevel(idx) {
+        function enterHQBase(idx) {
             game.jobIdx = idx % JOBS.length;
             var job = JOBS[game.jobIdx];
 
@@ -2216,10 +2703,10 @@
             rebuild3DStreetWorld();
             updateActiveAlarmPanelCoords();
 
-            var h = HOUSES[job.houseIdx];
-            player.x = Math.max(-28, h.cx - 10.5);
-            player.z = 0.0;
-            player.yaw = Math.atan2(-(h.cx - 1.1 - player.x), -((h.cz + h.side * 4.0) - player.z));
+            // Spawn Engineer inside Northants Security HQ Office facing Craig & Ringing Desk Phone
+            player.x = -0.5;
+            player.z = 34.0;
+            player.yaw = -0.35;
             player.pitch = -0.02;
 
             game.timeLeft = job.baseTime + (game.upgrades.tool_snips ? 10 : 0);
@@ -2227,23 +2714,52 @@
             game.selectedWireId = null;
             game.draggingWireId = null;
             game.draughtClaimed = false;
+            game.freeBrewClaimedThisJob = false;
+            game.phoneRinging = true;
+            game.callAnswered = false;
+            game.slaRunning = false;
             game.active = true;
             game.phase = 'street';
 
-            document.getElementById('hudJobBadge').textContent = 'JOB ' + job.jobNum + '/' + JOBS.length;
-            document.getElementById('hudLocationText').innerHTML = '#' + h.num + ' (' + h.styleName + ') • <span id="hudRoomName" style="color:#fde047;">Street</span>';
-            document.getElementById('hudObjectiveText').textContent = '#' + h.num + ' ' + job.roomName;
+            document.getElementById('hudJobBadge').textContent = 'HQ SHIFT ' + job.jobNum + '/' + JOBS.length;
+            document.getElementById('hudLocationText').innerHTML = 'Northants HQ • <span id="hudRoomName" style="color:#fde047;">Trade Office</span>';
+            document.getElementById('hudObjectiveText').textContent = '📞 Answer Ringing HQ Phone';
+            document.getElementById('hudTimerText').textContent = 'STANDBY (IN HQ)';
+            document.getElementById('hudTimerText').style.color = '#4ade80';
             updateHudWallet();
 
-            showDavidMessage(job.briefing);
+            showCommsMessage('CRAIG', "Morning mate! Desk phone's ringing off the hook with a callout! Answer it when you're ready, or come have a chat first.");
         }
 
+        var loadJobLevel = enterHQBase;
+
         var radioTimeout = null;
-        function showDavidMessage(msg) {
-            audio.chirp();
+        function showCommsMessage(speaker, msg) {
+            if (speaker === 'CRAIG') {
+                audio.craigVoice();
+            } else {
+                audio.chirp();
+            }
             var box = document.getElementById('davidRadio');
             var txt = document.getElementById('davidRadioText');
+            var title = document.getElementById('radioSpeakerTitle');
+            var avatar = document.getElementById('radioAvatarBox');
             if (!box || !txt) return;
+
+            if (title && avatar) {
+                if (speaker === 'CRAIG') {
+                    title.textContent = 'COLLEAGUE CRAIG • HQ DESK';
+                    title.style.color = '#38bdf8';
+                    avatar.textContent = '👨‍🔧';
+                    avatar.style.background = '#0ea5e9';
+                } else {
+                    title.textContent = 'BOSS DAVID • CHANNEL 1';
+                    title.style.color = '#ff6b00';
+                    avatar.textContent = '👷‍♂️';
+                    avatar.style.background = '#ff6b00';
+                }
+            }
+
             txt.textContent = '"' + msg + '"';
             box.classList.remove('radio-hidden');
             box.classList.add('radio-visible');
@@ -2251,7 +2767,11 @@
             radioTimeout = setTimeout(function() {
                 box.classList.remove('radio-visible');
                 box.classList.add('radio-hidden');
-            }, 6800);
+            }, 7200);
+        }
+
+        function showDavidMessage(msg) {
+            showCommsMessage('DAVID', msg);
         }
 
         function renderShopItems() {
@@ -2307,8 +2827,9 @@
             }
             saveProgress();
             buildUpgradable3DVan();
+            build3DHQOffice();
             audio.coin();
-            if (fb) fb.textContent = 'Purchased ' + item.name + '! Your kit and 3D Van on the street are upgraded!';
+            if (fb) fb.textContent = 'Purchased ' + item.name + '! Your 3D HQ Office and Van on the street are updated!';
             renderShopItems();
         };
 
@@ -2320,6 +2841,7 @@
             for (var k in game.upgrades) game.upgrades[k] = false;
             saveProgress();
             buildUpgradable3DVan();
+            build3DHQOffice();
             renderShopItems();
         };
 
@@ -2561,6 +3083,7 @@
          ********************************************************************/
         function finishJobSuccess() {
             game.active = false;
+            game.slaRunning = false;
             game.phase = 'result';
             game.lastOutcomeWin = true;
             game.shuffledTargets = [];
@@ -2570,7 +3093,7 @@
             var job = JOBS[game.jobIdx];
             var h = HOUSES[job.houseIdx];
             var speedBonus = Math.round(game.timeLeft * 1.5);
-            var mult = game.upgrades.gear_hivis ? 1.25 : 1.0;
+            var mult = 1.0 + (game.upgrades.gear_hivis ? 0.25 : 0) + (game.upgrades.hq_trophy ? 0.15 : 0);
             var totalEarned = Math.round((job.basePay + speedBonus) * mult);
 
             game.cash += totalEarned;
@@ -2581,22 +3104,27 @@
             document.getElementById('resultBadge').textContent = 'NSI GOLD ALARM ARMED & SECURE!';
             document.getElementById('resultHeading').textContent = 'HOUSE #' + h.num + ' PROTECTED!';
 
+            var bonusTags = [];
+            if (game.upgrades.gear_hivis) bonusTags.push('🦺 +25% Hi-Vis Tip');
+            if (game.upgrades.hq_trophy) bonusTags.push('🏆 +15% Gold Trophy');
+
             document.getElementById('resultVisualBox').innerHTML =
                 '<div style="font-size:38px;margin-bottom:4px;">🛡️🚐✨</div>' +
                 '<div style="font-size:22px;font-weight:900;color:#4ade80;">+£' + totalEarned + ' WAGES EARNED!</div>' +
                 '<div style="font-size:12px;color:#93c5fd;margin-top:4px;">' +
-                    'Base Pay: £' + job.basePay + ' • Fast SLA Bonus: +£' + speedBonus + (game.upgrades.gear_hivis ? ' • 🦺 +25% Hi-Vis Tip!' : '') +
+                    'Base Pay: £' + job.basePay + ' • Fast SLA Bonus: +£' + speedBonus + (bonusTags.length ? ' • ' + bonusTags.join(' • ') : '') +
                 '</div>';
 
             document.getElementById('resultDavidQuote').textContent =
-                '"Top class wiring at #' + h.num + ' mate! Sticky-Fingers Kev took one look at that flashing Northants Security bellbox and legged it back to Wellingborough!"';
+                '"Top class wiring at #' + h.num + ' mate! Head back to HQ Office — Craig\'s got the kettle on and the desk phone is ringing with the next job!"';
 
-            document.getElementById('resultNextBtn').textContent = 'NEXT PROPERTY ON STREET →';
+            document.getElementById('resultNextBtn').textContent = 'RETURN TO HQ OFFICE →';
             document.getElementById('resultModal').style.display = 'flex';
         }
 
         function triggerKevBurglary() {
             game.active = false;
+            game.slaRunning = false;
             game.phase = 'result';
             game.lastOutcomeWin = false;
             game.shuffledTargets = [];
@@ -2622,9 +3150,9 @@
                 '</div>';
 
             document.getElementById('resultDavidQuote').textContent =
-                '"Nightmare mate! Kev made off with #' + h.num + '\'s telly while you were still stripping the 12V wire! Grab some Knipex snips from the Shop and retry!"';
+                '"Nightmare mate! Kev made off with #' + h.num + '\'s telly! Head back to HQ Office, have a word with Craig, and re-take the dispatch call!"';
 
-            document.getElementById('resultNextBtn').textContent = 'RETRY THIS HOUSE ↻';
+            document.getElementById('resultNextBtn').textContent = 'BACK TO HQ & RETRY ↻';
             document.getElementById('resultModal').style.display = 'flex';
         }
 
@@ -2632,9 +3160,9 @@
             if (!debounceTap()) return;
             document.getElementById('resultModal').style.display = 'none';
             if (game.lastOutcomeWin) {
-                loadJobLevel((game.jobIdx + 1) % JOBS.length);
+                enterHQBase((game.jobIdx + 1) % JOBS.length);
             } else {
-                loadJobLevel(game.jobIdx);
+                enterHQBase(game.jobIdx);
             }
         };
 
@@ -2655,8 +3183,10 @@
                 if (e.code === 'KeyT') window.toggleTorch();
                 if (e.code === 'Space' || e.code === 'KeyF') {
                     if (game.phase !== 'street') return;
-                    if (game.canWirePanel) window.openWiring();
+                    if (!game.callAnswered && game.nearHQPhone) window.answerHQPhone();
+                    else if (game.canWirePanel) window.openWiring();
                     else if (game.nearestDoor) window.useDoor();
+                    else if (game.nearCraig) window.chatToCraig();
                 }
             });
             window.addEventListener('keyup', function(e) {
@@ -2708,8 +3238,10 @@
                 if (lookPointerId === e.pointerId) {
                     var dist = Math.hypot(e.clientX - startX, e.clientY - startY);
                     if (dist < 12 && game.phase === 'street') {
-                        if (game.canWirePanel) window.openWiring();
+                        if (!game.callAnswered && game.nearHQPhone) window.answerHQPhone();
+                        else if (game.canWirePanel) window.openWiring();
                         else if (game.nearestDoor) window.useDoor();
+                        else if (game.nearCraig) window.chatToCraig();
                     }
                     lookPointerId = null;
                 }
@@ -2750,36 +3282,70 @@
                     renderPCBTorchOverlay();
                 }
 
-                if (game.teaSlowTimer > 0) {
-                    game.teaSlowTimer = Math.max(0, game.teaSlowTimer - dt);
+                // Ring HQ Phone periodically until answered
+                if (game.phoneRinging && !game.callAnswered) {
+                    if (now - game.lastRingSoundTime > 3200) {
+                        game.lastRingSoundTime = now;
+                        audio.phoneRing();
+                    }
                 }
-                var rate = game.teaSlowTimer > 0 ? 0.35 : 1.0;
-                game.timeLeft -= dt * rate;
 
-                var tStr = Math.max(0, game.timeLeft).toFixed(1) + 's';
-                var hTimer = document.getElementById('hudTimerText');
-                var wTimer = document.getElementById('wireModalTimer');
-                if (hTimer) {
-                    hTimer.textContent = tStr;
-                    hTimer.style.color = game.timeLeft < 15 ? '#ef4444' : '#ffffff';
-                }
-                if (wTimer) wTimer.textContent = tStr;
+                // SLA Timer only counts down once player exits HQ (or starts wiring)
+                if (game.slaRunning) {
+                    if (game.teaSlowTimer > 0) {
+                        game.teaSlowTimer = Math.max(0, game.teaSlowTimer - dt);
+                    }
+                    var rate = game.teaSlowTimer > 0 ? 0.35 : 1.0;
+                    game.timeLeft -= dt * rate;
 
-                if (game.timeLeft <= 0) {
-                    triggerKevBurglary();
+                    var tStr = Math.max(0, game.timeLeft).toFixed(1) + 's';
+                    var hTimer = document.getElementById('hudTimerText');
+                    var wTimer = document.getElementById('wireModalTimer');
+                    if (hTimer) {
+                        hTimer.textContent = tStr;
+                        hTimer.style.color = game.timeLeft < 15 ? '#ef4444' : '#ffffff';
+                    }
+                    if (wTimer) wTimer.textContent = tStr;
+
+                    if (game.timeLeft <= 0) {
+                        triggerKevBurglary();
+                    }
                 }
             }
 
-            // Render Three.js v4.0 ULTRA 3D World
+            // Render Three.js v5.0 ULTRA 3D World
             if (renderer && scene && camera) {
                 if (!game.active && game.phase === 'title') {
-                    camera.position.set(-27.0, 2.35, 0.0);
-                    camera.rotation.y = -Math.PI / 2 + Math.sin(now * 0.0005) * 0.32;
-                    camera.rotation.x = -0.04;
+                    // Showcase the 3D HQ Office & Colleague Craig behind the Title Modal
+                    camera.position.set(-1.2, 2.05, 34.8);
+                    camera.rotation.y = -0.42 + Math.sin(now * 0.0006) * 0.22;
+                    camera.rotation.x = -0.06;
                 } else {
                     camera.position.set(player.x, player.y + Math.sin(player.bob) * 0.045, player.z);
                     camera.rotation.y = player.yaw;
                     camera.rotation.x = player.pitch;
+                }
+
+                // Animate Colleague Craig at his HQ Desk (turns head toward player & waves mug)
+                if (craigHeadGroup && craigArmGroup) {
+                    var lookAngle = Math.atan2(player.x - 2.65, player.z - 29.75);
+                    craigHeadGroup.rotation.y = Math.max(-0.7, Math.min(0.7, lookAngle * 0.45));
+                    craigArmGroup.rotation.x += (0 - craigArmGroup.rotation.x) * Math.min(1, dt * 4);
+                }
+
+                // Animate Ringing HQ Desk Phone & Red Marker Cone
+                if (hqPhoneConeMesh && hqPhoneLEDMesh && hqPhoneHandset) {
+                    var isRinging = !game.callAnswered;
+                    hqPhoneConeMesh.visible = isRinging;
+                    if (isRinging) {
+                        hqPhoneConeMesh.position.y = 1.82 + Math.sin(now * 0.008) * 0.16;
+                        hqPhoneConeMesh.rotation.y = now * 0.004;
+                        hqPhoneLEDMesh.visible = Math.sin(now * 0.02) > 0;
+                        hqPhoneHandset.position.x = 1.15 + Math.sin(now * 0.05) * 0.015;
+                    } else {
+                        hqPhoneLEDMesh.visible = true;
+                        hqPhoneHandset.position.x = 1.15;
+                    }
                 }
 
                 // Animate Spinning Amber Roof Beacon on Van
@@ -2809,6 +3375,7 @@
                 // Animate Floating Orange Target Marker Cone above Assigned Property
                 if (targetConeMesh && HOUSES.length > 0) {
                     var th = HOUSES[JOBS[game.jobIdx].houseIdx];
+                    targetConeMesh.visible = game.callAnswered;
                     targetConeMesh.position.set(th.cx - 1.1, 6.0 + Math.sin(now * 0.005) * 0.45, th.cz + th.side * 3.8);
                     targetConeMesh.rotation.y = now * 0.0025;
                 }
