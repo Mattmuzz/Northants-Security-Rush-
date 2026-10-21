@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
-<title>Northants Security Rush — v10.0 Ultimate Realism Edition</title>
+<title>Northants Security Rush — v10.5 Polish & Realism Edition</title>
 
 <script>
 // Clear stale service workers & caches so GitHub updates show immediately
@@ -41,7 +41,7 @@ window.downloadHtmlFile = function() {
   }
 };
 
-// WebAudio Synthesizer (Tones, Hammer Drill, Dog Bark, Rung Clank)
+// WebAudio Synthesizer
 window._audioCtx = null;
 window.playTone = function(freq, dur, type, vol) {
   try {
@@ -82,7 +82,7 @@ window.startShift = function() {
   setTimeout(function() { window.playTone(659, 0.18, 'sine'); }, 120);
   if (typeof window.syncLadderVisuals === 'function') window.syncLadderVisuals();
   if (typeof window.updateHud === 'function') window.updateHud();
-  window.showToast("💬 Craig: 'Morning mate! Tap <b>📞 Answer Phone</b> above or walk over to my desk to grab your first Northampton callout!'");
+  window.showToast("💬 Craig (typing quotes): 'Morning mate! Tap <b>📞 Answer Phone</b> or walk to my desk to grab your first Northampton callout!'");
 };
 
 window.openShop = function() {
@@ -93,7 +93,10 @@ window.openShop = function() {
 window.closeShop = function() { document.getElementById('shopModal').style.display = 'none'; };
 window.openBrandingModal = function() { document.getElementById('brandingModal').style.display = 'flex'; };
 window.closeBrandingModal = function() { document.getElementById('brandingModal').style.display = 'none'; };
-window.closeJobModal = function() { document.getElementById('jobModal').style.display = 'none'; };
+window.closeJobModal = function() {
+  if (window._stopWireLoop) window._stopWireLoop();
+  document.getElementById('jobModal').style.display = 'none';
+};
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -168,6 +171,14 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
     color: #e0f2fe; pointer-events: none;
     max-width: 98%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  }
+  #darkRoomBanner {
+    align-self: center;
+    background: rgba(15, 23, 42, 0.95);
+    border: 1.5px solid #facc15; border-radius: 999px;
+    padding: 4px 14px; font-size: 11.5px; font-weight: 900;
+    color: #fde047; display: none; pointer-events: none;
+    box-shadow: 0 0 14px rgba(250, 204, 21, 0.45);
   }
   #ladderClimbBar {
     align-self: center;
@@ -306,7 +317,7 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
     <div class="hud-group">
       <button id="ladderHudBtn" class="hud-btn active-tool" onclick="if(window.toggleCarryLadder)window.toggleCarryLadder();">🪜 <span id="ladderStatus">IN HAND</span></button>
       <button class="hud-btn secondary" onclick="if(window.cycleWeather)window.cycleWeather();">🌦️ <span id="weatherLabel">Sunny</span></button>
-      <button class="hud-btn secondary" onclick="if(window.toggleTorch)window.toggleTorch();">🔦 Torch</button>
+      <button id="torchHudBtn" class="hud-btn active-tool" onclick="if(window.toggleTorch)window.toggleTorch();">🔦 Torch: ON</button>
       <button class="hud-btn secondary" onclick="if(window.drinkTea)window.drinkTea();">☕ (<span id="teaCount">2</span>)</button>
       <button class="hud-btn secondary" onclick="if(window.throwBiscuit)window.throwBiscuit();">🦴 Biscuit (<span id="biscuitCount">2</span>)</button>
     </div>
@@ -315,7 +326,8 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
     </div>
   </div>
   <div id="compassBar">📞 HQ OFFICE: Tap "📞 Answer Phone" above or walk to Craig's desk!</div>
-  <div id="ladderClimbBar">🪜 ON LADDER: Push Left Stick UP/DOWN (or W/S) to climb rung-by-rung! Height: 1.7m / 4.5m</div>
+  <div id="darkRoomBanner">🌑 DARK UNDER-STAIRS CUPBOARD — TURN ON YOUR 🔦 TORCH TO SEE!</div>
+  <div id="ladderClimbBar">🪜 ON LADDER: Push Left Stick UP/DOWN (or W/S) to climb rung-by-rung! Height: 1.7m / 4.3m</div>
   <div id="radioToast"></div>
 </div>
 
@@ -332,19 +344,17 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
 <!-- TITLE MODAL -->
 <div id="titleModal" class="modal-backdrop">
   <div class="modal-card">
-    <span class="version-badge">✨ v10.0 ULTIMATE EDITION — 2-STOREY HOUSES, REAL LADDER CLIMB, DRILL & SPIDERS</span>
+    <span class="version-badge">✨ v10.5 POLISH EDITION — SWIPE WIRING, DARK ROOMS, REAL HQ & CAMERAS ON WALLS</span>
     <h2 style="margin:4px 0 6px;color:#ff6b00;">NORTHANTS SECURITY RUSH</h2>
     <p style="font-size:12.5px;color:#cbd5e1;margin:0 0 8px;">
-      First-Person 3D Security Engineer Simulator — Northamptonshire HQ & 8 Two-Storey Homes
+      First-Person 3D Security Engineer Simulator — Perfected Edition
     </p>
-    <div style="background:rgba(0,0,0,0.38);border-radius:10px;padding:10px;font-size:11.5px;line-height:1.45;color:#e2e8f0;">
-      ✅ <b>Two-Storey See-Through Houses:</b> Panelled doors with brass handles, see-through double-glazed windows, furnished Lounge (sofa/TV), Kitchen (tiles/units/fridge) & upstairs Bedroom!<br>
-      ✅ <b>Physical Rung-by-Rung Ladder Climbing:</b> Pitch your ladder and use the joystick/WASD to physically climb up and down every rung to 4.5m eaves height!<br>
-      ✅ <b>3 Realistic Security Jobs + Hazards:</b><br>
-      &nbsp;&nbsp;• <b>📟 Indoor Alarm Panel:</b> Wire-to-wire copper connection + <b>🕷️ Scuttling Spiders</b> to swat!<br>
-      &nbsp;&nbsp;• <b>📹 Dual CCTV Camera Install (1 or 2 Cams):</b> Hold the <b>🔨 Hammer Drill</b> to bore masonry holes, plug wall & focus 4K turret cameras!<br>
-      &nbsp;&nbsp;• <b>🔔 Bell Box Sequence Repair:</b> Live strobe/siren sequence diagnostic at roof height!<br>
-      &nbsp;&nbsp;• <b>🐕 Barking Lawn Dogs:</b> Distracting guard dogs on front lawns—distract them with a 🦴 Dog Biscuit!
+    <div style="background:rgba(0,0,0,0.38);border-radius:10px;padding:10px;font-size:11.5px;line-height:1.48;color:#e2e8f0;">
+      ✅ <b>1. Separate Interior Rooms & Dark Cupboards:</b> Every house now has internal partition walls and swinging interior doors separating the <b>Hallway</b>, <b>Lounge</b>, <b>Kitchen</b>, and a <b>Pitch-Black Under-Stairs Cupboard</b> where you need your 🔦 Torch!<br>
+      ✅ <b>2. True Touch-Swipe / Drag Alarm Wiring:</b> Drag and swipe flexible copper wires across the PCB from left to right with your finger or mouse while swatting scuttling spiders!<br>
+      ✅ <b>3. Cameras Mounted on Brick Walls:</b> Turret cameras are now mounted cleanly on the outer brick piers (`±4.45m`) well clear of the windows.<br>
+      ✅ <b>4. Realistic Brick HQ Building:</b> Two-room brick trade HQ with see-through front windows, illuminated sign, <b>Craig seated at his dual-monitor PC typing customer quotes</b>, and <b>Boss David roaming naturally around the office</b>!<br>
+      ✅ <b>5. Natural Pedestrian & Dog-Walker Speed:</b> Slowed right down to a relaxed Northamptonshire stroll.
     </div>
     <button id="startShiftBtn" class="big-cta" onclick="document.getElementById('titleModal').style.display='none'; if(window.startShift) window.startShift();">
       🚐 START SHIFT IN NORTHANTS HQ
@@ -400,7 +410,7 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
   </div>
 </div>
 
-<!-- UNIVERSAL MULTI-JOB ENGINEERING MODAL (WIRE-TO-WIRE + SPIDERS / HAMMER DRILL CCTV / BELLBOX SEQUENCE) -->
+<!-- UNIVERSAL MULTI-JOB ENGINEERING MODAL -->
 <div id="jobModal" class="modal-backdrop" style="display:none;">
   <div class="modal-card" id="jobCard">
     <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -411,7 +421,6 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
       <div style="color:#86efac;font-size:12px;" id="lcdStatus">READY</div>
       <div style="color:#fde047;font-size:11px;margin-top:3px;" id="flukeHint">Follow trade procedure below</div>
     </div>
-    <!-- Dynamic Interactive Container for Wire-to-Wire, Hammer Drill, or Bell Box Sequence -->
     <div id="jobInteractiveArea" style="margin-top:10px;"></div>
   </div>
 </div>
@@ -435,12 +444,12 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
     teas: 2,
     biscuits: 2,
     phase: 'HQ_RINGING',
-    jobType: 'ALARM', // 'ALARM' | 'CCTV' | 'BELLBOX'
+    jobType: 'ALARM',
     jobTypeLabel: '📟 Indoor Alarm Panel',
     camerasRequired: 1,
     camerasInstalled: 0,
-    timer: 90,
-    maxTimer: 90,
+    timer: 95,
+    maxTimer: 95,
     weatherIdx: 0,
     torchOn: true,
     draughtPaid: false,
@@ -449,11 +458,12 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
     hasLadderInHand: true,
     ladderDeployed: false,
     ladderHouseIdx: -1,
-    ladderSpotType: 'BELLBOX', // 'BELLBOX' | 'CCTV1' | 'CCTV2'
+    ladderSpotType: 'BELLBOX',
     ladderX: 0,
     ladderZ: 0,
     onLadder: false,
     dogCalmed: false,
+    inDarkCupboard: false,
     upgrades: {
       snips: false,
       fluke: false,
@@ -467,7 +477,7 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
   };
 
   try {
-    var saved = JSON.parse(localStorage.getItem('ns_rush_v10_save') || 'null');
+    var saved = JSON.parse(localStorage.getItem('ns_rush_v105_save') || 'null');
     if (saved) {
       if (typeof saved.cash === 'number') STATE.cash = saved.cash;
       if (typeof saved.jobNum === 'number') STATE.jobNum = saved.jobNum;
@@ -481,7 +491,7 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
 
   function saveGame() {
     try {
-      localStorage.setItem('ns_rush_v10_save', JSON.stringify({
+      localStorage.setItem('ns_rush_v105_save', JSON.stringify({
         cash: STATE.cash, jobNum: STATE.jobNum, teas: STATE.teas, biscuits: STATE.biscuits, upgrades: STATE.upgrades
       }));
     } catch (e) {}
@@ -492,17 +502,17 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
     "🎙️ Boss David: 'I bought a new step ladder for the van today... we get on great, I never knew my real ladder!'",
     "🎙️ Boss David: 'Why did the CCTV camera apply for a loan? Because it was tired of always being framed!'",
     "🎙️ Boss David: 'Customer asked if our external bellboxes are waterproof. I said: Mate, they've survived three Northampton bank holidays!'",
-    "🎙️ Boss David: 'Watch out for spiders inside the alarm panels today—they're all on the web!'"
+    "🎙️ Boss David: 'Watch out for spiders inside the under-stairs alarm panels today—they're all on the web!'"
   ];
   var CRAIG_TIPS = [
-    "💬 Craig: 'When you pitch your ladder on the blue ring, push the Left Joystick UP or press W to physically climb rung-by-rung up to 4.5m!'",
-    "💬 Craig: 'Inside the Alarm Panel, tap a left cable core and then its matching right terminal to draw the copper wire—and swat any spiders first!'",
-    "💬 Craig: 'Some CCTV jobs need 2 cameras fitted! Drill the masonry holes with your SDS drill, mount Camera #1, climb down, move the ladder to Spot #2, and fit the second camera!'",
-    "💬 Craig: 'If the homeowner's dog barks at you on the front lawn, tap 🦴 Biscuit on the HUD to keep him happy!'"
+    "💬 Craig (typing quotes): 'Just pricing up a Pyronix Enforcer & 4K turret job in Abington mate! Remember: the alarm panel is in the dark rear cupboard—keep your 🔦 Torch on!'",
+    "💬 Craig (typing quotes): 'On the Alarm Panel screen, put your finger or mouse on a left wire core and swipe/drag it all the way across to the matching terminal on the right!'",
+    "💬 Craig (typing quotes): 'We moved the CCTV brackets onto the solid brick corner piers on every house so you're drilling into proper masonry, not window glass!'",
+    "💬 Craig (typing quotes): 'If the customer's terrier barks at you on the lawn, tap 🦴 Biscuit on the top bar to settle him down!'"
   ];
 
   // ==========================================================================
-  // PROCEDURAL HIGH-RES TEXTURES (BRICK, SLATE, WOOD DOOR, LAWN, ROAD, TILES)
+  // PROCEDURAL HIGH-RES TEXTURES (BRICK, DOORS, LAWN, TILES, QUOTE SCREEN)
   // ==========================================================================
   function makeBrickTex(baseHex, mortarHex) {
     mortarHex = mortarHex || '#cbd5e1';
@@ -515,7 +525,7 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
       for (var col=-1; col<5; col++) {
         ctx.fillStyle = baseHex;
         ctx.fillRect(col*64 + offset + 2, y + 2, 60, 28);
-        ctx.fillStyle = 'rgba(0,0,0,0.08)';
+        ctx.fillStyle = 'rgba(0,0,0,0.09)';
         ctx.fillRect(col*64 + offset + 2, y + 22, 60, 8);
       }
     }
@@ -525,29 +535,51 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
     return tex;
   }
 
-  function makeDoorTex(doorHex) {
+  function makeDoorTex(doorHex, isInterior) {
     var c = document.createElement('canvas'); c.width = 256; c.height = 512;
     var ctx = c.getContext('2d');
     ctx.fillStyle = doorHex; ctx.fillRect(0,0,256,512);
-    // Outer frame & moulded panels
     ctx.strokeStyle = 'rgba(0,0,0,0.35)'; ctx.lineWidth = 8;
-    ctx.strokeRect(16, 16, 224, 480);
-    // Frosted decorative top glass panels
-    ctx.fillStyle = '#bae6fd';
-    ctx.fillRect(38, 38, 78, 130);
-    ctx.fillRect(140, 38, 78, 130);
-    ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 4;
-    ctx.strokeRect(38, 38, 78, 130);
-    ctx.strokeRect(140, 38, 78, 130);
-    // Brass Letterbox in middle
-    ctx.fillStyle = '#facc15';
-    ctx.fillRect(78, 220, 100, 24);
-    ctx.strokeStyle = '#713f12'; ctx.lineWidth = 3;
-    ctx.strokeRect(78, 220, 100, 24);
-    // Lower raised timber panels
+    ctx.strokeRect(14, 14, 228, 484);
+    if (!isInterior) {
+      ctx.fillStyle = '#bae6fd';
+      ctx.fillRect(38, 38, 78, 130); ctx.fillRect(140, 38, 78, 130);
+      ctx.fillStyle = '#facc15'; ctx.fillRect(78, 220, 100, 24);
+    } else {
+      ctx.strokeRect(38, 38, 180, 180);
+    }
     ctx.strokeStyle = 'rgba(0,0,0,0.4)'; ctx.lineWidth = 6;
-    ctx.strokeRect(38, 280, 78, 175);
-    ctx.strokeRect(140, 280, 78, 175);
+    ctx.strokeRect(38, 260, 180, 200);
+    return new THREE.CanvasTexture(c);
+  }
+
+  function makeCraigMonitorTex() {
+    var c = document.createElement('canvas'); c.width = 256; c.height = 128;
+    var ctx = c.getContext('2d');
+    ctx.fillStyle = '#07192e'; ctx.fillRect(0,0,256,128);
+    ctx.fillStyle = '#ff6b00'; ctx.fillRect(0,0,256,24);
+    ctx.fillStyle = '#ffffff'; ctx.font = 'bold 13px monospace';
+    ctx.fillText('NORTHANTS SECURITY QUOTES', 10, 16);
+    ctx.fillStyle = '#86efac'; ctx.font = '11px monospace';
+    ctx.fillText('Job #409: Enforcer + Bell', 10, 46);
+    ctx.fillText('Job #410: 2x 4K PoE Turret', 10, 66);
+    ctx.fillText('EOL Resistors: 4k7 / 2k2', 10, 86);
+    ctx.fillStyle = '#fde047';
+    ctx.fillText('STATUS: CRAIG TYPING...', 10, 110);
+    return new THREE.CanvasTexture(c);
+  }
+
+  function makeHQSignTex() {
+    var c = document.createElement('canvas'); c.width = 512; c.height = 128;
+    var ctx = c.getContext('2d');
+    ctx.fillStyle = '#0a2240'; ctx.fillRect(0,0,512,128);
+    ctx.strokeStyle = '#ff6b00'; ctx.lineWidth = 10;
+    ctx.strokeRect(5,5,502,118);
+    ctx.fillStyle = '#ff6b00'; ctx.font = '900 34px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('NORTHANTS SECURITY HQ', 256, 56);
+    ctx.fillStyle = '#38bdf8'; ctx.font = 'bold 20px sans-serif';
+    ctx.fillText('TRADE COUNTER • DISPATCH • 24HR ALARMS & CCTV', 256, 96);
     return new THREE.CanvasTexture(c);
   }
 
@@ -584,10 +616,8 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
     var ctx = c.getContext('2d');
     ctx.fillStyle = tier === 0 ? '#f8fafc' : '#0a2240';
     ctx.fillRect(0,0,512,256);
-    ctx.fillStyle = '#ff6b00';
-    ctx.fillRect(0, 168, 512, 46);
-    ctx.fillStyle = '#38bdf8';
-    ctx.fillRect(0, 156, 512, 12);
+    ctx.fillStyle = '#ff6b00'; ctx.fillRect(0, 168, 512, 46);
+    ctx.fillStyle = '#38bdf8'; ctx.fillRect(0, 156, 512, 12);
     ctx.fillStyle = tier === 0 ? '#0a2240' : '#ffffff';
     ctx.font = '900 34px sans-serif';
     ctx.fillText('NORTHANTS SECURITY', 24, 92);
@@ -603,11 +633,10 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
     var ctx = c.getContext('2d');
     ctx.fillStyle = bgHex; ctx.strokeStyle = borderHex; ctx.lineWidth = 8;
     ctx.fillRect(12, 16, 488, 96); ctx.strokeRect(12, 16, 488, 96);
-    ctx.fillStyle = '#ffffff'; ctx.font = '900 26px sans-serif';
+    ctx.fillStyle = '#ffffff'; ctx.font = '900 25px sans-serif';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(text, 256, 64);
-    var tex = new THREE.CanvasTexture(c);
-    var sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false }));
+    var sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), depthTest: false }));
     sp.scale.set(3.5, 0.88, 1); sp.renderOrder = 999;
     return sp;
   }
@@ -643,7 +672,7 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
   scene.fog = new THREE.FogExp2(0x7dd3fc, 0.0042);
 
   var camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.15, 420);
-  var player = { x: 0, y: 1.7, z: 34.5, yaw: 0, pitch: 0 };
+  var player = { x: 0, y: 1.7, z: 32.5, yaw: 0, pitch: 0 };
   camera.position.set(player.x, player.y, player.z);
 
   var hemiLight = new THREE.HemisphereLight(0xdbeafe, 0x1e293b, 0.88);
@@ -659,7 +688,7 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
   sunLight.shadow.camera.top = d; sunLight.shadow.camera.bottom = -d;
   scene.add(sunLight);
 
-  var torchLight = new THREE.SpotLight(0xffffff, 1.8, 34, Math.PI/5, 0.45, 1.2);
+  var torchLight = new THREE.SpotLight(0xffffff, 2.2, 34, Math.PI/4.5, 0.4, 1.1);
   torchLight.position.set(0, 0, 0); torchLight.target.position.set(0, 0, -5);
   camera.add(torchLight); camera.add(torchLight.target);
   scene.add(camera);
@@ -716,9 +745,9 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
   handGroup.add(leftArm, rightArm, carriedLadderMesh, rightToolGroup);
   camera.add(handGroup);
 
-  // PITCHED 4.8m TRADE LADDER IN WORLD
+  // PITCHED 4.6m TRADE LADDER IN WORLD
   var pitchedLadderGroup = new THREE.Group();
-  var worldLadderMesh = create3DLadderMesh(4.85, 0.58, 14, false);
+  var worldLadderMesh = create3DLadderMesh(4.5, 0.58, 13, false);
   worldLadderMesh.rotation.x = 0.15;
   pitchedLadderGroup.add(worldLadderMesh);
   var pitchedLadderBadge = makeNameplateSprite('🪜 CLIMB LADDER (USE STICK/WASD)', '#22c55e', '#ffffff');
@@ -749,7 +778,7 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
       puff.scale.y = 0.58; cg.add(puff);
     }
     cg.position.set(-160 + Math.random()*320, 46 + Math.random()*24, -150 + Math.random()*240);
-    cg.userData = { speed: 1.5 + Math.random()*1.6 };
+    cg.userData = { speed: 1.2 + Math.random()*1.2 };
     skyGroup.add(cg); cloudClusters.push(cg);
   }
 
@@ -775,7 +804,7 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
   });
 
   // ==========================================================================
-  // ROADS, PAVEMENTS, SWAN-NECK STREETLIGHTS & HQ OFFICE
+  // ROADS, PAVEMENTS & SWAN-NECK STREETLIGHTS
   // ==========================================================================
   var lawnTex = makeLawnTex();
   var grassGround = new THREE.Mesh(new THREE.PlaneGeometry(320, 320), new THREE.MeshStandardMaterial({ map: lawnTex, roughness: 0.9 }));
@@ -787,7 +816,7 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
   mainRoad.rotation.x = -Math.PI/2; mainRoad.position.set(0, 0.02, 0); mainRoad.receiveShadow = true;
   scene.add(mainRoad);
 
-  var spurRoad = new THREE.Mesh(new THREE.PlaneGeometry(10.5, 28), roadMat);
+  var spurRoad = new THREE.Mesh(new THREE.PlaneGeometry(11.5, 28), roadMat);
   spurRoad.rotation.x = -Math.PI/2; spurRoad.position.set(0, 0.021, 14);
   scene.add(spurRoad);
 
@@ -796,7 +825,6 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
     dash.rotation.x = -Math.PI/2; dash.position.set(rx, 0.035, 0);
     scene.add(dash);
   }
-  // Double-yellow kerb lines & raised pavements
   [-5.5, 5.5].forEach(function(yz) {
     var dy = new THREE.Mesh(new THREE.PlaneGeometry(130, 0.14), new THREE.MeshBasicMaterial({color:0xfacc15}));
     dy.rotation.x = -Math.PI/2; dy.position.set(0, 0.035, yz);
@@ -808,7 +836,6 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
     scene.add(pave);
   });
 
-  // Realistic Swan-Neck Streetlights along Both Pavements
   var poleMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.7, roughness: 0.3 });
   [-42, -18, 6, 30, 48].forEach(function(lx, idx) {
     var slGroup = new THREE.Group();
@@ -828,35 +855,53 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
   });
 
   // ==========================================================================
-  // HUMANOIDS, BARKING GARDEN DOGS & HQ OFFICE
+  // HUMANOIDS, SEATED CRAIG AT PC, ROAMING BOSS DAVID & REALISTIC BRICK HQ
   // ==========================================================================
   var doorObjects = [];
   var hqPhoneRingLight = null, hqPhoneMarker = null, craigGroup = null, davidGroup = null;
   var hqCosmeticsGroup = new THREE.Group(); scene.add(hqCosmeticsGroup);
 
-  function buildHumanoid(shirtHex, trimHex, badgeText, badgeBg) {
+  function buildHumanoid(shirtHex, trimHex, badgeText, badgeBg, isSeated) {
     var g = new THREE.Group();
     var legMat = new THREE.MeshStandardMaterial({ color: 0x1e293b });
     var shirtMat = new THREE.MeshStandardMaterial({ color: shirtHex });
     var skinMat = new THREE.MeshStandardMaterial({ color: 0xfdba74 });
 
-    var lL = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.75, 0.22), legMat); lL.position.set(-0.14, 0.38, 0);
-    var rL = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.75, 0.22), legMat); rL.position.set(0.14, 0.38, 0);
-    var torso = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.75, 0.32), shirtMat); torso.position.y = 1.12;
-    var stripe = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.14, 0.34), new THREE.MeshBasicMaterial({color:trimHex})); stripe.position.y = 1.15;
-    var head = new THREE.Mesh(new THREE.SphereGeometry(0.23, 14, 14), skinMat); head.position.y = 1.72;
-    var lA = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.65, 0.18), shirtMat); lA.position.set(-0.38, 1.12, 0);
-    var rA = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.65, 0.18), shirtMat); rA.position.set(0.38, 1.12, 0);
+    var lL = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.72, 0.22), legMat);
+    var rL = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.72, 0.22), legMat);
+    var torso = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.75, 0.32), shirtMat);
+    var stripe = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.14, 0.34), new THREE.MeshBasicMaterial({color:trimHex}));
+    var head = new THREE.Mesh(new THREE.SphereGeometry(0.23, 14, 14), skinMat);
+    var lA = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.62, 0.18), shirtMat);
+    var rA = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.62, 0.18), shirtMat);
+
+    if (isSeated) {
+      // Seated posture for Craig in his swivel office chair typing at PC!
+      lL.rotation.x = Math.PI/2; lL.position.set(-0.15, 0.48, -0.25);
+      rL.rotation.x = Math.PI/2; rL.position.set(0.15, 0.48, -0.25);
+      torso.position.set(0, 0.88, 0);
+      stripe.position.set(0, 0.92, 0);
+      head.position.set(0, 1.46, 0);
+      lA.rotation.x = -Math.PI/3; lA.position.set(-0.34, 0.92, -0.22);
+      rA.rotation.x = -Math.PI/3; rA.position.set(0.34, 0.92, -0.22);
+    } else {
+      lL.position.set(-0.14, 0.36, 0);
+      rL.position.set(0.14, 0.36, 0);
+      torso.position.y = 1.10;
+      stripe.position.y = 1.14;
+      head.position.y = 1.70;
+      lA.position.set(-0.38, 1.10, 0);
+      rA.position.set(0.38, 1.10, 0);
+    }
 
     var badge = makeNameplateSprite(badgeText, badgeBg || '#ff6b00');
-    badge.position.set(0, 2.38, 0);
+    badge.position.set(0, isSeated ? 2.08 : 2.38, 0);
 
     g.add(lL, rL, torso, stripe, head, lA, rA, badge);
-    g.userData = { leftLeg: lL, rightLeg: rL, leftArm: lA, rightArm: rA, badge: badge };
+    g.userData = { leftLeg: lL, rightLeg: rL, leftArm: lA, rightArm: rA, head: head, badge: badge };
     return g;
   }
 
-  // 3D Barking Lawn Guard Dog Builder
   function buildGuardDog() {
     var dg = new THREE.Group();
     var furMat = new THREE.MeshStandardMaterial({ color: 0x92400e, roughness: 0.85 });
@@ -881,52 +926,126 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
     return dg;
   }
 
-  (function buildHQOffice() {
+  // REALISTIC BRICK TWO-ROOM NORTHANTS SECURITY HQ BUILDING (Z = 26..38, X = -7..+7)
+  (function buildRealisticHQBuilding() {
     var hq = new THREE.Group();
-    var wallMat = new THREE.MeshStandardMaterial({ color: 0x1e3a5f, roughness: 0.7 });
-    var floorMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.8 });
+    var hqBrickMat = new THREE.MeshStandardMaterial({ map: makeBrickTex('#7c2d12', '#cbd5e1'), roughness: 0.85 });
+    var plasterMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.7 });
+    var glassMat = new THREE.MeshPhysicalMaterial({ color: 0xbae6fd, transparent: true, opacity: 0.34, roughness: 0.1 });
+    var upvcMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 });
 
-    var fl = new THREE.Mesh(new THREE.BoxGeometry(14, 0.15, 12), floorMat); fl.position.set(0, 0.07, 32); hq.add(fl);
-    var ceil = new THREE.Mesh(new THREE.BoxGeometry(14, 0.2, 12), new THREE.MeshStandardMaterial({color:0x0f172a})); ceil.position.set(0, 3.8, 32); hq.add(ceil);
+    // Office Carpet Floor & Store Room Floor
+    var flOffice = new THREE.Mesh(new THREE.BoxGeometry(14, 0.16, 8), new THREE.MeshStandardMaterial({ color: 0x1e293b }));
+    flOffice.position.set(0, 0.08, 30);
+    var flStore = new THREE.Mesh(new THREE.BoxGeometry(14, 0.17, 4), new THREE.MeshStandardMaterial({ color: 0x475569 }));
+    flStore.position.set(0, 0.085, 36);
+    var ceil = new THREE.Mesh(new THREE.BoxGeometry(14.4, 0.24, 12.4), upvcMat);
+    ceil.position.set(0, 4.2, 32);
+    hq.add(flOffice, flStore, ceil);
 
-    var backW = new THREE.Mesh(new THREE.BoxGeometry(14, 3.8, 0.25), wallMat); backW.position.set(0, 1.9, 38);
-    var leftW = new THREE.Mesh(new THREE.BoxGeometry(0.25, 3.8, 12), wallMat); leftW.position.set(-7, 1.9, 32);
-    var rightW = new THREE.Mesh(new THREE.BoxGeometry(0.25, 3.8, 12), wallMat); rightW.position.set(7, 1.9, 32);
-    var frontLeft = new THREE.Mesh(new THREE.BoxGeometry(5.8, 3.8, 0.25), wallMat); frontLeft.position.set(-4.1, 1.9, 26);
-    var frontRight = new THREE.Mesh(new THREE.BoxGeometry(5.8, 3.8, 0.25), wallMat); frontRight.position.set(4.1, 1.9, 26);
-    hq.add(backW, leftW, rightW, frontLeft, frontRight);
+    // Pitched Commercial Slate Roof & Illuminated Fascia Signboard
+    var hqRoof = new THREE.Mesh(new THREE.ConeGeometry(10.6, 3.2, 4), new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.8 }));
+    hqRoof.position.set(0, 5.8, 32); hqRoof.rotation.y = Math.PI/4;
+    var signBoard = new THREE.Mesh(new THREE.BoxGeometry(8.8, 1.15, 0.22), new THREE.MeshBasicMaterial({ map: makeHQSignTex() }));
+    signBoard.position.set(0, 3.65, 25.82);
+    hq.add(hqRoof, signBoard);
 
+    // Back, Left & Right Exterior Brick Walls
+    var backW = new THREE.Mesh(new THREE.BoxGeometry(14, 4.2, 0.28), hqBrickMat); backW.position.set(0, 2.1, 38);
+    var leftW = new THREE.Mesh(new THREE.BoxGeometry(0.28, 4.2, 12), hqBrickMat); leftW.position.set(-7, 2.1, 32);
+    var rightW = new THREE.Mesh(new THREE.BoxGeometry(0.28, 4.2, 12), hqBrickMat); rightW.position.set(7, 2.1, 32);
+    hq.add(backW, leftW, rightW);
+
+    // Front Brick Wall with See-Through Glazed Windows (X = -4.2 and X = +4.2) & Center Entrance Door
+    [-6.1, -1.8, 1.8, 6.1].forEach(function(px, idx) {
+      var pw = (idx === 0 || idx === 3) ? 1.8 : 1.4;
+      var pier = new THREE.Mesh(new THREE.BoxGeometry(pw, 4.2, 0.28), hqBrickMat);
+      pier.position.set(px, 2.1, 26);
+      hq.add(pier);
+    });
+    // Header above front door
+    var doorHdr = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.5, 0.28), hqBrickMat);
+    doorHdr.position.set(0, 3.45, 26);
+    hq.add(doorHdr);
+
+    // Left & Right Front HQ Windows (See-through from inside & outside!)
+    [-3.85, 3.85].forEach(function(wx) {
+      var lowW = new THREE.Mesh(new THREE.BoxGeometry(2.7, 0.9, 0.28), hqBrickMat); lowW.position.set(wx, 0.45, 26);
+      var topW = new THREE.Mesh(new THREE.BoxGeometry(2.7, 1.6, 0.28), hqBrickMat); topW.position.set(wx, 3.4, 26);
+      var glass = new THREE.Mesh(new THREE.PlaneGeometry(2.68, 1.7), glassMat); glass.position.set(wx, 1.75, 26);
+      var sill = new THREE.Mesh(new THREE.BoxGeometry(2.85, 0.1, 0.38), upvcMat); sill.position.set(wx, 0.9, 25.95);
+      hq.add(lowW, topW, glass, sill);
+    });
+
+    // Internal Partition Wall at Z = 34.2 separating Front Dispatch Office from Back Store Room
+    var partLeft = new THREE.Mesh(new THREE.BoxGeometry(5.6, 4.1, 0.22), plasterMat); partLeft.position.set(-4.2, 2.05, 34.2);
+    var partRight = new THREE.Mesh(new THREE.BoxGeometry(5.6, 4.1, 0.22), plasterMat); partRight.position.set(4.2, 2.05, 34.2);
+    var partTop = new THREE.Mesh(new THREE.BoxGeometry(2.8, 1.5, 0.22), plasterMat); partTop.position.set(0, 3.4, 34.2);
+    hq.add(partLeft, partRight, partTop);
+
+    // Swinging HQ Front Exit Door
     var hqDoorPivot = new THREE.Group(); hqDoorPivot.position.set(-1.1, 0, 26);
-    var hqDoorMesh = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2.7, 0.12), new THREE.MeshStandardMaterial({map: makeDoorTex('#ea580c')}));
+    var hqDoorMesh = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2.7, 0.12), new THREE.MeshStandardMaterial({map: makeDoorTex('#ea580c', false)}));
     hqDoorMesh.position.set(1.1, 1.35, 0); hqDoorPivot.add(hqDoorMesh); hq.add(hqDoorPivot);
-    doorObjects.push({ pivot: hqDoorPivot, open: true, targetAngle: -Math.PI*0.55, x: 0, z: 26, label: 'HQ Exit Door' });
+    doorObjects.push({ pivot: hqDoorPivot, open: true, targetAngle: -Math.PI*0.55, x: 0, z: 26, label: 'HQ Front Door' });
 
-    var hqLight = new THREE.PointLight(0xfffbeb, 1.2, 18); hqLight.position.set(0, 3.4, 32); hq.add(hqLight);
+    // Warm Ceiling Lights in Front Office & Back Store Room
+    var hqLight1 = new THREE.PointLight(0xfffbeb, 1.25, 16); hqLight1.position.set(0, 3.8, 29.8);
+    var hqLight2 = new THREE.PointLight(0xfffbeb, 0.9, 12); hqLight2.position.set(0, 3.8, 36.2);
+    hq.add(hqLight1, hqLight2);
 
+    // Back Store Room Racking Shelves (Z = 34.6..37.6)
     for (var s=0; s<3; s++) {
-      var shelf = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.08, 7), new THREE.MeshStandardMaterial({color:0x475569}));
-      shelf.position.set(-6.2, 0.8 + s*0.9, 32); hq.add(shelf);
-      for (var b=0; b<4; b++) {
-        var box = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.45, 0.8), new THREE.MeshStandardMaterial({ color: (b%2===0) ? 0xff6b00 : 0x38bdf8 }));
-        box.position.set(-6.1, 1.08 + s*0.9, 29.5 + b*1.6); hq.add(box);
+      var shelf = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.08, 3.2), new THREE.MeshStandardMaterial({color:0x475569}));
+      shelf.position.set(-6.1, 0.8 + s*0.9, 36.1); hq.add(shelf);
+      for (var b=0; b<3; b++) {
+        var box = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.45, 0.75), new THREE.MeshStandardMaterial({ color: (b%2===0) ? 0xff6b00 : 0x38bdf8 }));
+        box.position.set(-6.0, 1.08 + s*0.9, 35.0 + b*1.0); hq.add(box);
       }
     }
 
-    var desk = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.8, 1.3), new THREE.MeshStandardMaterial({color:0x78350f}));
-    desk.position.set(-2.4, 0.4, 30.2); hq.add(desk);
+    // Craig's Workstation Desk, PC Tower, Dual Quote Monitors, Keyboard & Swivel Chair (X = -3.4, Z = 29.8)
+    var desk = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.78, 1.3), new THREE.MeshStandardMaterial({color:0x78350f}));
+    desk.position.set(-3.4, 0.39, 29.8); hq.add(desk);
+
+    // PC Tower, Dual Glowing Quote Monitors & Keyboard
+    var pcTower = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.52, 0.48), new THREE.MeshStandardMaterial({color:0x0f172a}));
+    pcTower.position.set(-4.4, 1.04, 29.8);
+    var monMat = new THREE.MeshBasicMaterial({ map: makeCraigMonitorTex() });
+    var mon1 = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.44, 0.05), monMat);
+    mon1.position.set(-3.65, 1.08, 29.55); mon1.rotation.y = 0.15;
+    var mon2 = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.44, 0.05), monMat);
+    mon2.position.set(-2.90, 1.08, 29.55); mon2.rotation.y = -0.15;
+    var keyboard = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.03, 0.18), new THREE.MeshStandardMaterial({color:0x1e293b}));
+    keyboard.position.set(-3.3, 0.80, 30.05);
+    hq.add(pcTower, mon1, mon2, keyboard);
+
+    // Swivel Office Chair + Seated Colleague Craig Typing Quotes!
+    var chairSeat = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.08, 0.58), new THREE.MeshStandardMaterial({color:0x0f172a}));
+    chairSeat.position.set(-3.3, 0.48, 30.65);
+    var chairBack = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.68, 0.08), new THREE.MeshStandardMaterial({color:0x0f172a}));
+    chairBack.position.set(-3.3, 0.85, 30.92);
+    var chairBase = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.28, 0.48, 10), new THREE.MeshStandardMaterial({color:0x334155}));
+    chairBase.position.set(-3.3, 0.24, 30.65);
+    hq.add(chairSeat, chairBack, chairBase);
+
+    craigGroup = buildHumanoid(0x0a2240, 0xff6b00, '💻 CRAIG (TYPING QUOTES)', '#0284c7', true);
+    craigGroup.position.set(-3.3, 0.08, 30.62);
+    hq.add(craigGroup);
+
+    // Ringing Dispatch Phone on Right End of Craig's Desk (X = -2.2, Z = 29.8)
     var phoneBase = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.16, 0.35), new THREE.MeshStandardMaterial({color:0x111827}));
-    phoneBase.position.set(-1.6, 0.88, 30.0); hq.add(phoneBase);
+    phoneBase.position.set(-2.2, 0.86, 29.8); hq.add(phoneBase);
     hqPhoneRingLight = new THREE.Mesh(new THREE.SphereGeometry(0.11, 12, 12), new THREE.MeshBasicMaterial({color:0xef4444}));
-    hqPhoneRingLight.position.set(-1.6, 1.04, 30.0); hq.add(hqPhoneRingLight);
+    hqPhoneRingLight.position.set(-2.2, 1.02, 29.8); hq.add(hqPhoneRingLight);
 
     hqPhoneMarker = makeNameplateSprite('📞 ANSWER DISPATCH CALL', '#ef4444', '#fde047');
-    hqPhoneMarker.position.set(-1.6, 1.85, 30.0); hq.add(hqPhoneMarker);
+    hqPhoneMarker.position.set(-2.2, 1.82, 29.8); hq.add(hqPhoneMarker);
 
-    craigGroup = buildHumanoid(0x0a2240, 0xff6b00, '💬 COLLEAGUE CRAIG', '#0284c7');
-    craigGroup.position.set(-2.8, 0, 31.3); hq.add(craigGroup);
-
-    davidGroup = buildHumanoid(0x1e293b, 0xfacc15, '🎙️ BOSS DAVID (DAD JOKES)', '#d97706');
-    davidGroup.position.set(2.5, 0, 31.0); hq.add(davidGroup);
+    // Boss David (Roams randomly across 2D waypoints in Front Office & Back Store Room!)
+    davidGroup = buildHumanoid(0x1e293b, 0xfacc15, '🎙️ BOSS DAVID (DAD JOKES)', '#d97706', false);
+    davidGroup.position.set(2.8, 0, 30.5);
+    hq.add(davidGroup);
 
     scene.add(hq);
   })();
@@ -1061,24 +1180,25 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
   var streetCar2 = buildRealisticCar(0xdc2626); streetCar2.rotation.y = Math.PI; streetCar2.position.set(42, 0, 2.5); scene.add(streetCar2);
 
   // ==========================================================================
-  // 8 TWO-STOREY NORTHAMPTONSHIRE HOUSES (#10-#17) WITH SEE-THROUGH WINDOWS,
-  // PANELLED DOORS + HANDLES, FURNISHED LOUNGE, KITCHEN & UPSTAIRS BEDROOM
+  // 8 TWO-STOREY HOUSES WITH SEPARATE PARTITIONED ROOMS, INTERIOR DOORS,
+  // PITCH-BLACK UNDER-STAIRS CUPBOARD (TORCH NEEDED!), & CAMERAS ON WALL PIERS
   // ==========================================================================
   var HOUSE_NUMS = [10, 12, 14, 16, 11, 13, 15, 17];
   var STREET_NAMES = ['Kettering Rd', 'Wellingborough Rd', 'Billing Rd', 'Abington Ave', 'Kingsthorpe Grove', 'Towcester Rd', 'Brackmills Way', 'Duston Close'];
   var houses = [];
 
-  (function buildTwoStoreyNeighborhood() {
+  (function buildMultiRoomNeighborhood() {
     var brickMats = [
       new THREE.MeshStandardMaterial({ map: makeBrickTex('#991b1b'), roughness: 0.85 }),
       new THREE.MeshStandardMaterial({ map: makeBrickTex('#b45309'), roughness: 0.85 }),
       new THREE.MeshStandardMaterial({ map: makeBrickTex('#d6d3d1', '#57534e'), roughness: 0.85 })
     ];
     var doorHexes = ['#b91c1c', '#1d4ed8', '#15803d', '#6d28d9', '#c2410c'];
-    var glassMat = new THREE.MeshPhysicalMaterial({
-      color: 0xbae6fd, transparent: true, opacity: 0.34, roughness: 0.1, metalness: 0.1
-    });
+    var intDoorTex = makeDoorTex('#f8fafc', true);
+    var glassMat = new THREE.MeshPhysicalMaterial({ color: 0xbae6fd, transparent: true, opacity: 0.34, roughness: 0.1 });
     var upvcMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 });
+    var wallPlasterMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.8 });
+    var darkCupboardMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.95 });
     var kitchenTileMat = new THREE.MeshStandardMaterial({ map: makeKitchenTileTex(), roughness: 0.5 });
 
     for (var i=0; i<8; i++) {
@@ -1094,44 +1214,44 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
       if (!isNorth) hGroup.rotation.y = Math.PI;
 
       var bMat = brickMats[i % brickMats.length];
-      var w = 10.4, hd = 9.0, h = 6.2; // Full Two-Storey 6.2m height!
+      var w = 10.6, hd = 9.2, h = 6.2;
 
-      // 1. Ground Floor (Lounge Carpet, Hallway Wood, Kitchen Chequered Tiles)
-      var loungeFloor = new THREE.Mesh(new THREE.BoxGeometry(w*0.55, 0.16, hd), new THREE.MeshStandardMaterial({color:0x475569}));
-      loungeFloor.position.set(-w*0.22, 0.08, 0);
-      var kitchenFloor = new THREE.Mesh(new THREE.BoxGeometry(w*0.45, 0.17, hd), kitchenTileMat);
-      kitchenFloor.position.set(w*0.27, 0.085, 0);
-      hGroup.add(loungeFloor, kitchenFloor);
+      // 1. Distinct Room Floors: Left Lounge Carpet, Center Hallway Wood, Right Kitchen Tiles
+      var loungeFl = new THREE.Mesh(new THREE.BoxGeometry(3.8, 0.16, hd), new THREE.MeshStandardMaterial({color:0x334155}));
+      loungeFl.position.set(-3.3, 0.08, 0);
+      var hallFl = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.16, hd), new THREE.MeshStandardMaterial({color:0x78350f}));
+      hallFl.position.set(0, 0.08, 0);
+      var kitchFl = new THREE.Mesh(new THREE.BoxGeometry(3.8, 0.17, hd), kitchenTileMat);
+      kitchFl.position.set(3.3, 0.085, 0);
+      hGroup.add(loungeFl, hallFl, kitchFl);
 
-      // 2. First-Floor / Second-Storey Floor Slab (Y = 3.1m) & Roof Ceiling (Y = 6.2m)
-      var secondFloorSlab = new THREE.Mesh(new THREE.BoxGeometry(w-0.2, 0.2, hd-0.2), new THREE.MeshStandardMaterial({color:0xe2e8f0}));
+      // 2. Second-Storey Floor Slab (Y = 3.1m) & Roof Ceiling (Y = 6.2m)
+      var secondFloorSlab = new THREE.Mesh(new THREE.BoxGeometry(w-0.2, 0.22, hd-0.2), new THREE.MeshStandardMaterial({color:0xe2e8f0}));
       secondFloorSlab.position.set(0, 3.1, 0);
-      var roofCeil = new THREE.Mesh(new THREE.BoxGeometry(w, 0.2, hd), new THREE.MeshStandardMaterial({color:0xf8fafc}));
+      var roofCeil = new THREE.Mesh(new THREE.BoxGeometry(w, 0.2, hd), upvcMat);
       roofCeil.position.set(0, h, 0);
       hGroup.add(secondFloorSlab, roofCeil);
 
-      // 3. Pitched Slate Roof & Brick Chimney Stack
-      var roof = new THREE.Mesh(new THREE.ConeGeometry(7.8, 3.0, 4), new THREE.MeshStandardMaterial({color:0x1e293b, roughness:0.8}));
+      // 3. Pitched Slate Roof & Chimney
+      var roof = new THREE.Mesh(new THREE.ConeGeometry(7.9, 3.0, 4), new THREE.MeshStandardMaterial({color:0x1e293b, roughness:0.8}));
       roof.position.set(0, h + 1.5, 0); roof.rotation.y = Math.PI/4; roof.castShadow = true;
       var chimney = new THREE.Mesh(new THREE.BoxGeometry(0.95, 2.6, 0.95), bMat);
-      chimney.position.set(-3.2, h + 1.7, -1.4);
+      chimney.position.set(-3.3, h + 1.7, -1.4);
       hGroup.add(roof, chimney);
 
-      // 4. Back, Left, Right Exterior Brick Walls
+      // 4. Exterior Back, Left & Right Brick Walls
       var backW = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.26), bMat); backW.position.set(0, h/2, -hd/2); backW.castShadow = true;
       var leftW = new THREE.Mesh(new THREE.BoxGeometry(0.26, h, hd), bMat); leftW.position.set(-w/2, h/2, 0); leftW.castShadow = true;
       var rightW = new THREE.Mesh(new THREE.BoxGeometry(0.26, h, hd), bMat); rightW.position.set(w/2, h/2, 0); rightW.castShadow = true;
       hGroup.add(backW, leftW, rightW);
 
-      // 5. Two-Storey Front Facade with See-Through Ground & Upstairs Windows!
-      // Center Pier above Front Door
+      // 5. Front Facade: Solid Outer Brick Corner Piers (X = ±4.45m where CCTV Cameras mount!), Windows (X = ±2.65m), Center Door
       var doorTopWall = new THREE.Mesh(new THREE.BoxGeometry(2.2, h - 2.55, 0.26), bMat);
       doorTopWall.position.set(0, 2.55 + (h-2.55)/2, hd/2);
       hGroup.add(doorTopWall);
 
-      // Left & Right Corner Piers & Spandrel Panels around See-Through Windows
-      [-4.4, 4.4].forEach(function(px) {
-        var cornerPier = new THREE.Mesh(new THREE.BoxGeometry(1.6, h, 0.26), bMat);
+      [-4.45, 4.45].forEach(function(px) {
+        var cornerPier = new THREE.Mesh(new THREE.BoxGeometry(1.7, h, 0.26), bMat);
         cornerPier.position.set(px, h/2, hd/2);
         hGroup.add(cornerPier);
       });
@@ -1141,32 +1261,59 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
         hGroup.add(midPier);
       });
 
-      // Window Sills, Spandrels & Transparent Double-Glazed Windows (Ground Left=Lounge, Ground Right=Kitchen, Upstairs Left & Right=Bedrooms)
       [-2.65, 2.65].forEach(function(wx) {
-        // Below ground window (Y = 0..0.85)
-        var lowWall = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.85, 0.26), bMat);
-        lowWall.position.set(wx, 0.425, hd/2);
-        // Between ground & upstairs window (Y = 2.35..3.85)
-        var midWall = new THREE.Mesh(new THREE.BoxGeometry(1.9, 1.5, 0.26), bMat);
-        midWall.position.set(wx, 3.1, hd/2);
-        // Above upstairs window (Y = 5.25..6.2)
-        var topWall = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.95, 0.26), bMat);
-        topWall.position.set(wx, 5.725, hd/2);
+        var lowWall = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.85, 0.26), bMat); lowWall.position.set(wx, 0.425, hd/2);
+        var midWall = new THREE.Mesh(new THREE.BoxGeometry(1.9, 1.5, 0.26), bMat); midWall.position.set(wx, 3.1, hd/2);
+        var topWall = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.95, 0.26), bMat); topWall.position.set(wx, 5.725, hd/2);
         hGroup.add(lowWall, midWall, topWall);
 
-        // See-Through Ground Window (Y = 1.6) & Upstairs Window (Y = 4.55)
         [1.6, 4.55].forEach(function(wy) {
-          var pane = new THREE.Mesh(new THREE.PlaneGeometry(1.88, 1.48), glassMat);
-          pane.position.set(wx, wy, hd/2);
-          var sill = new THREE.Mesh(new THREE.BoxGeometry(2.05, 0.1, 0.36), upvcMat);
-          sill.position.set(wx, wy - 0.75, hd/2 + 0.04);
-          var mullion = new THREE.Mesh(new THREE.BoxGeometry(0.07, 1.5, 0.28), upvcMat);
-          mullion.position.set(wx, wy, hd/2);
+          var pane = new THREE.Mesh(new THREE.PlaneGeometry(1.88, 1.48), glassMat); pane.position.set(wx, wy, hd/2);
+          var sill = new THREE.Mesh(new THREE.BoxGeometry(2.05, 0.1, 0.36), upvcMat); sill.position.set(wx, wy - 0.75, hd/2 + 0.04);
+          var mullion = new THREE.Mesh(new THREE.BoxGeometry(0.07, 1.5, 0.28), upvcMat); mullion.position.set(wx, wy, hd/2);
           hGroup.add(pane, sill, mullion);
         });
       });
 
-      // 6. Realistic Panelled Front Door with Brass Lever Handle & Porch Canopy
+      // 6. INTERNAL PARTITION WALLS & DOORWAYS (Dividing Hallway, Lounge, Kitchen & Dark Under-Stairs Cupboard!)
+      // Left Hallway Wall (X = -1.4) & Right Hallway Wall (X = +1.4) with open archways into Lounge & Kitchen
+      [-1.4, 1.4].forEach(function(wx) {
+        var frontSeg = new THREE.Mesh(new THREE.BoxGeometry(0.18, 3.0, 2.6), wallPlasterMat);
+        frontSeg.position.set(wx, 1.5, 3.2);
+        var backSeg = new THREE.Mesh(new THREE.BoxGeometry(0.18, 3.0, 4.4), wallPlasterMat);
+        backSeg.position.set(wx, 1.5, -2.3);
+        var doorHdrSeg = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.6, 2.2), wallPlasterMat);
+        doorHdrSeg.position.set(wx, 2.7, 0.8);
+        hGroup.add(frontSeg, backSeg, doorHdrSeg);
+      });
+
+      // DARK UNDER-STAIRS CUPBOARD / UTILITY ROOM Partition Wall at Z = -1.2 (Between X = -1.4 and +1.4)
+      var cupWallL = new THREE.Mesh(new THREE.BoxGeometry(0.6, 3.0, 0.18), darkCupboardMat); cupWallL.position.set(-1.1, 1.5, -1.2);
+      var cupWallR = new THREE.Mesh(new THREE.BoxGeometry(0.6, 3.0, 0.18), darkCupboardMat); cupWallR.position.set(1.1, 1.5, -1.2);
+      var cupWallTop = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.55, 0.18), darkCupboardMat); cupWallTop.position.set(0, 2.72, -1.2);
+      // Dark interior lining inside the rear cupboard so it looks genuinely pitch-black without your Torch!
+      var cupBackLining = new THREE.Mesh(new THREE.BoxGeometry(2.7, 2.95, 0.05), darkCupboardMat); cupBackLining.position.set(0, 1.5, -hd/2 + 0.16);
+      var cupCeilLining = new THREE.Mesh(new THREE.BoxGeometry(2.7, 0.05, 3.3), darkCupboardMat); cupCeilLining.position.set(0, 2.95, -2.85);
+      hGroup.add(cupWallL, cupWallR, cupWallTop, cupBackLining, cupCeilLining);
+
+      // Swinging Interior Cupboard Door (at Z = -1.2)
+      var cupDoorPivot = new THREE.Group();
+      cupDoorPivot.position.set(-0.8, 0, -1.2);
+      var cupDoorMesh = new THREE.Mesh(new THREE.BoxGeometry(1.6, 2.45, 0.10), new THREE.MeshStandardMaterial({ map: intDoorTex }));
+      cupDoorMesh.position.set(0.8, 1.225, 0);
+      var cupHandle = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.04, 0.18), new THREE.MeshStandardMaterial({color:0xe2e8f0, metalness:0.9}));
+      cupHandle.position.set(1.4, 1.1, 0);
+      cupDoorPivot.add(cupDoorMesh, cupHandle);
+      hGroup.add(cupDoorPivot);
+
+      var worldCupDoorZ = hz - facingDir * 1.2;
+      doorObjects.push({
+        pivot: cupDoorPivot, open: false, targetAngle: 0,
+        x: finalX, z: worldCupDoorZ, houseIdx: i, isFrontDoor: false,
+        label: 'Dark Cupboard Door (#' + HOUSE_NUMS[i] + ')'
+      });
+
+      // 7. Front Door on Hinges with Brass Lever Handle
       var porchCanopy = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.16, 1.0), upvcMat);
       porchCanopy.position.set(0, 2.68, hd/2 + 0.45);
       hGroup.add(porchCanopy);
@@ -1175,15 +1322,12 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
       doorPivot.position.set(-0.95, 0, hd/2);
       var doorMesh = new THREE.Mesh(
         new THREE.BoxGeometry(1.9, 2.52, 0.12),
-        new THREE.MeshStandardMaterial({ map: makeDoorTex(doorHexes[i % doorHexes.length]), roughness: 0.4 })
+        new THREE.MeshStandardMaterial({ map: makeDoorTex(doorHexes[i % doorHexes.length], false), roughness: 0.4 })
       );
       doorMesh.position.set(0.95, 1.26, 0);
-      // 3D Brass Lever Handle (Both inside & outside)
       var handleMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, metalness: 0.9, roughness: 0.15 });
-      var backplate = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.26, 0.16), handleMat);
-      backplate.position.set(1.68, 1.15, 0);
-      var leverOut = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.04, 0.05), handleMat);
-      leverOut.position.set(1.62, 1.15, 0.11);
+      var backplate = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.26, 0.16), handleMat); backplate.position.set(1.68, 1.15, 0);
+      var leverOut = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.04, 0.05), handleMat); leverOut.position.set(1.62, 1.15, 0.11);
       var leverIn = leverOut.clone(); leverIn.position.z = -0.11;
       doorPivot.add(doorMesh, backplate, leverOut, leverIn);
       hGroup.add(doorPivot);
@@ -1196,40 +1340,37 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
       };
       doorObjects.push(doorRecord);
 
-      // 7. Furnished Interior Rooms (Visible through the Windows & when walking inside!)
-      // Warm Interior PointLight
-      var roomLight = new THREE.PointLight(0xfffbeb, 0.95, 11);
-      roomLight.position.set(0, 2.7, 0);
-      hGroup.add(roomLight);
+      // 8. Furnished Rooms: Lounge (Left), Kitchen (Right), Upstairs Bedroom (Top), & Alarm Panel inside Dark Rear Cupboard!
+      var loungeLight = new THREE.PointLight(0xfffbeb, 0.85, 7); loungeLight.position.set(-3.2, 2.7, 1.5);
+      var kitchLight = new THREE.PointLight(0xfffbeb, 0.85, 7); kitchLight.position.set(3.2, 2.7, 1.5);
+      hGroup.add(loungeLight, kitchLight);
 
-      // A) LOUNGE (Left Ground Side): L-Shaped Sofa, Coffee Table, Rug & Glowing 65" TV
-      var sofaBase = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.55, 1.0), new THREE.MeshStandardMaterial({color:0x1e3a8a}));
-      sofaBase.position.set(-3.1, 0.35, -1.2);
-      var sofaBack = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.65, 0.25), new THREE.MeshStandardMaterial({color:0x1d4ed8}));
-      sofaBack.position.set(-3.1, 0.75, -1.6);
-      var coffeeTbl = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.42, 0.7), new THREE.MeshStandardMaterial({color:0x78350f}));
-      coffeeTbl.position.set(-3.1, 0.25, 0.3);
-      var tvStand = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.5, 0.45), new THREE.MeshStandardMaterial({color:0x0f172a}));
-      tvStand.position.set(-3.1, 0.3, 2.2);
-      var tvScreen = new THREE.Mesh(new THREE.BoxGeometry(1.65, 0.95, 0.08), new THREE.MeshStandardMaterial({color:0x0284c7, emissive:0x38bdf8, emissiveIntensity:0.65}));
-      tvScreen.position.set(-3.1, 1.1, 2.2);
-      hGroup.add(sofaBase, sofaBack, coffeeTbl, tvStand, tvScreen);
+      // Lounge Furniture (Left Room X = -1.6..-5.0)
+      var sofaBase = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.55, 0.95), new THREE.MeshStandardMaterial({color:0x1e3a8a}));
+      sofaBase.position.set(-3.3, 0.35, -1.2);
+      var sofaBack = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.65, 0.25), new THREE.MeshStandardMaterial({color:0x1d4ed8}));
+      sofaBack.position.set(-3.3, 0.75, -1.6);
+      var tvStand = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.5, 0.45), new THREE.MeshStandardMaterial({color:0x0f172a}));
+      tvStand.position.set(-3.3, 0.3, 2.4);
+      var tvScreen = new THREE.Mesh(new THREE.BoxGeometry(1.55, 0.9, 0.08), new THREE.MeshStandardMaterial({color:0x0284c7, emissive:0x38bdf8, emissiveIntensity:0.65}));
+      tvScreen.position.set(-3.3, 1.08, 2.4);
+      hGroup.add(sofaBase, sofaBack, tvStand, tvScreen);
 
-      // B) KITCHEN (Right Ground Side): Worktop Counter, Stainless Sink, Fridge-Freezer
-      var worktop = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.9, 0.8), new THREE.MeshStandardMaterial({color:0x334155}));
-      worktop.position.set(3.0, 0.5, -2.2);
-      var counterTop = new THREE.Mesh(new THREE.BoxGeometry(2.9, 0.08, 0.86), new THREE.MeshStandardMaterial({color:0xd6d3d1}));
-      counterTop.position.set(3.0, 0.98, -2.2);
+      // Kitchen Furniture (Right Room X = +1.6..+5.0)
+      var worktop = new THREE.Mesh(new THREE.BoxGeometry(2.7, 0.9, 0.8), new THREE.MeshStandardMaterial({color:0x334155}));
+      worktop.position.set(3.3, 0.5, -2.5);
+      var counterTop = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.08, 0.86), new THREE.MeshStandardMaterial({color:0xd6d3d1}));
+      counterTop.position.set(3.3, 0.98, -2.5);
       var fridge = new THREE.Mesh(new THREE.BoxGeometry(0.85, 1.95, 0.85), new THREE.MeshStandardMaterial({color:0xe2e8f0, metalness:0.6, roughness:0.25}));
       fridge.position.set(4.3, 1.05, -0.5);
       hGroup.add(worktop, counterTop, fridge);
 
-      // C) HALLWAY & STAIRCASE + ALARM PANEL (Center Back Wall)
-      var panelBox = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.88, 0.22), new THREE.MeshStandardMaterial({color:0xf8fafc, emissive:0x22c55e, emissiveIntensity:0.35}));
-      panelBox.position.set(0, 1.55, -hd/2 + 0.24);
+      // Alarm Panel inside the Dark Rear Under-Stairs Cupboard (X = 0, Z = -hd/2 + 0.26)
+      var panelBox = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.88, 0.22), new THREE.MeshStandardMaterial({color:0xf8fafc, emissive:0x22c55e, emissiveIntensity:0.25}));
+      panelBox.position.set(0, 1.55, -hd/2 + 0.26);
       hGroup.add(panelBox);
 
-      // D) UPSTAIRS BEDROOM (Visible through 2nd-floor windows at Y = 3.2m..6.0m): Double Bed, Headboard, Mattress & Pillows
+      // Upstairs Bedroom (Visible through 2nd-floor windows)
       var bedFrame = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.45, 2.2), new THREE.MeshStandardMaterial({color:0x78350f}));
       bedFrame.position.set(-2.6, 3.45, 1.8);
       var duvet = new THREE.Mesh(new THREE.BoxGeometry(1.95, 0.22, 1.6), new THREE.MeshStandardMaterial({color:0xef4444}));
@@ -1238,14 +1379,13 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
       pillow.position.set(-2.6, 3.78, 2.5);
       hGroup.add(bedFrame, duvet, pillow);
 
-      // 8. High-Level External Bell Box & TWO High-Level CCTV Camera Mounts (At Y = 4.35m Eaves!)
+      // 9. Bell Box (Center Brick Wall X = 0, Y = 3.85m) & CCTV Cameras ON SOLID BRICK CORNER PIERS (X = ±4.45m, Y = 3.85m — Off the Windows!)
       var bellBox = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.76, 0.24), new THREE.MeshStandardMaterial({color:0xff6b00}));
-      bellBox.position.set(0, 4.35, hd/2 + 0.16);
+      bellBox.position.set(0, 3.85, hd/2 + 0.16);
       var strobe = makeGlowSprite('#38bdf8', 1.6);
-      strobe.position.set(0, 4.15, hd/2 + 0.32);
+      strobe.position.set(0, 3.65, hd/2 + 0.32);
       hGroup.add(bellBox, strobe);
 
-      // Camera Mount #1 (Left Eaves X = -3.4, Y = 4.35m) & Camera Mount #2 (Right Eaves X = +3.4, Y = 4.35m)
       function buildTurretCam() {
         var cg = new THREE.Group();
         var jb = new THREE.Mesh(new THREE.CylinderGeometry(0.20, 0.20, 0.12, 12), upvcMat); jb.rotation.x = Math.PI/2;
@@ -1255,11 +1395,11 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
         cg.add(jb, dm, ir);
         return cg;
       }
-      var cam1 = buildTurretCam(); cam1.position.set(-3.4, 4.35, hd/2 + 0.15);
-      var cam2 = buildTurretCam(); cam2.position.set(3.4, 4.35, hd/2 + 0.15);
+      // Mounted at X = -4.45 and X = +4.45 squarely on the solid brick corner piers!
+      var cam1 = buildTurretCam(); cam1.position.set(-4.45, 3.85, hd/2 + 0.16);
+      var cam2 = buildTurretCam(); cam2.position.set(4.45, 3.85, hd/2 + 0.16);
       hGroup.add(cam1, cam2);
 
-      // Glowing Blue Ground Target Circle showing where to Pitch Ladder
       var ladderZoneRing = new THREE.Mesh(
         new THREE.RingGeometry(0.48, 0.74, 24),
         new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide })
@@ -1269,12 +1409,11 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
       ladderZoneRing.visible = false;
       hGroup.add(ladderZoneRing);
 
-      // 9. Realistic Front Lawn, Flagstone Path, Flowerbeds & Low Garden Wall
+      // 10. Front Path & Flowerbeds
       var path = new THREE.Mesh(new THREE.BoxGeometry(1.85, 0.06, 6.4), new THREE.MeshStandardMaterial({color:0x94a3b8, roughness:0.8}));
       path.position.set(0, 0.03, hd/2 + 3.2);
       hGroup.add(path);
 
-      // Colourful Flowerbeds flanking the front door
       [-2.8, 2.8].forEach(function(fx) {
         var soil = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.12, 1.1), new THREE.MeshStandardMaterial({color:0x451a03}));
         soil.position.set(fx, 0.06, hd/2 + 0.65);
@@ -1298,13 +1437,13 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
         facingDir: facingDir,
         frontDoorZ: worldDoorZ,
         panelX: finalX,
-        panelZ: hz - facingDir * (hd/2 - 0.5),
-        // World coordinates for Bell Box (center X=0), CCTV #1 (local X=-3.4), CCTV #2 (local X=+3.4)
+        panelZ: hz - facingDir * (hd/2 - 0.55),
         bellX: finalX,
         bellZ: worldDoorZ + facingDir * 0.75,
-        cctv1X: finalX - facingDir * 3.4,
+        // World coordinates for solid brick corner piers (±4.45m)
+        cctv1X: finalX - facingDir * 4.45,
         cctv1Z: worldDoorZ + facingDir * 0.75,
-        cctv2X: finalX + facingDir * 3.4,
+        cctv2X: finalX + facingDir * 4.45,
         cctv2Z: worldDoorZ + facingDir * 0.75,
         ladderZoneRing: ladderZoneRing,
         frontDoor: doorRecord
@@ -1313,25 +1452,24 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
   })();
 
   // ==========================================================================
-  // NPCS: ANXIOUS HOMEOWNER, STICKY-FINGERS KEV, PEDESTRIANS & BARKING LAWN DOG
+  // NPCS: ANXIOUS HOMEOWNER, STICKY-FINGERS KEV, STROLLING PEDESTRIANS & DOG
   // ==========================================================================
   var targetHouseMarker = makeNameplateSprite('🚨 TARGET CALLOUT — HEAD HERE!', '#ef4444', '#fde047');
   targetHouseMarker.scale.set(5.5, 1.35, 1);
   scene.add(targetHouseMarker);
 
-  var homeownerNPC = buildHumanoid(0x2563eb, 0x93c5fd, '🏠 ANXIOUS CUSTOMER (WAVE)', '#1d4ed8');
+  var homeownerNPC = buildHumanoid(0x2563eb, 0x93c5fd, '🏠 ANXIOUS CUSTOMER (WAVE)', '#1d4ed8', false);
   scene.add(homeownerNPC);
 
-  var kevNPC = buildHumanoid(0x111827, 0xef4444, '🦹 STICKY-FINGERS KEV (BURGLAR)', '#b91c1c');
+  var kevNPC = buildHumanoid(0x111827, 0xef4444, '🦹 STICKY-FINGERS KEV (BURGLAR)', '#b91c1c', false);
   var swagBag = new THREE.Mesh(new THREE.SphereGeometry(0.32, 12, 12), new THREE.MeshStandardMaterial({color:0xf8fafc}));
   swagBag.position.set(0.45, 0.85, 0.25); kevNPC.add(swagBag);
   scene.add(kevNPC);
 
-  var neighbour1 = buildHumanoid(0x15803d, 0xfde047, '🚶 LOCAL PEDESTRIAN', '#166534');
-  var neighbour2 = buildHumanoid(0x7e22ce, 0xfecdd3, '🚶 DOG WALKER', '#6b21a8');
+  var neighbour1 = buildHumanoid(0x15803d, 0xfde047, '🚶 LOCAL PEDESTRIAN', '#166534', false);
+  var neighbour2 = buildHumanoid(0x7e22ce, 0xfecdd3, '🐕 DOG WALKER', '#6b21a8', false);
   scene.add(neighbour1, neighbour2);
 
-  // Active Barking Guard Dog on Target House Lawn
   var lawnDog = buildGuardDog();
   scene.add(lawnDog);
 
@@ -1345,11 +1483,11 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
       if (STATE.camerasInstalled === 0) {
         STATE.ladderSpotType = 'CCTV1';
         STATE.ladderX = th.cctv1X; STATE.ladderZ = th.cctv1Z;
-        th.ladderZoneRing.position.x = -3.4;
+        th.ladderZoneRing.position.x = -4.45;
       } else {
         STATE.ladderSpotType = 'CCTV2';
         STATE.ladderX = th.cctv2X; STATE.ladderZ = th.cctv2Z;
-        th.ladderZoneRing.position.x = 3.4;
+        th.ladderZoneRing.position.x = 4.45;
       }
     }
   }
@@ -1372,7 +1510,7 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
   // WEATHER CONTROLLER
   // ==========================================================================
   var WEATHER_MODES = [
-    { name: 'Sunny', bg: 0x38bdf8, fog: 0x7dd3fc, sunInt: 1.25, hemiInt: 0.9, sunVis: true, moonVis: false, cloudCol: 0xffffff },
+    { name: 'Sunny', bg: 0x38bdf8, fog: 0x7dd3fc, sunInt: 1.25, hemiInt: 0.88, sunVis: true, moonVis: false, cloudCol: 0xffffff },
     { name: 'Dusk',  bg: 0x1e1b4b, fog: 0xf97316, sunInt: 0.85, hemiInt: 0.55, sunVis: true, moonVis: true, cloudCol: 0xfed7aa },
     { name: 'Rain',  bg: 0x1e293b, fog: 0x334155, sunInt: 0.45, hemiInt: 0.45, sunVis: false, moonVis: false, cloudCol: 0x64748b },
     { name: 'Night', bg: 0x030712, fog: 0x090d16, sunInt: 0.15, hemiInt: 0.25, sunVis: false, moonVis: true, cloudCol: 0x334155 }
@@ -1403,7 +1541,7 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
       st.textContent = player.y.toFixed(1) + 'm';
       btn.className = 'hud-btn active-tool';
       climbBar.style.display = 'block';
-      climbBar.textContent = '🪜 ON LADDER: Push Left Stick UP/DOWN (or W/S) to climb! Height: ' + player.y.toFixed(1) + 'm / 4.5m';
+      climbBar.textContent = '🪜 ON LADDER: Push Left Stick UP/DOWN (or W/S) to climb! Height: ' + player.y.toFixed(1) + 'm / 4.2m';
     } else if (STATE.ladderDeployed) {
       st.textContent = 'PITCHED';
       btn.className = 'hud-btn active-tool';
@@ -1427,7 +1565,7 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
     pitchedLadderGroup.position.set(STATE.ladderX, 0, STATE.ladderZ);
     pitchedLadderGroup.rotation.y = (th.facingDir === 1) ? 0 : Math.PI;
     window.playTone(480, 0.14, 'square');
-    window.showToast("🪜 Ladder pitched against the wall! Tap <b>GRAB & CLIMB LADDER</b>, then push your Joystick UP (or W) to climb rung-by-rung to 4.3m!");
+    window.showToast("🪜 Ladder pitched against the brick pier! Tap <b>GRAB & CLIMB LADDER</b>, then push your Joystick UP (or W) to climb rung-by-rung!");
     window.syncLadderVisuals();
   }
 
@@ -1435,11 +1573,11 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
     STATE.onLadder = true;
     player.x = STATE.ladderX;
     player.z = STATE.ladderZ + th.facingDir * 0.55;
-    player.y = 1.85; // Start at bottom rung — player climbs manually with joystick/W!
+    player.y = 1.85;
     player.yaw = (th.facingDir === 1) ? 0 : Math.PI;
-    player.pitch = 0.15;
+    player.pitch = 0.12;
     window.playTone(540, 0.1, 'triangle');
-    window.showToast("🪜 You're on the bottom rung! <b>Push Left Stick UP (or hold W / Up Arrow)</b> to climb rung-by-rung up to 4.3m!");
+    window.showToast("🪜 You're on the bottom rung! <b>Push Left Stick UP (or hold W / Up Arrow)</b> to climb rung-by-rung up to 3.8m!");
     window.syncLadderVisuals();
   }
 
@@ -1471,14 +1609,19 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
 
   window.toggleTorch = function() {
     STATE.torchOn = !STATE.torchOn;
-    torchLight.intensity = STATE.torchOn ? 1.8 : 0.0;
+    torchLight.intensity = STATE.torchOn ? 2.2 : 0.0;
+    var tBtn = document.getElementById('torchHudBtn');
+    if (tBtn) {
+      tBtn.textContent = STATE.torchOn ? '🔦 Torch: ON' : '🔦 Torch: OFF';
+      tBtn.className = STATE.torchOn ? 'hud-btn active-tool' : 'hud-btn secondary';
+    }
     window.playTone(STATE.torchOn ? 720 : 420, 0.08, 'square');
   };
 
   window.drinkTea = function() {
     if (STATE.teas <= 0) { window.showToast("☕ Flask empty! Buy a Greggs/Brew in the Shop!"); return; }
     STATE.teas--;
-    STATE.timer = Math.min(110, STATE.timer + 18);
+    STATE.timer = Math.min(115, STATE.timer + 18);
     window.playTone(660, 0.15, 'sine');
     window.showToast("☕ Proper builder's brew! +18 Seconds added to your SLA clock!");
     saveGame();
@@ -1498,9 +1641,9 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
   // DISPATCH PHONE & THE 3 DISTINCT ENGINEERING MINIGAMES
   // ==========================================================================
   var JOB_TYPES_POOL = [
-    { id: 'ALARM',   label: '📟 Indoor Alarm Panel (Wire-to-Wire + Spiders)', cams: 0 },
-    { id: 'CCTV',    label: '📹 Dual 4K CCTV Camera Install (2 Cams + Drill)', cams: 2 },
-    { id: 'BELLBOX', label: '🔔 External Bell Box Sequence Repair (4.3m)', cams: 0 }
+    { id: 'ALARM',   label: '📟 Indoor Alarm Panel (Dark Cupboard + Swipe Wires)', cams: 0 },
+    { id: 'CCTV',    label: '📹 Dual 4K CCTV Camera Install (Brick Pier + Drill)', cams: 2 },
+    { id: 'BELLBOX', label: '🔔 External Bell Box Sequence Repair (3.8m)', cams: 0 }
   ];
 
   window.answerDispatchPhone = function() {
@@ -1520,145 +1663,230 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
     lawnDog.userData.badge.visible = true;
     STATE.onLadder = false; player.y = 1.7;
     STATE.ladderDeployed = false; STATE.hasLadderInHand = true;
-    STATE.maxTimer = STATE.upgrades.snips ? 105 : 90;
+    STATE.maxTimer = STATE.upgrades.snips ? 110 : 95;
     STATE.timer = STATE.maxTimer;
 
     positionNPCsAtTargetHouse();
     window.syncLadderVisuals();
     window.playTone(880, 0.12, 'square');
-    window.showToast('📞 DISPATCH: <b>' + STATE.jobTypeLabel + '</b> at <b>#' + th.number + ' (' + th.street + ')</b>! Watch out for Chomper the dog on the lawn!', 7000);
+    window.showToast('📞 DISPATCH: <b>' + STATE.jobTypeLabel + '</b> at <b>#' + th.number + ' (' + th.street + ')</b>!', 7000);
     window.updateHud();
   };
 
   // --------------------------------------------------------------------------
-  // 1) INDOOR ALARM MINIGAME: WIRE-TO-WIRE CONNECTION + SCUTTLING SPIDERS
+  // 1) TRUE TOUCH-SWIPE / DRAG-ACROSS ALARM WIRING MINIGAME (+ SPIDERS!)
   // --------------------------------------------------------------------------
-  function openAlarmWireMinigame() {
+  var wireAnimId = null;
+  window._stopWireLoop = function() {
+    if (wireAnimId) cancelAnimationFrame(wireAnimId);
+    wireAnimId = null;
+  };
+
+  function openAlarmSwipeWireMinigame() {
+    if (STATE.inDarkCupboard && !STATE.torchOn) {
+      window.playTone(160, 0.25, 'sawtooth');
+      window.showToast("🌑 Pitch black in the under-stairs cupboard! Tap <b>🔦 Torch: ON</b> on the top HUD before wiring!");
+      return;
+    }
+
     document.getElementById('jobModal').style.display = 'flex';
-    document.getElementById('jobModalTitle').textContent = '🔌 WIRE-TO-WIRE EOL PANEL (+ SWAT SPIDERS!)';
+    document.getElementById('jobModalTitle').textContent = '🔌 SWIPE / DRAG WIRES ACROSS PCB (+ SWAT SPIDERS!)';
     var area = document.getElementById('jobInteractiveArea');
     area.innerHTML = '';
 
-    var spidersAlive = 2;
-    var selectedLeft = null;
-    var connectedCount = 0;
-    var WIRES = [
-      { id: '12V', leftLabel: '🔴 +12V RED CORE', rightLabel: '⚡ AUX +12V TERMINAL', color: '#ef4444', done: false },
-      { id: '0V',  leftLabel: '⚫ 0V BLACK CORE', rightLabel: '⚡ AUX 0V TERMINAL',   color: '#475569', done: false },
-      { id: 'Z1',  leftLabel: '🟢 4k7 GREEN CORE', rightLabel: '📟 ZONE 1 EOL INPUT', color: '#22c55e', done: false },
-      { id: 'TMP', label: 'TMP', leftLabel: '🟡 2k2 YELLOW CORE', rightLabel: '🛡️ TAMPER RETURN', color: '#eab308', done: false }
-    ];
-    var rightOrder = WIRES.slice().sort(function() { return Math.random() - 0.5; });
+    var c = document.createElement('canvas');
+    c.width = 480; c.height = 290;
+    c.style.cssText = 'width:100%;height:265px;background:#061c14;border:2px solid #22c55e;border-radius:12px;touch-action:none;cursor:crosshair;display:block;';
+    area.appendChild(c);
+    var ctx = c.getContext('2d');
 
-    function updateStatus() {
+    var WIRES = [
+      { id: '12V', label: '+12V RED',   termLabel: 'AUX +12V', color: '#ef4444', yL: 48,  done: false },
+      { id: '0V',  label: '0V BLACK',   termLabel: 'AUX 0V',   color: '#94a3b8', yL: 112, done: false },
+      { id: 'Z1',  label: '4k7 GREEN',  termLabel: 'ZONE 1',   color: '#22c55e', yL: 176, done: false },
+      { id: 'TMP', label: '2k2 YELLOW', termLabel: 'TAMPER',   color: '#facc15', yL: 240, done: false }
+    ];
+    // Shuffle right-hand PCB terminal positions
+    var rightYSlots = [48, 112, 176, 240].sort(function() { return Math.random() - 0.5; });
+    WIRES.forEach(function(w, idx) { w.yR = rightYSlots[idx]; });
+
+    // 2 Scuttling Spiders crawling around the PCB
+    var spiders = [
+      { x: 240, y: 90, vx: 1.4, vy: 1.1, alive: true },
+      { x: 250, y: 195, vx: -1.3, vy: -1.2, alive: true }
+    ];
+
+    var draggingWire = null;
+    var pointerX = 0, pointerY = 0;
+    var connectedCount = 0;
+
+    function updateStatusText() {
+      var aliveCount = spiders.filter(function(s){return s.alive;}).length;
       var st = document.getElementById('lcdStatus');
       var fh = document.getElementById('flukeHint');
-      if (spidersAlive > 0) {
-        st.textContent = '🕷️ WARNING: ' + spidersAlive + ' SPIDER(S) ON PCB! TAP SPIDERS TO SWAT!';
-        fh.textContent = 'Clear the spiders before connecting live 12V wires!';
+      if (aliveCount > 0) {
+        st.textContent = '🕷️ ' + aliveCount + ' SPIDER(S) ON PCB! TAP SPIDERS TO SWAT!';
+        fh.textContent = 'Tap the scuttling spiders on the board, then swipe wires from Left to Right!';
       } else {
-        st.textContent = 'TERMINALS WIRED: ' + connectedCount + ' / 4';
-        fh.textContent = selectedLeft ? ('Selected ' + selectedLeft + ' — Now tap matching Right Terminal!') : 'Tap a Left Cable Core, then tap its matching Right PCB Terminal!';
+        st.textContent = 'SWIPE WIRES LEFT ➔ RIGHT (' + connectedCount + '/4 CONNECTED)';
+        fh.textContent = 'Touch/click a left wire node and drag your finger across to the matching right terminal!';
+      }
+    }
+    updateStatusText();
+
+    function getCanvasCoords(ev) {
+      var rect = c.getBoundingClientRect();
+      var clientX = ev.touches ? ev.touches[0].clientX : (ev.changedTouches ? ev.changedTouches[0].clientX : ev.clientX);
+      var clientY = ev.touches ? ev.touches[0].clientY : (ev.changedTouches ? ev.changedTouches[0].clientY : ev.clientY);
+      return {
+        x: (clientX - rect.left) * (c.width / rect.width),
+        y: (clientY - rect.top) * (c.height / rect.height)
+      };
+    }
+
+    function onDown(ev) {
+      ev.preventDefault();
+      var pt = getCanvasCoords(ev);
+      pointerX = pt.x; pointerY = pt.y;
+
+      // 1. Check if tapping a Spider to swat it
+      for (var i=0; i<spiders.length; i++) {
+        var sp = spiders[i];
+        if (sp.alive && Math.hypot(pt.x - sp.x, pt.y - sp.y) < 38) {
+          sp.alive = false;
+          window.playTone(520, 0.09, 'triangle');
+          updateStatusText();
+          return;
+        }
+      }
+
+      // If spiders still alive, warn player
+      if (spiders.some(function(s){return s.alive;})) {
+        window.playTone(160, 0.2, 'sawtooth');
+        document.getElementById('lcdStatus').textContent = '🕷️ SWAT THE SPIDERS FIRST BEFORE WIRING!';
+        return;
+      }
+
+      // 2. Check if starting a swipe on a Left Wire Node (x: 20..155)
+      for (var j=0; j<WIRES.length; j++) {
+        var w = WIRES[j];
+        if (!w.done && pt.x < 165 && Math.abs(pt.y - w.yL) < 28) {
+          draggingWire = w;
+          window.playTone(440, 0.06, 'sine');
+          break;
+        }
       }
     }
 
-    var wrap = document.createElement('div');
-    wrap.style.position = 'relative';
-    wrap.innerHTML = '<canvas id="wireCanvasOverlay" width="460" height="230" style="width:100%;height:230px;background:#071a12;border:1.5px solid #16a34a;border-radius:10px;display:block;"></canvas>';
-    area.appendChild(wrap);
-
-    var grid = document.createElement('div');
-    grid.style.cssText = 'position:absolute;inset:10px;display:flex;justify-content:space-between;pointer-events:none;';
-    var leftCol = document.createElement('div');
-    leftCol.style.cssText = 'width:43%;display:flex;flex-direction:column;justify-content:space-around;pointer-events:auto;';
-    var rightCol = document.createElement('div');
-    rightCol.style.cssText = 'width:43%;display:flex;flex-direction:column;justify-content:space-around;pointer-events:auto;';
-    grid.appendChild(leftCol); grid.appendChild(rightCol);
-    wrap.appendChild(grid);
-
-    // Spawn 2 Scuttling Spiders on the PCB
-    for (var s=0; s<2; s++) {
-      (function(spIdx) {
-        var spBtn = document.createElement('button');
-        spBtn.innerHTML = '🕷️ SWAT SPIDER!';
-        spBtn.style.cssText = 'position:absolute;z-index:5;background:#dc2626;color:#fff;border:2px solid #fde047;border-radius:999px;padding:6px 12px;font-weight:900;font-size:12px;cursor:pointer;top:' + (45 + spIdx*95) + 'px;left:' + (140 + spIdx*40) + 'px;';
-        spBtn.onclick = function() {
-          spidersAlive--;
-          spBtn.remove();
-          window.playTone(480, 0.1, 'triangle');
-          updateStatus();
-        };
-        wrap.appendChild(spBtn);
-      })(s);
+    function onMove(ev) {
+      if (!draggingWire) return;
+      ev.preventDefault();
+      var pt = getCanvasCoords(ev);
+      pointerX = pt.x; pointerY = pt.y;
     }
 
-    function drawConnectedWires() {
-      var wc = document.getElementById('wireCanvasOverlay');
-      if (!wc) return;
-      var wctx = wc.getContext('2d');
-      wctx.clearRect(0, 0, wc.width, wc.height);
-      WIRES.forEach(function(w, lIdx) {
-        if (!w.done) return;
-        var rIdx = rightOrder.indexOf(w);
-        var y1 = 28 + lIdx * 56;
-        var y2 = 28 + rIdx * 56;
-        wctx.strokeStyle = w.color;
-        wctx.lineWidth = 6;
-        wctx.beginPath();
-        wctx.moveTo(185, y1);
-        wctx.bezierCurveTo(230, y1, 230, y2, 275, y2);
-        wctx.stroke();
+    function onUp(ev) {
+      if (!draggingWire) return;
+      ev.preventDefault();
+      var pt = getCanvasCoords(ev);
+      // Check if released over the matching Right PCB Terminal (x > 315)
+      if (pt.x > 310 && Math.abs(pt.y - draggingWire.yR) < 34) {
+        draggingWire.done = true;
+        connectedCount++;
+        window.playTone(660 + connectedCount * 95, 0.14, 'sine');
+        draggingWire = null;
+        updateStatusText();
+        if (connectedCount >= 4) {
+          window._stopWireLoop();
+          setTimeout(completeJobSuccess, 280);
+        }
+      } else if (pt.x > 310) {
+        // Released on wrong right terminal!
+        STATE.timer = Math.max(4, STATE.timer - 5);
+        window.playTone(150, 0.25, 'sawtooth');
+        document.getElementById('lcdStatus').textContent = '⚡ SPARK FAULT! WRONG TERMINAL (-5s PENALTY)!';
+        draggingWire = null;
+      } else {
+        draggingWire = null;
+      }
+    }
+
+    c.addEventListener('mousedown', onDown);
+    c.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    c.addEventListener('touchstart', onDown, {passive: false});
+    c.addEventListener('touchmove', onMove, {passive: false});
+    c.addEventListener('touchend', onUp, {passive: false});
+
+    function renderPCB() {
+      wireAnimId = requestAnimationFrame(renderPCB);
+      ctx.fillStyle = '#062016';
+      ctx.fillRect(0, 0, c.width, c.height);
+
+      // PCB Copper Traces Grid
+      ctx.strokeStyle = 'rgba(34,197,94,0.12)';
+      ctx.lineWidth = 1;
+      for (var gx=0; gx<c.width; gx+=24) { ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,c.height); ctx.stroke(); }
+      for (var gy=0; gy<c.height; gy+=24) { ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(c.width,gy); ctx.stroke(); }
+
+      // Draw Left Cable Cores & Right Terminals
+      WIRES.forEach(function(w) {
+        // Left Cable Jacket & Copper Core Pad
+        ctx.fillStyle = w.color;
+        ctx.fillRect(14, w.yL - 18, 125, 36);
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
+        ctx.strokeRect(14, w.yL - 18, 125, 36);
+        ctx.fillStyle = '#ffffff'; ctx.font = 'bold 13px monospace';
+        ctx.fillText(w.label, 24, w.yL + 5);
+
+        // Right PCB Screw Terminal Block
+        var highlight = (STATE.upgrades.fluke && draggingWire && draggingWire.id === w.id);
+        ctx.fillStyle = w.done ? '#14532d' : '#1e293b';
+        ctx.fillRect(340, w.yR - 18, 126, 36);
+        ctx.strokeStyle = highlight ? '#fde047' : w.color;
+        ctx.lineWidth = highlight ? 4 : 2.5;
+        ctx.strokeRect(340, w.yR - 18, 126, 36);
+        ctx.fillStyle = '#ffffff'; ctx.font = 'bold 13px monospace';
+        ctx.fillText((w.done ? '✅ ' : '🔩 ') + w.termLabel, 348, w.yR + 5);
+
+        // Completed Bezier Copper Wire
+        if (w.done) {
+          ctx.strokeStyle = w.color;
+          ctx.lineWidth = 7;
+          ctx.beginPath();
+          ctx.moveTo(139, w.yL);
+          ctx.bezierCurveTo(235, w.yL, 245, w.yR, 340, w.yR);
+          ctx.stroke();
+        }
+      });
+
+      // Active Dragging Wire Preview
+      if (draggingWire) {
+        ctx.strokeStyle = draggingWire.color;
+        ctx.lineWidth = 7;
+        ctx.beginPath();
+        ctx.moveTo(139, draggingWire.yL);
+        ctx.bezierCurveTo(220, draggingWire.yL, (139 + pointerX)/2, pointerY, pointerX, pointerY);
+        ctx.stroke();
+        ctx.fillStyle = '#fde047';
+        ctx.beginPath(); ctx.arc(pointerX, pointerY, 9, 0, Math.PI*2); ctx.fill();
+      }
+
+      // Draw & Move Scuttling Spiders
+      spiders.forEach(function(sp) {
+        if (!sp.alive) return;
+        sp.x += sp.vx; sp.y += sp.vy;
+        if (sp.x < 175 || sp.x > 305) sp.vx *= -1;
+        if (sp.y < 35 || sp.y > 255) sp.vy *= -1;
+
+        ctx.fillStyle = '#dc2626';
+        ctx.beginPath(); ctx.arc(sp.x, sp.y, 16, 0, Math.PI*2); ctx.fill();
+        ctx.strokeStyle = '#fde047'; ctx.lineWidth = 2; ctx.stroke();
+        ctx.font = '20px sans-serif';
+        ctx.fillText('🕷️', sp.x - 12, sp.y + 7);
       });
     }
-
-    WIRES.forEach(function(w) {
-      var bL = document.createElement('button');
-      bL.className = 'term-btn';
-      bL.style.background = w.color;
-      bL.textContent = w.leftLabel;
-      bL.onclick = function() {
-        if (spidersAlive > 0) {
-          window.playTone(170, 0.2, 'sawtooth');
-          window.showToast("🕷️ Swat the spiders off the PCB before touching the wires!");
-          return;
-        }
-        if (w.done) return;
-        selectedLeft = w.id;
-        window.playTone(540, 0.08, 'sine');
-        updateStatus();
-      };
-      leftCol.appendChild(bL);
-    });
-
-    rightOrder.forEach(function(w) {
-      var bR = document.createElement('button');
-      bR.className = 'term-btn';
-      bR.style.background = '#1e293b';
-      bR.textContent = w.rightLabel;
-      bR.onclick = function() {
-        if (spidersAlive > 0 || w.done || !selectedLeft) return;
-        if (selectedLeft === w.id) {
-          w.done = true;
-          connectedCount++;
-          selectedLeft = null;
-          bR.style.background = '#14532d';
-          bR.textContent = '✅ ' + w.rightLabel;
-          window.playTone(680 + connectedCount*90, 0.12, 'sine');
-          drawConnectedWires();
-          updateStatus();
-          if (connectedCount >= 4) {
-            setTimeout(completeJobSuccess, 320);
-          }
-        } else {
-          STATE.timer = Math.max(4, STATE.timer - 5);
-          window.playTone(150, 0.25, 'sawtooth');
-          document.getElementById('lcdStatus').textContent = '⚡ SHORT CIRCUIT! WRONG TERMINAL (-5s)!';
-        }
-      };
-      rightCol.appendChild(bR);
-    });
-
-    updateStatus();
+    renderPCB();
   }
 
   // --------------------------------------------------------------------------
@@ -1672,13 +1900,11 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
     area.innerHTML = '';
 
     var drillPct = 0;
-    var plugsFitted = false;
     var rj45Crimped = false;
-
     var st = document.getElementById('lcdStatus');
     var fh = document.getElementById('flukeHint');
-    st.textContent = 'STAGE 1/3: DRILL BRICKWORK MOUNTING HOLES (0%)';
-    fh.textContent = 'Tap or hold the SDS Hammer Drill button below to bore into the brick!';
+    st.textContent = 'STAGE 1/3: DRILL BRICK PIER MOUNTING HOLES (0%)';
+    fh.textContent = 'Tap or hold the SDS Hammer Drill button below to bore into the brick pier!';
 
     var drillBarWrap = document.createElement('div');
     drillBarWrap.style.cssText = 'background:#1e293b;border-radius:10px;height:24px;overflow:hidden;margin-bottom:10px;border:1px solid #38bdf8;';
@@ -1696,15 +1922,13 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
       drillPct = Math.min(100, drillPct + 25);
       drillBarFill.style.width = drillPct + '%';
       btnDrill.textContent = drillPct < 100 ? ('🔨 DRILLING BRICKWORK... (' + drillPct + '%)') : '✅ MASONRY HOLES DRILLED (100%)';
-      // Hammer drill buzz sound + 3D drill recoil
       window.playTone(135, 0.14, 'sawtooth', 0.12);
       rightToolGroup.position.z = -0.72;
       setTimeout(function(){ rightToolGroup.position.z = -0.58; }, 110);
       if (drillPct >= 100) {
         btnDrill.style.background = '#14532d';
-        st.textContent = 'STAGE 2/3: INSERT RAWLPLUGS & CRIMP CAT6 PoE';
-        btnCrimp.disabled = false;
-        btnCrimp.style.opacity = '1';
+        st.textContent = 'STAGE 2/3: INSERT WALL PLUGS & CRIMP CAT6 PoE';
+        btnCrimp.disabled = false; btnCrimp.style.opacity = '1';
       }
     };
     area.appendChild(btnDrill);
@@ -1721,8 +1945,7 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
       btnCrimp.textContent = '✅ CAT6 PoE & IP67 GLAND SEALED';
       window.playTone(680, 0.14, 'sine');
       st.textContent = 'STAGE 3/3: FOCUS 2.8mm 4K TURRET LENS';
-      btnFocus.disabled = false;
-      btnFocus.style.opacity = '1';
+      btnFocus.disabled = false; btnFocus.style.opacity = '1';
     };
     area.appendChild(btnCrimp);
 
@@ -1737,14 +1960,11 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
       window.playTone(880, 0.2, 'sine');
       if (STATE.camerasInstalled < STATE.camerasRequired) {
         document.getElementById('jobModal').style.display = 'none';
-        // Move blue ladder ring to Camera Spot #2 on the right eaves!
-        STATE.onLadder = false;
-        player.y = 1.7;
-        STATE.ladderDeployed = false;
-        STATE.hasLadderInHand = true;
+        STATE.onLadder = false; player.y = 1.7;
+        STATE.ladderDeployed = false; STATE.hasLadderInHand = true;
         updateTargetSpotCoordinates();
         window.syncLadderVisuals();
-        window.showToast("📹 Camera #1 Installed! Now walk to the <b>Second Blue Ring</b> on the right side of the house, pitch your ladder, climb up, and drill Camera #2!", 7000);
+        window.showToast("📹 Camera #1 Installed on Left Brick Pier! Now walk to the <b>Right Brick Pier Blue Ring</b>, pitch your ladder, climb up, and drill Camera #2!", 7000);
       } else {
         completeJobSuccess();
       }
@@ -1757,7 +1977,7 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
   // --------------------------------------------------------------------------
   function openBellBoxSequenceMinigame() {
     document.getElementById('jobModal').style.display = 'flex';
-    document.getElementById('jobModalTitle').textContent = '🔔 EXTERNAL BELL BOX SEQUENCE REPAIR (4.3m)';
+    document.getElementById('jobModalTitle').textContent = '🔔 EXTERNAL BELL BOX SEQUENCE REPAIR (3.8m)';
     var area = document.getElementById('jobInteractiveArea');
     area.innerHTML = '';
 
@@ -1785,8 +2005,7 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
         if (step.id < curStep) return;
         if (step.id === curStep) {
           curStep++;
-          btn.style.background = '#14532d';
-          btn.style.opacity = '0.5';
+          btn.style.background = '#14532d'; btn.style.opacity = '0.5';
           btn.textContent = '✅ ' + step.label;
           window.playTone(600 + curStep*110, 0.14, 'sine');
           if (curStep >= 4) {
@@ -1805,6 +2024,7 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
   }
 
   function completeJobSuccess() {
+    window._stopWireLoop();
     document.getElementById('jobModal').style.display = 'none';
     var basePay = (STATE.jobType === 'CCTV') ? (135 * STATE.camerasRequired) : (STATE.jobType === 'BELLBOX' ? 155 : 125);
     var payout = basePay + Math.floor(STATE.timer * 1.3);
@@ -1816,7 +2036,7 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
     STATE.phase = 'HQ_RINGING';
     STATE.onLadder = false; player.y = 1.7;
     STATE.ladderDeployed = false; STATE.hasLadderInHand = true;
-    player.x = 0; player.z = 34.0; player.yaw = 0; player.pitch = 0;
+    player.x = 0; player.z = 32.5; player.yaw = 0; player.pitch = 0;
     window.syncLadderVisuals();
     saveGame();
     window.playTone(587, 0.14, 'sine');
@@ -1830,7 +2050,7 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
   var SHOP_CATALOG = [
     { id: 'fibreglassLadder', key: 'fibreglassLadder', name: '🪜 Trade Fibreglass Pro Ladder', cost: 160, desc: 'Upgrades ladder to yellow fibreglass + faster climbing + £25 High-Access Bonus', type: 'flag' },
     { id: 'snips', name: '✂️ Knipex Snips & SDS Plus Drill Bit', cost: 120, desc: '+15s Extra SLA Timer on Alarms, Bellboxes & CCTV', type: 'flag' },
-    { id: 'fluke', name: '📟 Fluke Multimeter & PoE Tester', cost: 220, desc: 'Highlights fault diagnostics across all 3 job types', type: 'flag' },
+    { id: 'fluke', name: '📟 Fluke Multimeter & PoE Tester', cost: 220, desc: 'Highlights target PCB terminal in yellow while swiping wires!', type: 'flag' },
     { id: 'hivis', name: '🦺 NS Hi-Vis Bomber Jacket', cost: 95, desc: '+20% Customer Tip Bonus on every callout', type: 'flag' },
     { id: 'teaPack', name: '🥐 Greggs Roll, Brew & Dog Biscuits', cost: 30, desc: '+2 Tea Refills (+18s) & +2 Dog Biscuits for lawn dogs', type: 'consumable' },
     { id: 'van1', name: '🚐 Signwritten NS Custom Transit Van', cost: 400, desc: 'Upgrades your 3D Van to Metallic Navy & Orange livery', type: 'van', tier: 1 },
@@ -1843,8 +2063,8 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
     while(hqCosmeticsGroup.children.length) hqCosmeticsGroup.remove(hqCosmeticsGroup.children[0]);
     if (STATE.upgrades.teaUrn) {
       var urn = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 0.65, 14), new THREE.MeshStandardMaterial({color:0xe2e8f0, metalness:0.85, roughness:0.2}));
-      urn.position.set(4.8, 0.9, 34.5);
-      var badge = makeNameplateSprite('☕ FREE HQ TEA URN', '#16a34a'); badge.position.set(4.8, 1.7, 34.5);
+      urn.position.set(5.2, 0.9, 32.5);
+      var badge = makeNameplateSprite('☕ FREE HQ TEA URN', '#16a34a'); badge.position.set(5.2, 1.7, 32.5);
       hqCosmeticsGroup.add(urn, badge);
     }
     if (STATE.upgrades.cctv) {
@@ -1853,7 +2073,7 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
     }
     if (STATE.upgrades.goldBell) {
       var trophy = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.8, 0.35), new THREE.MeshStandardMaterial({color:0xfacc15, metalness:0.9, roughness:0.15}));
-      trophy.position.set(4.8, 1.1, 29.5); hqCosmeticsGroup.add(trophy);
+      trophy.position.set(5.2, 1.1, 28.5); hqCosmeticsGroup.add(trophy);
     }
   };
   window.rebuildHQCosmetics();
@@ -1905,7 +2125,7 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
   };
 
   // ==========================================================================
-  // CONTROLS & MAIN 60FPS ANIMATION LOOP (WITH RUNG-BY-RUNG LADDER CLIMBING)
+  // CONTROLS, BOSS DAVID 2D WAYPOINT AI & MAIN 60FPS ANIMATION LOOP
   // ==========================================================================
   var keys = {};
   window.addEventListener('keydown', function(e) { keys[e.code] = true; });
@@ -1973,12 +2193,35 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
+  // Boss David 2D Waypoint Roaming State inside HQ (Front Office & Back Store Room)
+  var DAVID_WAYPOINTS = [
+    { x: 3.5, z: 28.5 },
+    { x: 0.0, z: 31.5 },
+    { x: 3.8, z: 33.0 },
+    { x: 1.5, z: 36.2 },
+    { x: -2.5, z: 36.0 },
+    { x: -1.0, z: 28.2 }
+  ];
+  var davidState = { targetX: 3.5, targetZ: 28.5, waitTimer: 0 };
+
   var currentAction = null, subAction = null;
   window.triggerContextAction = function() { if (currentAction && currentAction.fn) currentAction.fn(); };
   window.triggerSubAction = function() { if (subAction && subAction.fn) subAction.fn(); };
 
   var lastTime = performance.now();
   var ringAccum = 0, lastRungIndex = 0, dogBarkCooldown = 0;
+
+  function animateLimbs(npc, walkPhase, waveRight) {
+    if (!npc || !npc.userData.leftLeg) return;
+    npc.userData.leftLeg.rotation.x = Math.sin(walkPhase) * 0.5;
+    npc.userData.rightLeg.rotation.x = -Math.sin(walkPhase) * 0.5;
+    npc.userData.leftArm.rotation.x = -Math.sin(walkPhase) * 0.4;
+    if (waveRight) {
+      npc.userData.rightArm.rotation.z = Math.PI * 0.75 + Math.sin(walkPhase * 1.4) * 0.35;
+    } else {
+      npc.userData.rightArm.rotation.x = Math.sin(walkPhase) * 0.4;
+    }
+  }
 
   function animate(now) {
     requestAnimationFrame(animate);
@@ -1989,29 +2232,27 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
     var moveF = -joyVec.y + (keys['KeyW']||keys['ArrowUp'] ? 1 : 0) - (keys['KeyS']||keys['ArrowDown'] ? 1 : 0);
     var moveS = joyVec.x + (keys['KeyD']||keys['ArrowRight'] ? 1 : 0) - (keys['KeyA']||keys['ArrowLeft'] ? 1 : 0);
 
-    // PHYSICAL RUNG-BY-RUNG LADDER CLIMBING OR GROUND WALKING
+    // 1. Physical Rung-by-Rung Ladder Climbing OR Ground Walking
     if (STATE.onLadder) {
-      var climbSpeed = STATE.upgrades.fibreglassLadder ? 2.5 : 1.95;
+      var climbSpeed = STATE.upgrades.fibreglassLadder ? 2.4 : 1.85;
       if (Math.abs(moveF) > 0.05) {
         player.y += moveF * climbSpeed * dt;
-        // Rung-by-rung metallic clank sound + slight horizontal rung sway
-        var curRung = Math.floor(player.y / 0.34);
+        var curRung = Math.floor(player.y / 0.32);
         if (curRung !== lastRungIndex) {
           lastRungIndex = curRung;
           window.playTone(320 + curRung * 28, 0.05, 'triangle', 0.06);
         }
         handGroup.position.y = Math.sin(player.y * 12) * 0.035;
       }
-      // Step off automatically if climbed all the way down below 1.65m
       if (player.y < 1.65) {
         stepOffLadder();
       } else {
-        player.y = Math.min(4.55, player.y);
+        player.y = Math.min(4.25, player.y);
         window.syncLadderVisuals();
       }
     } else {
       player.y = 1.7;
-      var speed = 6.4;
+      var speed = 6.2;
       if (Math.abs(moveF) > 0.02 || Math.abs(moveS) > 0.02) {
         var sin = Math.sin(player.yaw), cos = Math.cos(player.yaw);
         player.x += (-sin * moveF + cos * moveS) * speed * dt;
@@ -2022,40 +2263,100 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
       }
     }
 
+    // 2. Check if Player is inside any House's Dark Rear Under-Stairs Cupboard!
+    var insideCupboard = false;
+    for (var hi=0; hi<houses.length; hi++) {
+      var hc = houses[hi];
+      if (Math.abs(player.x - hc.x) < 1.55 && Math.hypot(player.x - hc.x, player.z - hc.panelZ) < 3.1) {
+        insideCupboard = true;
+        break;
+      }
+    }
+    STATE.inDarkCupboard = insideCupboard;
+    var darkBanner = document.getElementById('darkRoomBanner');
+    if (insideCupboard) {
+      // Plunge ambient lighting into darkness inside the windowless cupboard so the Torch is genuinely needed!
+      hemiLight.intensity = STATE.torchOn ? 0.35 : 0.02;
+      sunLight.intensity = STATE.torchOn ? 0.25 : 0.01;
+      darkBanner.style.display = STATE.torchOn ? 'none' : 'block';
+    } else {
+      var wm = WEATHER_MODES[STATE.weatherIdx];
+      hemiLight.intensity = wm.hemiInt;
+      sunLight.intensity = wm.sunInt;
+      darkBanner.style.display = 'none';
+    }
+
     camera.position.set(player.x, player.y, player.z);
     camera.rotation.order = 'YXZ';
     camera.rotation.y = player.yaw;
     camera.rotation.x = player.pitch;
 
-    // Sky & Traffic Animations
+    // 3. Sky & Traffic Animations
     cloudClusters.forEach(function(c) {
       c.position.x += c.userData.speed * dt;
       if (c.position.x > 165) c.position.x = -165;
     });
     windTurbineRotors.forEach(function(r) { r.rotation.z -= 1.6 * dt; });
 
-    streetCar1.position.x += 11.5 * dt; if (streetCar1.position.x > 64) streetCar1.position.x = -64;
-    streetCar2.position.x -= 10.2 * dt; if (streetCar2.position.x < -64) streetCar2.position.x = 64;
+    streetCar1.position.x += 11.0 * dt; if (streetCar1.position.x > 64) streetCar1.position.x = -64;
+    streetCar2.position.x -= 9.8 * dt; if (streetCar2.position.x < -64) streetCar2.position.x = 64;
     if (vanBeaconLight) vanBeaconLight.intensity = 1.2 + Math.sin(t * 14) * 1.0;
 
     doorObjects.forEach(function(d) {
       if (d.pivot) d.pivot.rotation.y += (d.targetAngle - d.pivot.rotation.y) * 8 * dt;
     });
 
-    // NPCs & Barking Lawn Dog Animation
+    // 4. Colleague Craig Typing Animation at PC & Boss David 2D Waypoint Roaming inside HQ
+    if (craigGroup && craigGroup.userData.leftArm) {
+      craigGroup.userData.leftArm.rotation.x = -Math.PI/3 + Math.sin(t * 16) * 0.12;
+      craigGroup.userData.rightArm.rotation.x = -Math.PI/3 - Math.sin(t * 16) * 0.12;
+      craigGroup.userData.head.rotation.y = Math.sin(t * 1.5) * 0.18;
+    }
+
+    if (davidGroup) {
+      if (davidState.waitTimer > 0) {
+        davidState.waitTimer -= dt;
+        animateLimbs(davidGroup, 0, false);
+      } else {
+        var ddx = davidState.targetX - davidGroup.position.x;
+        var ddz = davidState.targetZ - davidGroup.position.z;
+        var dDist = Math.hypot(ddx, ddz);
+        if (dDist < 0.25) {
+          var nextWp = DAVID_WAYPOINTS[Math.floor(Math.random() * DAVID_WAYPOINTS.length)];
+          davidState.targetX = nextWp.x;
+          davidState.targetZ = nextWp.z;
+          davidState.waitTimer = 1.8 + Math.random() * 2.2;
+        } else {
+          var dSpeed = 1.65;
+          davidGroup.position.x += (ddx / dDist) * dSpeed * dt;
+          davidGroup.position.z += (ddz / dDist) * dSpeed * dt;
+          davidGroup.rotation.y = Math.atan2(ddx, ddz);
+          animateLimbs(davidGroup, t * 4.5, false);
+        }
+      }
+    }
+
+    // 5. Slowed-Down Strolling Pedestrians & Dog Walker + Homeowner & Kev
     var th = houses[STATE.targetHouseIdx] || houses[0];
-    if (davidGroup) davidGroup.position.x = 2.5 + Math.sin(t * 1.1) * 2.2;
-    homeownerNPC.position.x = th.x - 1.8 + Math.sin(t * 2.2) * 1.2;
+    homeownerNPC.position.x = th.x - 1.8 + Math.sin(t * 1.6) * 1.1;
     homeownerNPC.lookAt(player.x, 0, player.z);
+    animateLimbs(homeownerNPC, t * 3.8, true);
 
     var creepRatio = STATE.phase === 'ACTIVE_JOB' ? (1 - STATE.timer / STATE.maxTimer) : 0.2;
-    kevNPC.position.x = th.x + 4.4 - creepRatio * 3.2 + Math.cos(t * 2.0) * 1.0;
+    kevNPC.position.x = th.x + 4.4 - creepRatio * 3.2 + Math.cos(t * 1.5) * 0.9;
     kevNPC.lookAt(th.x, 0, th.frontDoorZ);
+    animateLimbs(kevNPC, t * 3.6, false);
 
-    neighbour1.position.set(Math.sin(t * 0.24) * 40, 0, -6.8);
-    neighbour2.position.set(-Math.sin(t * 0.21) * 38, 0, 6.8);
+    // Slow, relaxed pedestrian & dog-walker speed (0.045 rad/s -> ~1.7m/s stroll!)
+    neighbour1.position.set(Math.sin(t * 0.045) * 38, 0, -6.8);
+    neighbour1.rotation.y = Math.cos(t * 0.045) > 0 ? Math.PI/2 : -Math.PI/2;
+    animateLimbs(neighbour1, t * 2.8, false);
 
-    // Lawn Guard Dog Distraction Behavior
+    neighbour2.position.set(-Math.sin(t * 0.04) * 36, 0, 6.8);
+    neighbour2.rotation.y = -Math.cos(t * 0.04) > 0 ? Math.PI/2 : -Math.PI/2;
+    animateLimbs(neighbour2, t * 2.6, false);
+
+    // Lawn Guard Dog Distraction
     lawnDog.userData.tail.rotation.z = Math.sin(t * 18) * 0.4;
     if (STATE.phase === 'ACTIVE_JOB' && !STATE.dogCalmed && !STATE.onLadder) {
       var distToDog = Math.hypot(player.x - lawnDog.position.x, player.z - lawnDog.position.z);
@@ -2064,17 +2365,17 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
         lawnDog.position.y = Math.abs(Math.sin(t * 12)) * 0.22;
         dogBarkCooldown -= dt;
         if (dogBarkCooldown <= 0) {
-          dogBarkCooldown = 2.4;
+          dogBarkCooldown = 2.6;
           window.playTone(210, 0.09, 'sawtooth', 0.09);
           setTimeout(function(){ window.playTone(185, 0.12, 'sawtooth', 0.09); }, 110);
-          window.showToast("🐕 WOOF! Chomper the Lawn Dog is distracting you! Tap <b>🦴 Biscuit</b> on the HUD to calm him!");
+          window.showToast("🐕 WOOF! Chomper the Lawn Dog is barking! Tap <b>🦴 Biscuit</b> on the HUD to calm him!");
         }
       } else {
         lawnDog.position.y = 0;
       }
     }
 
-    // Ringing HQ Phone or Active Job SLA Timer
+    // 6. Ringing HQ Phone or Active Job SLA Timer
     if (STATE.phase === 'HQ_RINGING') {
       hqPhoneMarker.visible = true;
       hqPhoneRingLight.scale.setScalar(1 + Math.sin(t * 18) * 0.35);
@@ -2094,7 +2395,7 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
           STATE.phase = 'HQ_RINGING';
           STATE.onLadder = false; player.y = 1.7;
           STATE.ladderDeployed = false; STATE.hasLadderInHand = true;
-          player.x = 0; player.z = 34.0;
+          player.x = 0; player.z = 32.5;
           window.syncLadderVisuals();
           window.playTone(150, 0.4, 'sawtooth');
           window.showToast("🦹 STICKY-FINGERS KEV BEAT YOU TO IT! Back to HQ—answer the phone for the next callout!", 6000);
@@ -2103,32 +2404,32 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
       }
     }
 
-    // Context Action Detection
+    // 7. Context Action Detection
     currentAction = null; subAction = null;
 
     if (STATE.onLadder) {
-      if (player.y >= 3.85) {
+      if (player.y >= 3.45) {
         if (STATE.jobType === 'CCTV') {
           currentAction = {
-            label: '🔨 DRILL & FIT 4K CCTV CAMERA #' + (STATE.camerasInstalled + 1) + ' (AT ' + player.y.toFixed(1) + 'm)',
+            label: '🔨 DRILL BRICK PIER & FIT 4K CCTV #' + (STATE.camerasInstalled + 1) + ' (' + player.y.toFixed(1) + 'm)',
             fn: openCCTVDrillMinigame
           };
         } else {
           currentAction = {
-            label: '🔔 REPAIR EXTERNAL BELL BOX SIREN (AT ' + player.y.toFixed(1) + 'm)',
+            label: '🔔 REPAIR EXTERNAL BELL BOX SIREN (' + player.y.toFixed(1) + 'm)',
             fn: openBellBoxSequenceMinigame
           };
         }
       } else {
         currentAction = {
-          label: '⬆️ CLIMB HIGHER UP LADDER (HOLD W / STICK UP — ' + player.y.toFixed(1) + 'm / 4.2m)',
-          fn: function() { player.y = Math.min(4.4, player.y + 0.65); window.syncLadderVisuals(); }
+          label: '⬆️ CLIMB HIGHER UP LADDER (HOLD W / STICK UP — ' + player.y.toFixed(1) + 'm / 3.8m)',
+          fn: function() { player.y = Math.min(3.9, player.y + 0.65); window.syncLadderVisuals(); }
         };
       }
       subAction = { label: '🪜 STEP OFF LADDER TO GROUND', fn: stepOffLadder };
     }
 
-    if (!currentAction && STATE.phase === 'HQ_RINGING' && Math.hypot(player.x - (-1.6), player.z - 30.0) < 4.2) {
+    if (!currentAction && STATE.phase === 'HQ_RINGING' && Math.hypot(player.x - (-2.2), player.z - 29.8) < 4.2) {
       currentAction = { label: '📞 ANSWER DISPATCH PHONE CALL', fn: window.answerDispatchPhone };
     }
 
@@ -2137,7 +2438,7 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
       if (Math.hypot(player.x - STATE.ladderX, player.z - STATE.ladderZ) < 4.0) {
         if (!STATE.ladderDeployed) {
           currentAction = {
-            label: '🪜 PITCH LADDER ON BLUE MARKER (#' + th.number + ')',
+            label: '🪜 PITCH LADDER ON BRICK PIER MARKER (#' + th.number + ')',
             fn: function() { STATE.hasLadderInHand = true; pitchLadderAtTarget(th); }
           };
         } else {
@@ -2150,14 +2451,14 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
       }
     }
 
-    if (!currentAction && Math.hypot(player.x - th.panelX, player.z - th.panelZ) < 3.4) {
-      currentAction = { label: '🔌 OPEN & WIRE ALARM PANEL (#' + th.number + ')', fn: openAlarmWireMinigame };
+    if (!currentAction && Math.hypot(player.x - th.panelX, player.z - th.panelZ) < 2.8) {
+      currentAction = { label: '🔌 SWIPE-WIRE ALARM PANEL (#' + th.number + ')', fn: openAlarmSwipeWireMinigame };
     }
 
     if (!currentAction) {
       for (var di=0; di<doorObjects.length; di++) {
         var dObj = doorObjects[di];
-        if (Math.hypot(player.x - dObj.x, player.z - dObj.z) < 3.0) {
+        if (Math.hypot(player.x - dObj.x, player.z - dObj.z) < 2.8) {
           (function(dRef) {
             currentAction = {
               label: '🚪 ' + (dRef.open ? 'CLOSE ' : 'OPEN ') + dRef.label.toUpperCase(),
@@ -2179,9 +2480,9 @@ window.closeJobModal = function() { document.getElementById('jobModal').style.di
       }
     }
 
-    if (!currentAction && Math.hypot(player.x - (-2.8), player.z - 31.3) < 3.2) {
+    if (!currentAction && Math.hypot(player.x - (-3.3), player.z - 30.6) < 3.2) {
       currentAction = {
-        label: '💬 CHAT TO COLLEAGUE CRAIG',
+        label: '💬 CHAT TO COLLEAGUE CRAIG (AT PC)',
         fn: function() {
           window.playTone(520, 0.08, 'sine');
           window.showToast(CRAIG_TIPS[Math.floor(Math.random() * CRAIG_TIPS.length)]);
