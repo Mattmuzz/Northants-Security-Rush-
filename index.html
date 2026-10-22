@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
-<title>Northants Security Rush — v10.5 Polish & Realism Edition</title>
+<title>Northants Security Rush — v10.6 Magnetic Swipe Wiring, Leashed Dog & Classic Kev</title>
 
 <script>
 // Clear stale service workers & caches so GitHub updates show immediately
@@ -344,17 +344,16 @@ window.closeJobModal = function() {
 <!-- TITLE MODAL -->
 <div id="titleModal" class="modal-backdrop">
   <div class="modal-card">
-    <span class="version-badge">✨ v10.5 POLISH EDITION — SWIPE WIRING, DARK ROOMS, REAL HQ & CAMERAS ON WALLS</span>
+    <span class="version-badge">✨ v10.6 — MAGNETIC SWIPE WIRING FIX, LEASHED DOG & BURGLAR KEV</span>
     <h2 style="margin:4px 0 6px;color:#ff6b00;">NORTHANTS SECURITY RUSH</h2>
     <p style="font-size:12.5px;color:#cbd5e1;margin:0 0 8px;">
       First-Person 3D Security Engineer Simulator — Perfected Edition
     </p>
     <div style="background:rgba(0,0,0,0.38);border-radius:10px;padding:10px;font-size:11.5px;line-height:1.48;color:#e2e8f0;">
-      ✅ <b>1. Separate Interior Rooms & Dark Cupboards:</b> Every house now has internal partition walls and swinging interior doors separating the <b>Hallway</b>, <b>Lounge</b>, <b>Kitchen</b>, and a <b>Pitch-Black Under-Stairs Cupboard</b> where you need your 🔦 Torch!<br>
-      ✅ <b>2. True Touch-Swipe / Drag Alarm Wiring:</b> Drag and swipe flexible copper wires across the PCB from left to right with your finger or mouse while swatting scuttling spiders!<br>
-      ✅ <b>3. Cameras Mounted on Brick Walls:</b> Turret cameras are now mounted cleanly on the outer brick piers (`±4.45m`) well clear of the windows.<br>
-      ✅ <b>4. Realistic Brick HQ Building:</b> Two-room brick trade HQ with see-through front windows, illuminated sign, <b>Craig seated at his dual-monitor PC typing customer quotes</b>, and <b>Boss David roaming naturally around the office</b>!<br>
-      ✅ <b>5. Natural Pedestrian & Dog-Walker Speed:</b> Slowed right down to a relaxed Northamptonshire stroll.
+      ✅ <b>1. Fixed Magnetic Swipe-Wiring:</b> Dragging a wire across the PCB now shows a glowing magnetic lock ring as you approach a right terminal and snaps cleanly into place on release (also supports Tap-Left then Tap-Right!).<br>
+      ✅ <b>2. Small Terrier Dog on a Leash:</b> The pavement Dog Walker now walks an animated little terrier on a taut 3D lead!<br>
+      ✅ <b>3. Classic Burglar Sticky-Fingers Kev:</b> Dressed in a black-and-white striped jumper, black domino eye mask, beanie hat & `SWAG` bag—creeping and hiding behind houses and side alleys!<br>
+      ✅ <b>4. Multi-Room Houses, Dark Cupboards & Brick HQ:</b> Separate rooms, dark under-stairs cupboards requiring your 🔦 Torch, Craig seated at his PC typing quotes, and roaming Boss David!
     </div>
     <button id="startShiftBtn" class="big-cta" onclick="document.getElementById('titleModal').style.display='none'; if(window.startShift) window.startShift();">
       🚐 START SHIFT IN NORTHANTS HQ
@@ -477,7 +476,7 @@ window.closeJobModal = function() {
   };
 
   try {
-    var saved = JSON.parse(localStorage.getItem('ns_rush_v105_save') || 'null');
+    var saved = JSON.parse(localStorage.getItem('ns_rush_v106_save') || 'null');
     if (saved) {
       if (typeof saved.cash === 'number') STATE.cash = saved.cash;
       if (typeof saved.jobNum === 'number') STATE.jobNum = saved.jobNum;
@@ -491,7 +490,7 @@ window.closeJobModal = function() {
 
   function saveGame() {
     try {
-      localStorage.setItem('ns_rush_v105_save', JSON.stringify({
+      localStorage.setItem('ns_rush_v106_save', JSON.stringify({
         cash: STATE.cash, jobNum: STATE.jobNum, teas: STATE.teas, biscuits: STATE.biscuits, upgrades: STATE.upgrades
       }));
     } catch (e) {}
@@ -505,14 +504,14 @@ window.closeJobModal = function() {
     "🎙️ Boss David: 'Watch out for spiders inside the under-stairs alarm panels today—they're all on the web!'"
   ];
   var CRAIG_TIPS = [
-    "💬 Craig (typing quotes): 'Just pricing up a Pyronix Enforcer & 4K turret job in Abington mate! Remember: the alarm panel is in the dark rear cupboard—keep your 🔦 Torch on!'",
-    "💬 Craig (typing quotes): 'On the Alarm Panel screen, put your finger or mouse on a left wire core and swipe/drag it all the way across to the matching terminal on the right!'",
-    "💬 Craig (typing quotes): 'We moved the CCTV brackets onto the solid brick corner piers on every house so you're drilling into proper masonry, not window glass!'",
-    "💬 Craig (typing quotes): 'If the customer's terrier barks at you on the lawn, tap 🦴 Biscuit on the top bar to settle him down!'"
+    "💬 Craig (typing quotes): 'On the Alarm Panel screen, swipe a wire from Left to Right—as soon as you get near the terminal, the magnetic ring locks on and snaps it in!'",
+    "💬 Craig (typing quotes): 'Keep an eye out for Sticky-Fingers Kev in his striped jumper and eye mask—he's been sneaking behind the back walls and side alleys of the houses!'",
+    "💬 Craig (typing quotes): 'Look out the front HQ window—the local dog walker has her little terrier out on a lead along the pavement!'",
+    "💬 Craig (typing quotes): 'Remember the alarm panel is inside the dark rear cupboard—keep your 🔦 Torch switched ON!'"
   ];
 
   // ==========================================================================
-  // PROCEDURAL HIGH-RES TEXTURES (BRICK, DOORS, LAWN, TILES, QUOTE SCREEN)
+  // PROCEDURAL HIGH-RES TEXTURES (BRICK, DOORS, BURGLAR STRIPES, SWAG, QUOTES)
   // ==========================================================================
   function makeBrickTex(baseHex, mortarHex) {
     mortarHex = mortarHex || '#cbd5e1';
@@ -533,6 +532,26 @@ window.closeJobModal = function() {
     tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
     tex.repeat.set(4, 3);
     return tex;
+  }
+
+  function makeBurglarStripeTex() {
+    var c = document.createElement('canvas'); c.width = 128; c.height = 128;
+    var ctx = c.getContext('2d');
+    for (var i=0; i<8; i++) {
+      ctx.fillStyle = (i % 2 === 0) ? '#111827' : '#f8fafc';
+      ctx.fillRect(0, i * 16, 128, 16);
+    }
+    return new THREE.CanvasTexture(c);
+  }
+
+  function makeSwagBagTex() {
+    var c = document.createElement('canvas'); c.width = 128; c.height = 128;
+    var ctx = c.getContext('2d');
+    ctx.fillStyle = '#f5f5f4'; ctx.fillRect(0,0,128,128);
+    ctx.fillStyle = '#111827'; ctx.font = '900 28px sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('SWAG', 64, 64);
+    return new THREE.CanvasTexture(c);
   }
 
   function makeDoorTex(doorHex, isInterior) {
@@ -855,7 +874,7 @@ window.closeJobModal = function() {
   });
 
   // ==========================================================================
-  // HUMANOIDS, SEATED CRAIG AT PC, ROAMING BOSS DAVID & REALISTIC BRICK HQ
+  // HUMANOIDS, SEATED CRAIG, ROAMING BOSS DAVID, LEASHED DOG & BURGLAR KEV
   // ==========================================================================
   var doorObjects = [];
   var hqPhoneRingLight = null, hqPhoneMarker = null, craigGroup = null, davidGroup = null;
@@ -876,7 +895,6 @@ window.closeJobModal = function() {
     var rA = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.62, 0.18), shirtMat);
 
     if (isSeated) {
-      // Seated posture for Craig in his swivel office chair typing at PC!
       lL.rotation.x = Math.PI/2; lL.position.set(-0.15, 0.48, -0.25);
       rL.rotation.x = Math.PI/2; rL.position.set(0.15, 0.48, -0.25);
       torso.position.set(0, 0.88, 0);
@@ -898,8 +916,80 @@ window.closeJobModal = function() {
     badge.position.set(0, isSeated ? 2.08 : 2.38, 0);
 
     g.add(lL, rL, torso, stripe, head, lA, rA, badge);
-    g.userData = { leftLeg: lL, rightLeg: rL, leftArm: lA, rightArm: rA, head: head, badge: badge };
+    g.userData = { leftLeg: lL, rightLeg: rL, leftArm: lA, rightArm: rA, head: head, torso: torso, badge: badge };
     return g;
+  }
+
+  // CLASSIC BURGLAR STICKY-FINGERS KEV BUILDER (Striped Jumper, Domino Eye Mask, Beanie Hat & SWAG Bag)
+  function buildClassicBurglarKev() {
+    var g = new THREE.Group();
+    var stripeMat = new THREE.MeshStandardMaterial({ map: makeBurglarStripeTex(), roughness: 0.8 });
+    var blackMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.85 });
+    var skinMat = new THREE.MeshStandardMaterial({ color: 0xfdba74 });
+
+    var lL = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.72, 0.22), blackMat); lL.position.set(-0.14, 0.36, 0);
+    var rL = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.72, 0.22), blackMat); rL.position.set(0.14, 0.36, 0);
+
+    // Hunched sneaky burglar torso in Black & White Stripes
+    var torso = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.75, 0.32), stripeMat);
+    torso.position.set(0, 1.06, 0.06);
+    torso.rotation.x = 0.22; // Sneaky forward lean!
+
+    var head = new THREE.Mesh(new THREE.SphereGeometry(0.23, 14, 14), skinMat);
+    head.position.set(0, 1.66, 0.14);
+
+    // Classic Black Domino Burglar Eye Mask + White Peering Eyes
+    var mask = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.12, 0.16), blackMat);
+    mask.position.set(0, 1.68, 0.31);
+    var eyeL = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.04, 0.04), new THREE.MeshBasicMaterial({color:0xffffff}));
+    eyeL.position.set(-0.09, 1.68, 0.38);
+    var eyeR = eyeL.clone(); eyeR.position.x = 0.09;
+
+    // Classic Rolled Black Burglar Beanie Hat
+    var beanie = new THREE.Mesh(new THREE.SphereGeometry(0.24, 12, 10), blackMat);
+    beanie.position.set(0, 1.77, 0.13);
+    beanie.scale.set(1.02, 0.75, 1.02);
+
+    var lA = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.62, 0.18), stripeMat); lA.position.set(-0.38, 1.06, 0.08);
+    var rA = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.62, 0.18), stripeMat); rA.position.set(0.38, 1.06, 0.08);
+
+    // Classic Canvas "SWAG" Sack Slung Over Back/Shoulder
+    var swagBag = new THREE.Mesh(new THREE.SphereGeometry(0.38, 12, 12), new THREE.MeshStandardMaterial({ map: makeSwagBagTex(), roughness: 0.9 }));
+    swagBag.position.set(0.28, 1.18, -0.26);
+    swagBag.scale.set(0.95, 1.15, 0.9);
+
+    var badge = makeNameplateSprite('🦹 STICKY-FINGERS KEV (PROWLING)', '#111827', '#ef4444');
+    badge.position.set(0, 2.38, 0);
+
+    g.add(lL, rL, torso, head, mask, eyeL, eyeR, beanie, lA, rA, swagBag, badge);
+    g.userData = { leftLeg: lL, rightLeg: rL, leftArm: lA, rightArm: rA, badge: badge };
+    return g;
+  }
+
+  // SMALL TERRIER DOG ON A LEASH BUILDER (Attached to Dog Walker)
+  function buildLeashedCompanionDog() {
+    var dg = new THREE.Group();
+    var coatMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.85 }); // Golden/Tan Terrier
+    var earMat = new THREE.MeshStandardMaterial({ color: 0x451a03 });
+    var collarMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
+
+    var body = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.22, 0.46), coatMat); body.position.set(0, 0.26, 0);
+    var head = new THREE.Mesh(new THREE.BoxGeometry(0.20, 0.20, 0.22), coatMat); head.position.set(0, 0.39, 0.24);
+    var snout = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.10, 0.14), earMat); snout.position.set(0, 0.36, 0.36);
+    var collar = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.06, 0.22), collarMat); collar.position.set(0, 0.32, 0.16);
+    var tail = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.03, 0.20, 6), coatMat);
+    tail.position.set(0, 0.38, -0.24); tail.rotation.x = -0.5;
+
+    var legs = [];
+    [[-0.08, 0.15], [0.08, 0.15], [-0.08, -0.15], [0.08, -0.15]].forEach(function(lp) {
+      var leg = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.18, 0.06), coatMat);
+      leg.position.set(lp[0], 0.09, lp[1]);
+      dg.add(leg);
+      legs.push(leg);
+    });
+    dg.add(body, head, snout, collar, tail);
+    dg.userData = { tail: tail, legs: legs };
+    return dg;
   }
 
   function buildGuardDog() {
@@ -926,7 +1016,7 @@ window.closeJobModal = function() {
     return dg;
   }
 
-  // REALISTIC BRICK TWO-ROOM NORTHANTS SECURITY HQ BUILDING (Z = 26..38, X = -7..+7)
+  // REALISTIC BRICK TWO-ROOM NORTHANTS SECURITY HQ BUILDING
   (function buildRealisticHQBuilding() {
     var hq = new THREE.Group();
     var hqBrickMat = new THREE.MeshStandardMaterial({ map: makeBrickTex('#7c2d12', '#cbd5e1'), roughness: 0.85 });
@@ -934,7 +1024,6 @@ window.closeJobModal = function() {
     var glassMat = new THREE.MeshPhysicalMaterial({ color: 0xbae6fd, transparent: true, opacity: 0.34, roughness: 0.1 });
     var upvcMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 });
 
-    // Office Carpet Floor & Store Room Floor
     var flOffice = new THREE.Mesh(new THREE.BoxGeometry(14, 0.16, 8), new THREE.MeshStandardMaterial({ color: 0x1e293b }));
     flOffice.position.set(0, 0.08, 30);
     var flStore = new THREE.Mesh(new THREE.BoxGeometry(14, 0.17, 4), new THREE.MeshStandardMaterial({ color: 0x475569 }));
@@ -943,32 +1032,27 @@ window.closeJobModal = function() {
     ceil.position.set(0, 4.2, 32);
     hq.add(flOffice, flStore, ceil);
 
-    // Pitched Commercial Slate Roof & Illuminated Fascia Signboard
     var hqRoof = new THREE.Mesh(new THREE.ConeGeometry(10.6, 3.2, 4), new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.8 }));
     hqRoof.position.set(0, 5.8, 32); hqRoof.rotation.y = Math.PI/4;
     var signBoard = new THREE.Mesh(new THREE.BoxGeometry(8.8, 1.15, 0.22), new THREE.MeshBasicMaterial({ map: makeHQSignTex() }));
     signBoard.position.set(0, 3.65, 25.82);
     hq.add(hqRoof, signBoard);
 
-    // Back, Left & Right Exterior Brick Walls
     var backW = new THREE.Mesh(new THREE.BoxGeometry(14, 4.2, 0.28), hqBrickMat); backW.position.set(0, 2.1, 38);
     var leftW = new THREE.Mesh(new THREE.BoxGeometry(0.28, 4.2, 12), hqBrickMat); leftW.position.set(-7, 2.1, 32);
     var rightW = new THREE.Mesh(new THREE.BoxGeometry(0.28, 4.2, 12), hqBrickMat); rightW.position.set(7, 2.1, 32);
     hq.add(backW, leftW, rightW);
 
-    // Front Brick Wall with See-Through Glazed Windows (X = -4.2 and X = +4.2) & Center Entrance Door
     [-6.1, -1.8, 1.8, 6.1].forEach(function(px, idx) {
       var pw = (idx === 0 || idx === 3) ? 1.8 : 1.4;
       var pier = new THREE.Mesh(new THREE.BoxGeometry(pw, 4.2, 0.28), hqBrickMat);
       pier.position.set(px, 2.1, 26);
       hq.add(pier);
     });
-    // Header above front door
     var doorHdr = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.5, 0.28), hqBrickMat);
     doorHdr.position.set(0, 3.45, 26);
     hq.add(doorHdr);
 
-    // Left & Right Front HQ Windows (See-through from inside & outside!)
     [-3.85, 3.85].forEach(function(wx) {
       var lowW = new THREE.Mesh(new THREE.BoxGeometry(2.7, 0.9, 0.28), hqBrickMat); lowW.position.set(wx, 0.45, 26);
       var topW = new THREE.Mesh(new THREE.BoxGeometry(2.7, 1.6, 0.28), hqBrickMat); topW.position.set(wx, 3.4, 26);
@@ -977,24 +1061,20 @@ window.closeJobModal = function() {
       hq.add(lowW, topW, glass, sill);
     });
 
-    // Internal Partition Wall at Z = 34.2 separating Front Dispatch Office from Back Store Room
     var partLeft = new THREE.Mesh(new THREE.BoxGeometry(5.6, 4.1, 0.22), plasterMat); partLeft.position.set(-4.2, 2.05, 34.2);
     var partRight = new THREE.Mesh(new THREE.BoxGeometry(5.6, 4.1, 0.22), plasterMat); partRight.position.set(4.2, 2.05, 34.2);
     var partTop = new THREE.Mesh(new THREE.BoxGeometry(2.8, 1.5, 0.22), plasterMat); partTop.position.set(0, 3.4, 34.2);
     hq.add(partLeft, partRight, partTop);
 
-    // Swinging HQ Front Exit Door
     var hqDoorPivot = new THREE.Group(); hqDoorPivot.position.set(-1.1, 0, 26);
     var hqDoorMesh = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2.7, 0.12), new THREE.MeshStandardMaterial({map: makeDoorTex('#ea580c', false)}));
     hqDoorMesh.position.set(1.1, 1.35, 0); hqDoorPivot.add(hqDoorMesh); hq.add(hqDoorPivot);
     doorObjects.push({ pivot: hqDoorPivot, open: true, targetAngle: -Math.PI*0.55, x: 0, z: 26, label: 'HQ Front Door' });
 
-    // Warm Ceiling Lights in Front Office & Back Store Room
     var hqLight1 = new THREE.PointLight(0xfffbeb, 1.25, 16); hqLight1.position.set(0, 3.8, 29.8);
     var hqLight2 = new THREE.PointLight(0xfffbeb, 0.9, 12); hqLight2.position.set(0, 3.8, 36.2);
     hq.add(hqLight1, hqLight2);
 
-    // Back Store Room Racking Shelves (Z = 34.6..37.6)
     for (var s=0; s<3; s++) {
       var shelf = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.08, 3.2), new THREE.MeshStandardMaterial({color:0x475569}));
       shelf.position.set(-6.1, 0.8 + s*0.9, 36.1); hq.add(shelf);
@@ -1004,11 +1084,9 @@ window.closeJobModal = function() {
       }
     }
 
-    // Craig's Workstation Desk, PC Tower, Dual Quote Monitors, Keyboard & Swivel Chair (X = -3.4, Z = 29.8)
     var desk = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.78, 1.3), new THREE.MeshStandardMaterial({color:0x78350f}));
     desk.position.set(-3.4, 0.39, 29.8); hq.add(desk);
 
-    // PC Tower, Dual Glowing Quote Monitors & Keyboard
     var pcTower = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.52, 0.48), new THREE.MeshStandardMaterial({color:0x0f172a}));
     pcTower.position.set(-4.4, 1.04, 29.8);
     var monMat = new THREE.MeshBasicMaterial({ map: makeCraigMonitorTex() });
@@ -1020,7 +1098,6 @@ window.closeJobModal = function() {
     keyboard.position.set(-3.3, 0.80, 30.05);
     hq.add(pcTower, mon1, mon2, keyboard);
 
-    // Swivel Office Chair + Seated Colleague Craig Typing Quotes!
     var chairSeat = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.08, 0.58), new THREE.MeshStandardMaterial({color:0x0f172a}));
     chairSeat.position.set(-3.3, 0.48, 30.65);
     var chairBack = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.68, 0.08), new THREE.MeshStandardMaterial({color:0x0f172a}));
@@ -1033,7 +1110,6 @@ window.closeJobModal = function() {
     craigGroup.position.set(-3.3, 0.08, 30.62);
     hq.add(craigGroup);
 
-    // Ringing Dispatch Phone on Right End of Craig's Desk (X = -2.2, Z = 29.8)
     var phoneBase = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.16, 0.35), new THREE.MeshStandardMaterial({color:0x111827}));
     phoneBase.position.set(-2.2, 0.86, 29.8); hq.add(phoneBase);
     hqPhoneRingLight = new THREE.Mesh(new THREE.SphereGeometry(0.11, 12, 12), new THREE.MeshBasicMaterial({color:0xef4444}));
@@ -1042,7 +1118,6 @@ window.closeJobModal = function() {
     hqPhoneMarker = makeNameplateSprite('📞 ANSWER DISPATCH CALL', '#ef4444', '#fde047');
     hqPhoneMarker.position.set(-2.2, 1.82, 29.8); hq.add(hqPhoneMarker);
 
-    // Boss David (Roams randomly across 2D waypoints in Front Office & Back Store Room!)
     davidGroup = buildHumanoid(0x1e293b, 0xfacc15, '🎙️ BOSS DAVID (DAD JOKES)', '#d97706', false);
     davidGroup.position.set(2.8, 0, 30.5);
     hq.add(davidGroup);
@@ -1181,7 +1256,7 @@ window.closeJobModal = function() {
 
   // ==========================================================================
   // 8 TWO-STOREY HOUSES WITH SEPARATE PARTITIONED ROOMS, INTERIOR DOORS,
-  // PITCH-BLACK UNDER-STAIRS CUPBOARD (TORCH NEEDED!), & CAMERAS ON WALL PIERS
+  // PITCH-BLACK UNDER-STAIRS CUPBOARD & CAMERAS ON BRICK CORNER PIERS
   // ==========================================================================
   var HOUSE_NUMS = [10, 12, 14, 16, 11, 13, 15, 17];
   var STREET_NAMES = ['Kettering Rd', 'Wellingborough Rd', 'Billing Rd', 'Abington Ave', 'Kingsthorpe Grove', 'Towcester Rd', 'Brackmills Way', 'Duston Close'];
@@ -1216,7 +1291,6 @@ window.closeJobModal = function() {
       var bMat = brickMats[i % brickMats.length];
       var w = 10.6, hd = 9.2, h = 6.2;
 
-      // 1. Distinct Room Floors: Left Lounge Carpet, Center Hallway Wood, Right Kitchen Tiles
       var loungeFl = new THREE.Mesh(new THREE.BoxGeometry(3.8, 0.16, hd), new THREE.MeshStandardMaterial({color:0x334155}));
       loungeFl.position.set(-3.3, 0.08, 0);
       var hallFl = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.16, hd), new THREE.MeshStandardMaterial({color:0x78350f}));
@@ -1225,27 +1299,23 @@ window.closeJobModal = function() {
       kitchFl.position.set(3.3, 0.085, 0);
       hGroup.add(loungeFl, hallFl, kitchFl);
 
-      // 2. Second-Storey Floor Slab (Y = 3.1m) & Roof Ceiling (Y = 6.2m)
       var secondFloorSlab = new THREE.Mesh(new THREE.BoxGeometry(w-0.2, 0.22, hd-0.2), new THREE.MeshStandardMaterial({color:0xe2e8f0}));
       secondFloorSlab.position.set(0, 3.1, 0);
       var roofCeil = new THREE.Mesh(new THREE.BoxGeometry(w, 0.2, hd), upvcMat);
       roofCeil.position.set(0, h, 0);
       hGroup.add(secondFloorSlab, roofCeil);
 
-      // 3. Pitched Slate Roof & Chimney
       var roof = new THREE.Mesh(new THREE.ConeGeometry(7.9, 3.0, 4), new THREE.MeshStandardMaterial({color:0x1e293b, roughness:0.8}));
       roof.position.set(0, h + 1.5, 0); roof.rotation.y = Math.PI/4; roof.castShadow = true;
       var chimney = new THREE.Mesh(new THREE.BoxGeometry(0.95, 2.6, 0.95), bMat);
       chimney.position.set(-3.3, h + 1.7, -1.4);
       hGroup.add(roof, chimney);
 
-      // 4. Exterior Back, Left & Right Brick Walls
       var backW = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.26), bMat); backW.position.set(0, h/2, -hd/2); backW.castShadow = true;
       var leftW = new THREE.Mesh(new THREE.BoxGeometry(0.26, h, hd), bMat); leftW.position.set(-w/2, h/2, 0); leftW.castShadow = true;
       var rightW = new THREE.Mesh(new THREE.BoxGeometry(0.26, h, hd), bMat); rightW.position.set(w/2, h/2, 0); rightW.castShadow = true;
       hGroup.add(backW, leftW, rightW);
 
-      // 5. Front Facade: Solid Outer Brick Corner Piers (X = ±4.45m where CCTV Cameras mount!), Windows (X = ±2.65m), Center Door
       var doorTopWall = new THREE.Mesh(new THREE.BoxGeometry(2.2, h - 2.55, 0.26), bMat);
       doorTopWall.position.set(0, 2.55 + (h-2.55)/2, hd/2);
       hGroup.add(doorTopWall);
@@ -1275,8 +1345,6 @@ window.closeJobModal = function() {
         });
       });
 
-      // 6. INTERNAL PARTITION WALLS & DOORWAYS (Dividing Hallway, Lounge, Kitchen & Dark Under-Stairs Cupboard!)
-      // Left Hallway Wall (X = -1.4) & Right Hallway Wall (X = +1.4) with open archways into Lounge & Kitchen
       [-1.4, 1.4].forEach(function(wx) {
         var frontSeg = new THREE.Mesh(new THREE.BoxGeometry(0.18, 3.0, 2.6), wallPlasterMat);
         frontSeg.position.set(wx, 1.5, 3.2);
@@ -1287,16 +1355,13 @@ window.closeJobModal = function() {
         hGroup.add(frontSeg, backSeg, doorHdrSeg);
       });
 
-      // DARK UNDER-STAIRS CUPBOARD / UTILITY ROOM Partition Wall at Z = -1.2 (Between X = -1.4 and +1.4)
       var cupWallL = new THREE.Mesh(new THREE.BoxGeometry(0.6, 3.0, 0.18), darkCupboardMat); cupWallL.position.set(-1.1, 1.5, -1.2);
       var cupWallR = new THREE.Mesh(new THREE.BoxGeometry(0.6, 3.0, 0.18), darkCupboardMat); cupWallR.position.set(1.1, 1.5, -1.2);
       var cupWallTop = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.55, 0.18), darkCupboardMat); cupWallTop.position.set(0, 2.72, -1.2);
-      // Dark interior lining inside the rear cupboard so it looks genuinely pitch-black without your Torch!
       var cupBackLining = new THREE.Mesh(new THREE.BoxGeometry(2.7, 2.95, 0.05), darkCupboardMat); cupBackLining.position.set(0, 1.5, -hd/2 + 0.16);
       var cupCeilLining = new THREE.Mesh(new THREE.BoxGeometry(2.7, 0.05, 3.3), darkCupboardMat); cupCeilLining.position.set(0, 2.95, -2.85);
       hGroup.add(cupWallL, cupWallR, cupWallTop, cupBackLining, cupCeilLining);
 
-      // Swinging Interior Cupboard Door (at Z = -1.2)
       var cupDoorPivot = new THREE.Group();
       cupDoorPivot.position.set(-0.8, 0, -1.2);
       var cupDoorMesh = new THREE.Mesh(new THREE.BoxGeometry(1.6, 2.45, 0.10), new THREE.MeshStandardMaterial({ map: intDoorTex }));
@@ -1313,7 +1378,6 @@ window.closeJobModal = function() {
         label: 'Dark Cupboard Door (#' + HOUSE_NUMS[i] + ')'
       });
 
-      // 7. Front Door on Hinges with Brass Lever Handle
       var porchCanopy = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.16, 1.0), upvcMat);
       porchCanopy.position.set(0, 2.68, hd/2 + 0.45);
       hGroup.add(porchCanopy);
@@ -1340,12 +1404,10 @@ window.closeJobModal = function() {
       };
       doorObjects.push(doorRecord);
 
-      // 8. Furnished Rooms: Lounge (Left), Kitchen (Right), Upstairs Bedroom (Top), & Alarm Panel inside Dark Rear Cupboard!
       var loungeLight = new THREE.PointLight(0xfffbeb, 0.85, 7); loungeLight.position.set(-3.2, 2.7, 1.5);
       var kitchLight = new THREE.PointLight(0xfffbeb, 0.85, 7); kitchLight.position.set(3.2, 2.7, 1.5);
       hGroup.add(loungeLight, kitchLight);
 
-      // Lounge Furniture (Left Room X = -1.6..-5.0)
       var sofaBase = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.55, 0.95), new THREE.MeshStandardMaterial({color:0x1e3a8a}));
       sofaBase.position.set(-3.3, 0.35, -1.2);
       var sofaBack = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.65, 0.25), new THREE.MeshStandardMaterial({color:0x1d4ed8}));
@@ -1356,7 +1418,6 @@ window.closeJobModal = function() {
       tvScreen.position.set(-3.3, 1.08, 2.4);
       hGroup.add(sofaBase, sofaBack, tvStand, tvScreen);
 
-      // Kitchen Furniture (Right Room X = +1.6..+5.0)
       var worktop = new THREE.Mesh(new THREE.BoxGeometry(2.7, 0.9, 0.8), new THREE.MeshStandardMaterial({color:0x334155}));
       worktop.position.set(3.3, 0.5, -2.5);
       var counterTop = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.08, 0.86), new THREE.MeshStandardMaterial({color:0xd6d3d1}));
@@ -1365,12 +1426,10 @@ window.closeJobModal = function() {
       fridge.position.set(4.3, 1.05, -0.5);
       hGroup.add(worktop, counterTop, fridge);
 
-      // Alarm Panel inside the Dark Rear Under-Stairs Cupboard (X = 0, Z = -hd/2 + 0.26)
       var panelBox = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.88, 0.22), new THREE.MeshStandardMaterial({color:0xf8fafc, emissive:0x22c55e, emissiveIntensity:0.25}));
       panelBox.position.set(0, 1.55, -hd/2 + 0.26);
       hGroup.add(panelBox);
 
-      // Upstairs Bedroom (Visible through 2nd-floor windows)
       var bedFrame = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.45, 2.2), new THREE.MeshStandardMaterial({color:0x78350f}));
       bedFrame.position.set(-2.6, 3.45, 1.8);
       var duvet = new THREE.Mesh(new THREE.BoxGeometry(1.95, 0.22, 1.6), new THREE.MeshStandardMaterial({color:0xef4444}));
@@ -1379,7 +1438,6 @@ window.closeJobModal = function() {
       pillow.position.set(-2.6, 3.78, 2.5);
       hGroup.add(bedFrame, duvet, pillow);
 
-      // 9. Bell Box (Center Brick Wall X = 0, Y = 3.85m) & CCTV Cameras ON SOLID BRICK CORNER PIERS (X = ±4.45m, Y = 3.85m — Off the Windows!)
       var bellBox = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.76, 0.24), new THREE.MeshStandardMaterial({color:0xff6b00}));
       bellBox.position.set(0, 3.85, hd/2 + 0.16);
       var strobe = makeGlowSprite('#38bdf8', 1.6);
@@ -1395,7 +1453,6 @@ window.closeJobModal = function() {
         cg.add(jb, dm, ir);
         return cg;
       }
-      // Mounted at X = -4.45 and X = +4.45 squarely on the solid brick corner piers!
       var cam1 = buildTurretCam(); cam1.position.set(-4.45, 3.85, hd/2 + 0.16);
       var cam2 = buildTurretCam(); cam2.position.set(4.45, 3.85, hd/2 + 0.16);
       hGroup.add(cam1, cam2);
@@ -1409,7 +1466,6 @@ window.closeJobModal = function() {
       ladderZoneRing.visible = false;
       hGroup.add(ladderZoneRing);
 
-      // 10. Front Path & Flowerbeds
       var path = new THREE.Mesh(new THREE.BoxGeometry(1.85, 0.06, 6.4), new THREE.MeshStandardMaterial({color:0x94a3b8, roughness:0.8}));
       path.position.set(0, 0.03, hd/2 + 3.2);
       hGroup.add(path);
@@ -1440,7 +1496,6 @@ window.closeJobModal = function() {
         panelZ: hz - facingDir * (hd/2 - 0.55),
         bellX: finalX,
         bellZ: worldDoorZ + facingDir * 0.75,
-        // World coordinates for solid brick corner piers (±4.45m)
         cctv1X: finalX - facingDir * 4.45,
         cctv1Z: worldDoorZ + facingDir * 0.75,
         cctv2X: finalX + facingDir * 4.45,
@@ -1452,7 +1507,7 @@ window.closeJobModal = function() {
   })();
 
   // ==========================================================================
-  // NPCS: ANXIOUS HOMEOWNER, STICKY-FINGERS KEV, STROLLING PEDESTRIANS & DOG
+  // NPCS: ANXIOUS HOMEOWNER, CLASSIC BURGLAR KEV (HIDING AI), & LEASHED DOG WALKER
   // ==========================================================================
   var targetHouseMarker = makeNameplateSprite('🚨 TARGET CALLOUT — HEAD HERE!', '#ef4444', '#fde047');
   targetHouseMarker.scale.set(5.5, 1.35, 1);
@@ -1461,14 +1516,44 @@ window.closeJobModal = function() {
   var homeownerNPC = buildHumanoid(0x2563eb, 0x93c5fd, '🏠 ANXIOUS CUSTOMER (WAVE)', '#1d4ed8', false);
   scene.add(homeownerNPC);
 
-  var kevNPC = buildHumanoid(0x111827, 0xef4444, '🦹 STICKY-FINGERS KEV (BURGLAR)', '#b91c1c', false);
-  var swagBag = new THREE.Mesh(new THREE.SphereGeometry(0.32, 12, 12), new THREE.MeshStandardMaterial({color:0xf8fafc}));
-  swagBag.position.set(0.45, 0.85, 0.25); kevNPC.add(swagBag);
+  // Classic Burglar Sticky-Fingers Kev (Striped Jumper, Domino Mask, Beanie & Swag Bag)
+  var kevNPC = buildClassicBurglarKev();
   scene.add(kevNPC);
 
+  // Kev Stealth Hiding Spots (Behind houses, side alleys, and garden hedges!)
+  var KEV_HIDING_SPOTS = [];
+  houses.forEach(function(h) {
+    // Behind back wall of house
+    KEV_HIDING_SPOTS.push({ x: h.x - 2.5, z: h.z - h.facingDir * 5.6, peekX: h.x - 5.8, peekZ: h.z });
+    // Side alley between houses
+    KEV_HIDING_SPOTS.push({ x: h.x + 6.0, z: h.z - h.facingDir * 1.5, peekX: h.x + 5.8, peekZ: h.frontDoorZ });
+  });
+  var kevStealth = {
+    targetX: KEV_HIDING_SPOTS[0].x,
+    targetZ: KEV_HIDING_SPOTS[0].z,
+    waitTimer: 0,
+    spooked: false
+  };
+
   var neighbour1 = buildHumanoid(0x15803d, 0xfde047, '🚶 LOCAL PEDESTRIAN', '#166534', false);
-  var neighbour2 = buildHumanoid(0x7e22ce, 0xfecdd3, '🐕 DOG WALKER', '#6b21a8', false);
-  scene.add(neighbour1, neighbour2);
+  scene.add(neighbour1);
+
+  // Dog Walker with Small Terrier on a 3D Leash!
+  var neighbour2 = buildHumanoid(0x7e22ce, 0xfecdd3, '🐕 DOG WALKER & TERRIER', '#6b21a8', false);
+  var companionDog = buildLeashedCompanionDog();
+  // Position terrier walking 1.35m ahead of the dog walker along their local +Z forward direction
+  companionDog.position.set(0.22, 0, 1.35);
+  neighbour2.add(companionDog);
+
+  // 3D Taut Lead / Leash connecting Dog Walker's right hand (0.38, 0.95, 0.1) to Terrier's red collar (0.22, 0.34, 1.48)
+  var leashGeo = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(0.38, 0.92, 0.12),
+    new THREE.Vector3(0.30, 0.56, 0.80),
+    new THREE.Vector3(0.22, 0.34, 1.48)
+  ]);
+  var leashLine = new THREE.Line(leashGeo, new THREE.LineBasicMaterial({ color: 0xef4444, linewidth: 2 }));
+  neighbour2.add(leashLine);
+  scene.add(neighbour2);
 
   var lawnDog = buildGuardDog();
   scene.add(lawnDog);
@@ -1495,7 +1580,10 @@ window.closeJobModal = function() {
   function positionNPCsAtTargetHouse() {
     var th = houses[STATE.targetHouseIdx] || houses[0];
     homeownerNPC.position.set(th.x - 1.8, 0, th.frontDoorZ + th.facingDir * 2.5);
-    kevNPC.position.set(th.x + 4.6, 0, th.frontDoorZ + th.facingDir * 5.2);
+    // Start Kev hiding behind the target house or in its side alley
+    kevNPC.position.set(th.x + 6.0, 0, th.z - th.facingDir * 3.5);
+    kevStealth.targetX = th.x - 3.5;
+    kevStealth.targetZ = th.z - th.facingDir * 5.6;
     lawnDog.position.set(th.x + 2.2, 0, th.frontDoorZ + th.facingDir * 2.8);
     targetHouseMarker.position.set(th.x, 8.8, th.z);
 
@@ -1674,7 +1762,8 @@ window.closeJobModal = function() {
   };
 
   // --------------------------------------------------------------------------
-  // 1) TRUE TOUCH-SWIPE / DRAG-ACROSS ALARM WIRING MINIGAME (+ SPIDERS!)
+  // 1) BULLETPROOF MAGNETIC SWIPE / DRAG-ACROSS ALARM WIRING (+ SPIDERS!)
+  // Supports both smooth Pointer/Touch Dragging with Magnetic Snap AND Tap-Left/Tap-Right!
   // --------------------------------------------------------------------------
   var wireAnimId = null;
   window._stopWireLoop = function() {
@@ -1696,7 +1785,7 @@ window.closeJobModal = function() {
 
     var c = document.createElement('canvas');
     c.width = 480; c.height = 290;
-    c.style.cssText = 'width:100%;height:265px;background:#061c14;border:2px solid #22c55e;border-radius:12px;touch-action:none;cursor:crosshair;display:block;';
+    c.style.cssText = 'width:100%;height:265px;background:#061c14;border:2px solid #22c55e;border-radius:12px;touch-action:none;cursor:pointer;display:block;';
     area.appendChild(c);
     var ctx = c.getContext('2d');
 
@@ -1706,18 +1795,18 @@ window.closeJobModal = function() {
       { id: 'Z1',  label: '4k7 GREEN',  termLabel: 'ZONE 1',   color: '#22c55e', yL: 176, done: false },
       { id: 'TMP', label: '2k2 YELLOW', termLabel: 'TAMPER',   color: '#facc15', yL: 240, done: false }
     ];
-    // Shuffle right-hand PCB terminal positions
     var rightYSlots = [48, 112, 176, 240].sort(function() { return Math.random() - 0.5; });
     WIRES.forEach(function(w, idx) { w.yR = rightYSlots[idx]; });
 
-    // 2 Scuttling Spiders crawling around the PCB
     var spiders = [
-      { x: 240, y: 90, vx: 1.4, vy: 1.1, alive: true },
-      { x: 250, y: 195, vx: -1.3, vy: -1.2, alive: true }
+      { x: 240, y: 90, vx: 1.3, vy: 1.0, alive: true },
+      { x: 250, y: 195, vx: -1.2, vy: -1.1, alive: true }
     ];
 
-    var draggingWire = null;
-    var pointerX = 0, pointerY = 0;
+    var activeWire = null;     // Currently selected or dragged left wire
+    var isDragging = false;
+    var pointerX = 240, pointerY = 145;
+    var magneticTarget = null; // Right terminal currently within magnetic snap range
     var connectedCount = 0;
 
     function updateStatusText() {
@@ -1726,33 +1815,87 @@ window.closeJobModal = function() {
       var fh = document.getElementById('flukeHint');
       if (aliveCount > 0) {
         st.textContent = '🕷️ ' + aliveCount + ' SPIDER(S) ON PCB! TAP SPIDERS TO SWAT!';
-        fh.textContent = 'Tap the scuttling spiders on the board, then swipe wires from Left to Right!';
+        fh.textContent = 'Swat the spiders first, then swipe wires from Left to Right!';
       } else {
-        st.textContent = 'SWIPE WIRES LEFT ➔ RIGHT (' + connectedCount + '/4 CONNECTED)';
-        fh.textContent = 'Touch/click a left wire node and drag your finger across to the matching right terminal!';
+        st.textContent = 'WIRES LINKED: ' + connectedCount + ' / 4';
+        fh.textContent = activeWire
+          ? ('Swiping ' + activeWire.label + ' — Release on matching ' + activeWire.termLabel + ' terminal!')
+          : 'Swipe a Left Wire across to its matching Right Terminal (or tap Left then Right)!';
       }
     }
     updateStatusText();
 
-    function getCanvasCoords(ev) {
+    function extractCoords(ev) {
       var rect = c.getBoundingClientRect();
-      var clientX = ev.touches ? ev.touches[0].clientX : (ev.changedTouches ? ev.changedTouches[0].clientX : ev.clientX);
-      var clientY = ev.touches ? ev.touches[0].clientY : (ev.changedTouches ? ev.changedTouches[0].clientY : ev.clientY);
+      var cx = pointerX, cy = pointerY;
+      if (typeof ev.clientX === 'number') {
+        cx = ev.clientX; cy = ev.clientY;
+      } else if (ev.touches && ev.touches.length > 0) {
+        cx = ev.touches[0].clientX; cy = ev.touches[0].clientY;
+      } else if (ev.changedTouches && ev.changedTouches.length > 0) {
+        cx = ev.changedTouches[0].clientX; cy = ev.changedTouches[0].clientY;
+      }
       return {
-        x: (clientX - rect.left) * (c.width / rect.width),
-        y: (clientY - rect.top) * (c.height / rect.height)
+        x: (cx - rect.left) * (c.width / Math.max(1, rect.width)),
+        y: (cy - rect.top) * (c.height / Math.max(1, rect.height))
       };
     }
 
-    function onDown(ev) {
-      ev.preventDefault();
-      var pt = getCanvasCoords(ev);
+    // Find closest right-hand terminal if pointer is on right half of board
+    function findMagneticTerminal(px, py) {
+      if (px < 245) return null; // Only magnetize once dragged past center of board
+      var best = null, bestDist = 75; // Generous 75px magnetic capture radius!
+      for (var i=0; i<WIRES.length; i++) {
+        var w = WIRES[i];
+        var d = Math.hypot(px - 385, py - w.yR);
+        // Also check vertical proximity if finger is anywhere over the right terminal column (x > 280)
+        var vertD = (px > 275) ? Math.abs(py - w.yR) : d;
+        var score = Math.min(d, vertD);
+        if (score < bestDist) {
+          bestDist = score;
+          best = w;
+        }
+      }
+      return best;
+    }
+
+    function attemptLinkToTerminal(targetTerm) {
+      if (!activeWire || !targetTerm) return false;
+      if (targetTerm.id === activeWire.id) {
+        if (!activeWire.done) {
+          activeWire.done = true;
+          connectedCount++;
+          window.playTone(660 + connectedCount * 95, 0.14, 'sine');
+          activeWire = null;
+          isDragging = false;
+          magneticTarget = null;
+          updateStatusText();
+          if (connectedCount >= 4) {
+            window._stopWireLoop();
+            setTimeout(completeJobSuccess, 280);
+          }
+        }
+        return true;
+      } else {
+        STATE.timer = Math.max(4, STATE.timer - 5);
+        window.playTone(150, 0.25, 'sawtooth');
+        document.getElementById('lcdStatus').textContent = '⚡ SPARK FAULT! WRONG TERMINAL (-5s PENALTY)!';
+        activeWire = null;
+        isDragging = false;
+        magneticTarget = null;
+        return false;
+      }
+    }
+
+    function handleStart(ev) {
+      if (ev.cancelable) ev.preventDefault();
+      var pt = extractCoords(ev);
       pointerX = pt.x; pointerY = pt.y;
 
-      // 1. Check if tapping a Spider to swat it
+      // 1. Check Spider Swat
       for (var i=0; i<spiders.length; i++) {
         var sp = spiders[i];
-        if (sp.alive && Math.hypot(pt.x - sp.x, pt.y - sp.y) < 38) {
+        if (sp.alive && Math.hypot(pt.x - sp.x, pt.y - sp.y) < 44) {
           sp.alive = false;
           window.playTone(520, 0.09, 'triangle');
           updateStatusText();
@@ -1760,127 +1903,154 @@ window.closeJobModal = function() {
         }
       }
 
-      // If spiders still alive, warn player
       if (spiders.some(function(s){return s.alive;})) {
         window.playTone(160, 0.2, 'sawtooth');
         document.getElementById('lcdStatus').textContent = '🕷️ SWAT THE SPIDERS FIRST BEFORE WIRING!';
         return;
       }
 
-      // 2. Check if starting a swipe on a Left Wire Node (x: 20..155)
+      // 2. If user already tapped a left wire and now taps a right terminal directly, link it!
+      if (activeWire && pt.x > 265) {
+        var tappedRight = findMagneticTerminal(pt.x, pt.y);
+        if (tappedRight) {
+          attemptLinkToTerminal(tappedRight);
+          return;
+        }
+      }
+
+      // 3. Check if starting swipe/tap on a Left Wire Pad (generous x < 195 hit-box)
       for (var j=0; j<WIRES.length; j++) {
         var w = WIRES[j];
-        if (!w.done && pt.x < 165 && Math.abs(pt.y - w.yL) < 28) {
-          draggingWire = w;
+        if (!w.done && pt.x < 195 && Math.abs(pt.y - w.yL) < 32) {
+          activeWire = w;
+          isDragging = true;
+          magneticTarget = null;
           window.playTone(440, 0.06, 'sine');
-          break;
+          updateStatusText();
+          return;
         }
       }
     }
 
-    function onMove(ev) {
-      if (!draggingWire) return;
-      ev.preventDefault();
-      var pt = getCanvasCoords(ev);
+    function handleMove(ev) {
+      if (!isDragging || !activeWire) return;
+      if (ev.cancelable) ev.preventDefault();
+      var pt = extractCoords(ev);
       pointerX = pt.x; pointerY = pt.y;
+      magneticTarget = findMagneticTerminal(pointerX, pointerY);
     }
 
-    function onUp(ev) {
-      if (!draggingWire) return;
-      ev.preventDefault();
-      var pt = getCanvasCoords(ev);
-      // Check if released over the matching Right PCB Terminal (x > 315)
-      if (pt.x > 310 && Math.abs(pt.y - draggingWire.yR) < 34) {
-        draggingWire.done = true;
-        connectedCount++;
-        window.playTone(660 + connectedCount * 95, 0.14, 'sine');
-        draggingWire = null;
-        updateStatusText();
-        if (connectedCount >= 4) {
-          window._stopWireLoop();
-          setTimeout(completeJobSuccess, 280);
-        }
-      } else if (pt.x > 310) {
-        // Released on wrong right terminal!
-        STATE.timer = Math.max(4, STATE.timer - 5);
-        window.playTone(150, 0.25, 'sawtooth');
-        document.getElementById('lcdStatus').textContent = '⚡ SPARK FAULT! WRONG TERMINAL (-5s PENALTY)!';
-        draggingWire = null;
+    function handleEnd(ev) {
+      if (!isDragging || !activeWire) return;
+      if (ev.cancelable) ev.preventDefault();
+      var pt = extractCoords(ev);
+      pointerX = pt.x; pointerY = pt.y;
+      var dropTarget = magneticTarget || findMagneticTerminal(pointerX, pointerY);
+      if (dropTarget) {
+        attemptLinkToTerminal(dropTarget);
       } else {
-        draggingWire = null;
+        // Keep activeWire selected so user can also tap the right terminal if they didn't drag far enough!
+        isDragging = false;
+        updateStatusText();
       }
     }
 
-    c.addEventListener('mousedown', onDown);
-    c.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
-    c.addEventListener('touchstart', onDown, {passive: false});
-    c.addEventListener('touchmove', onMove, {passive: false});
-    c.addEventListener('touchend', onUp, {passive: false});
+    // Bind PointerEvents (modern mobile + desktop) with Touch/Mouse fallback
+    if (window.PointerEvent) {
+      c.addEventListener('pointerdown', handleStart);
+      c.addEventListener('pointermove', handleMove);
+      c.addEventListener('pointerup', handleEnd);
+      c.addEventListener('pointercancel', handleEnd);
+    } else {
+      c.addEventListener('touchstart', handleStart, {passive: false});
+      c.addEventListener('touchmove', handleMove, {passive: false});
+      c.addEventListener('touchend', handleEnd, {passive: false});
+      c.addEventListener('mousedown', handleStart);
+      c.addEventListener('mousemove', handleMove);
+      window.addEventListener('mouseup', handleEnd);
+    }
 
     function renderPCB() {
       wireAnimId = requestAnimationFrame(renderPCB);
       ctx.fillStyle = '#062016';
       ctx.fillRect(0, 0, c.width, c.height);
 
-      // PCB Copper Traces Grid
       ctx.strokeStyle = 'rgba(34,197,94,0.12)';
       ctx.lineWidth = 1;
       for (var gx=0; gx<c.width; gx+=24) { ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,c.height); ctx.stroke(); }
       for (var gy=0; gy<c.height; gy+=24) { ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(c.width,gy); ctx.stroke(); }
 
-      // Draw Left Cable Cores & Right Terminals
       WIRES.forEach(function(w) {
-        // Left Cable Jacket & Copper Core Pad
-        ctx.fillStyle = w.color;
-        ctx.fillRect(14, w.yL - 18, 125, 36);
-        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
-        ctx.strokeRect(14, w.yL - 18, 125, 36);
+        var isSelectedLeft = (activeWire && activeWire.id === w.id);
+        // Left Cable Core Pad
+        ctx.fillStyle = w.done ? '#14532d' : w.color;
+        ctx.fillRect(14, w.yL - 20, 136, 40);
+        ctx.strokeStyle = isSelectedLeft ? '#fde047' : '#ffffff';
+        ctx.lineWidth = isSelectedLeft ? 4 : 2;
+        ctx.strokeRect(14, w.yL - 20, 136, 40);
         ctx.fillStyle = '#ffffff'; ctx.font = 'bold 13px monospace';
-        ctx.fillText(w.label, 24, w.yL + 5);
+        ctx.fillText((w.done ? '✅ ' : '⚡ ') + w.label, 22, w.yL + 5);
 
-        // Right PCB Screw Terminal Block
-        var highlight = (STATE.upgrades.fluke && draggingWire && draggingWire.id === w.id);
-        ctx.fillStyle = w.done ? '#14532d' : '#1e293b';
-        ctx.fillRect(340, w.yR - 18, 126, 36);
-        ctx.strokeStyle = highlight ? '#fde047' : w.color;
-        ctx.lineWidth = highlight ? 4 : 2.5;
-        ctx.strokeRect(340, w.yR - 18, 126, 36);
+        // Right PCB Terminal Block
+        var isMag = (magneticTarget && magneticTarget.id === w.id);
+        var isFlukeHint = (STATE.upgrades.fluke && activeWire && activeWire.id === w.id);
+        ctx.fillStyle = w.done ? '#14532d' : (isMag ? '#0f392b' : '#1e293b');
+        ctx.fillRect(326, w.yR - 20, 140, 40);
+        ctx.strokeStyle = (isMag || isFlukeHint) ? '#fde047' : w.color;
+        ctx.lineWidth = (isMag || isFlukeHint) ? 4.5 : 2.5;
+        ctx.strokeRect(326, w.yR - 20, 140, 40);
         ctx.fillStyle = '#ffffff'; ctx.font = 'bold 13px monospace';
-        ctx.fillText((w.done ? '✅ ' : '🔩 ') + w.termLabel, 348, w.yR + 5);
+        ctx.fillText((w.done ? '✅ ' : '🔩 ') + w.termLabel, 336, w.yR + 5);
+
+        // Glowing Magnetic Snap Ring around Right Terminal Connector
+        if (isMag && !w.done) {
+          ctx.strokeStyle = '#fde047';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(326, w.yR, 16, 0, Math.PI * 2);
+          ctx.stroke();
+        }
 
         // Completed Bezier Copper Wire
         if (w.done) {
           ctx.strokeStyle = w.color;
           ctx.lineWidth = 7;
           ctx.beginPath();
-          ctx.moveTo(139, w.yL);
-          ctx.bezierCurveTo(235, w.yL, 245, w.yR, 340, w.yR);
+          ctx.moveTo(150, w.yL);
+          ctx.bezierCurveTo(238, w.yL, 242, w.yR, 326, w.yR);
           ctx.stroke();
+          // Solder joint dots
+          ctx.fillStyle = '#fde047';
+          ctx.beginPath(); ctx.arc(150, w.yL, 6, 0, Math.PI*2); ctx.fill();
+          ctx.beginPath(); ctx.arc(326, w.yR, 6, 0, Math.PI*2); ctx.fill();
         }
       });
 
-      // Active Dragging Wire Preview
-      if (draggingWire) {
-        ctx.strokeStyle = draggingWire.color;
+      // Live Dragging Wire Preview (Snaps visually to magnetic target!)
+      if (activeWire) {
+        var endX = magneticTarget ? 326 : pointerX;
+        var endY = magneticTarget ? magneticTarget.yR : pointerY;
+        ctx.strokeStyle = activeWire.color;
         ctx.lineWidth = 7;
         ctx.beginPath();
-        ctx.moveTo(139, draggingWire.yL);
-        ctx.bezierCurveTo(220, draggingWire.yL, (139 + pointerX)/2, pointerY, pointerX, pointerY);
+        ctx.moveTo(150, activeWire.yL);
+        ctx.bezierCurveTo(220, activeWire.yL, (150 + endX)/2, endY, endX, endY);
         ctx.stroke();
-        ctx.fillStyle = '#fde047';
-        ctx.beginPath(); ctx.arc(pointerX, pointerY, 9, 0, Math.PI*2); ctx.fill();
+
+        ctx.fillStyle = magneticTarget ? '#22c55e' : '#fde047';
+        ctx.beginPath(); ctx.arc(endX, endY, 10, 0, Math.PI*2); ctx.fill();
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.stroke();
       }
 
       // Draw & Move Scuttling Spiders
       spiders.forEach(function(sp) {
         if (!sp.alive) return;
         sp.x += sp.vx; sp.y += sp.vy;
-        if (sp.x < 175 || sp.x > 305) sp.vx *= -1;
+        if (sp.x < 175 || sp.x > 300) sp.vx *= -1;
         if (sp.y < 35 || sp.y > 255) sp.vy *= -1;
 
         ctx.fillStyle = '#dc2626';
-        ctx.beginPath(); ctx.arc(sp.x, sp.y, 16, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(sp.x, sp.y, 17, 0, Math.PI*2); ctx.fill();
         ctx.strokeStyle = '#fde047'; ctx.lineWidth = 2; ctx.stroke();
         ctx.font = '20px sans-serif';
         ctx.fillText('🕷️', sp.x - 12, sp.y + 7);
@@ -2193,7 +2363,6 @@ window.closeJobModal = function() {
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
-  // Boss David 2D Waypoint Roaming State inside HQ (Front Office & Back Store Room)
   var DAVID_WAYPOINTS = [
     { x: 3.5, z: 28.5 },
     { x: 0.0, z: 31.5 },
@@ -2258,12 +2427,12 @@ window.closeJobModal = function() {
         player.x += (-sin * moveF + cos * moveS) * speed * dt;
         player.z += (-cos * moveF - sin * moveS) * speed * dt;
         player.x = Math.max(-52, Math.min(52, player.x));
-        player.z = Math.max(-25, Math.min(37.2, player.z));
+        player.z = Math.max(-27, Math.min(37.2, player.z));
         handGroup.position.y = Math.sin(t * 10) * 0.025;
       }
     }
 
-    // 2. Check if Player is inside any House's Dark Rear Under-Stairs Cupboard!
+    // 2. Check if Player is inside any House's Dark Rear Under-Stairs Cupboard
     var insideCupboard = false;
     for (var hi=0; hi<houses.length; hi++) {
       var hc = houses[hi];
@@ -2275,7 +2444,6 @@ window.closeJobModal = function() {
     STATE.inDarkCupboard = insideCupboard;
     var darkBanner = document.getElementById('darkRoomBanner');
     if (insideCupboard) {
-      // Plunge ambient lighting into darkness inside the windowless cupboard so the Torch is genuinely needed!
       hemiLight.intensity = STATE.torchOn ? 0.35 : 0.02;
       sunLight.intensity = STATE.torchOn ? 0.25 : 0.01;
       darkBanner.style.display = STATE.torchOn ? 'none' : 'block';
@@ -2306,7 +2474,7 @@ window.closeJobModal = function() {
       if (d.pivot) d.pivot.rotation.y += (d.targetAngle - d.pivot.rotation.y) * 8 * dt;
     });
 
-    // 4. Colleague Craig Typing Animation at PC & Boss David 2D Waypoint Roaming inside HQ
+    // 4. Colleague Craig Typing Animation & Boss David 2D Waypoint Roaming inside HQ
     if (craigGroup && craigGroup.userData.leftArm) {
       craigGroup.userData.leftArm.rotation.x = -Math.PI/3 + Math.sin(t * 16) * 0.12;
       craigGroup.userData.rightArm.rotation.x = -Math.PI/3 - Math.sin(t * 16) * 0.12;
@@ -2336,18 +2504,44 @@ window.closeJobModal = function() {
       }
     }
 
-    // 5. Slowed-Down Strolling Pedestrians & Dog Walker + Homeowner & Kev
+    // 5. Homeowner, Pedestrians, Leashed Terrier & Stealth Burglar Sticky-Fingers Kev
     var th = houses[STATE.targetHouseIdx] || houses[0];
     homeownerNPC.position.x = th.x - 1.8 + Math.sin(t * 1.6) * 1.1;
     homeownerNPC.lookAt(player.x, 0, player.z);
     animateLimbs(homeownerNPC, t * 3.8, true);
 
-    var creepRatio = STATE.phase === 'ACTIVE_JOB' ? (1 - STATE.timer / STATE.maxTimer) : 0.2;
-    kevNPC.position.x = th.x + 4.4 - creepRatio * 3.2 + Math.cos(t * 1.5) * 0.9;
-    kevNPC.lookAt(th.x, 0, th.frontDoorZ);
-    animateLimbs(kevNPC, t * 3.6, false);
+    // Classic Burglar Kev Stealth AI: Creeps between back walls & side alleys of houses!
+    var kdx = kevStealth.targetX - kevNPC.position.x;
+    var kdz = kevStealth.targetZ - kevNPC.position.z;
+    var kDist = Math.hypot(kdx, kdz);
+    if (kevStealth.waitTimer > 0) {
+      kevStealth.waitTimer -= dt;
+      // Peek side-to-side around the corner of the house while hiding!
+      kevNPC.rotation.y += Math.sin(t * 3.5) * 0.02;
+      animateLimbs(kevNPC, 0, false);
+    } else if (kDist < 0.4) {
+      kevStealth.waitTimer = 2.0 + Math.random() * 2.5;
+      // Pick a new hiding spot behind a house or near the active job house
+      var pickTargetHouse = (Math.random() < 0.55);
+      var spotHouse = pickTargetHouse ? th : houses[Math.floor(Math.random() * houses.length)];
+      if (Math.random() < 0.5) {
+        // Hide behind back wall of house
+        kevStealth.targetX = spotHouse.x + (Math.random() - 0.5) * 7.0;
+        kevStealth.targetZ = spotHouse.z - spotHouse.facingDir * 5.6;
+      } else {
+        // Creep into side alley beside house
+        kevStealth.targetX = spotHouse.x + (Math.random() < 0.5 ? -6.0 : 6.0);
+        kevStealth.targetZ = spotHouse.z + (Math.random() - 0.5) * 4.0;
+      }
+    } else {
+      var kSpeed = 2.15;
+      kevNPC.position.x += (kdx / kDist) * kSpeed * dt;
+      kevNPC.position.z += (kdz / kDist) * kSpeed * dt;
+      kevNPC.rotation.y = Math.atan2(kdx, kdz);
+      animateLimbs(kevNPC, t * 5.2, false);
+    }
 
-    // Slow, relaxed pedestrian & dog-walker speed (0.045 rad/s -> ~1.7m/s stroll!)
+    // Slow, relaxed pedestrian & dog-walker speed + animated Terrier on leash!
     neighbour1.position.set(Math.sin(t * 0.045) * 38, 0, -6.8);
     neighbour1.rotation.y = Math.cos(t * 0.045) > 0 ? Math.PI/2 : -Math.PI/2;
     animateLimbs(neighbour1, t * 2.8, false);
@@ -2355,6 +2549,16 @@ window.closeJobModal = function() {
     neighbour2.position.set(-Math.sin(t * 0.04) * 36, 0, 6.8);
     neighbour2.rotation.y = -Math.cos(t * 0.04) > 0 ? Math.PI/2 : -Math.PI/2;
     animateLimbs(neighbour2, t * 2.6, false);
+    // Keep right hand raised slightly holding the dog lead
+    neighbour2.userData.rightArm.rotation.x = -0.55;
+    // Animate the leashed Terrier's legs & wagging tail
+    if (companionDog && companionDog.userData) {
+      companionDog.userData.tail.rotation.z = Math.sin(t * 16) * 0.45;
+      companionDog.position.y = Math.abs(Math.sin(t * 7)) * 0.04;
+      companionDog.userData.legs.forEach(function(leg, lIdx) {
+        leg.rotation.x = Math.sin(t * 8 + lIdx * Math.PI * 0.5) * 0.45;
+      });
+    }
 
     // Lawn Guard Dog Distraction
     lawnDog.userData.tail.rotation.z = Math.sin(t * 18) * 0.4;
